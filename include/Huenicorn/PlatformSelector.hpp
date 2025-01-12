@@ -7,6 +7,13 @@ namespace Huenicorn
   using PlatformAdapter = GnuLinuxAdapter;
   extern PlatformAdapter platformAdapter;
 }
+#elif __APPLE__
+#include <Huenicorn/Platforms/MacOS/MacOSAdapter.hpp>
+namespace Huenicorn
+{
+  using PlatformAdapter = MacOSAdapter;
+  extern PlatformAdapter platformAdapter;
+}
 #else
 #error "Unsupported platform"
 #endif

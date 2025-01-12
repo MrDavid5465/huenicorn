@@ -83,6 +83,10 @@ if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
 endif()
 
+if(APPLE)
+  include(cmake/platforms/MacOS.cmake)
+endif()
+
 target_compile_definitions(${BINARY_NAME} PUBLIC PROJECT_VERSION=${DISPLAYED_VERSION})
 
 set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)

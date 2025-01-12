@@ -4,9 +4,7 @@
 
 namespace Huenicorn
 {
-  class Config;
-
-  class GnuLinuxAdapter : public IPlatformAdapter
+  class MacOSAdapter : public IPlatformAdapter
   {
   public:
     virtual std::filesystem::path getConfigFilePath() const override;

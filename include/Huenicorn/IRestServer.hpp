@@ -7,7 +7,9 @@
 #include <unordered_set>
 
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <crow.h>
 #pragma GCC diagnostic pop
 
