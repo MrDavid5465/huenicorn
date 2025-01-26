@@ -50,7 +50,7 @@ Application app;
 
 void signalHandler(int signal)
 {
-  if(signal == SIGTERM || signal == SIGINT || signal == SIGTSTP){
+  if(signal == SIGTERM || signal == SIGINT){
     Huenicorn::Logger::log("Closing application");
     app.stop();
   }
@@ -63,7 +63,6 @@ int main()
 
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);
-  signal(SIGTSTP, signalHandler);
 
   app.start();
   Huenicorn::Logger::log("Huenicorn terminated properly");

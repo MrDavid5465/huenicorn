@@ -82,10 +82,13 @@ if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
 endif()
 
-if(APPLE)
+if(APPLE) # For MacOS
   include(cmake/platforms/MacOS.cmake)
 endif()
 
+if(WIN32) #For Windows
+  include(cmake/platforms/Windows.cmake)
+endif()
 
 set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)
 

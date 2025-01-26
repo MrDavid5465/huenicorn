@@ -14,6 +14,13 @@ namespace Huenicorn
   using PlatformAdapter = MacOSAdapter;
   extern PlatformAdapter platformAdapter;
 }
+#elif WIN32
+#include <Huenicorn/Platforms/Windows/WindowsAdapter.hpp>
+namespace Huenicorn
+{
+  using PlatformAdapter = WindowsAdapter;
+  extern PlatformAdapter platformAdapter;
+}
 #else
 #error "Unsupported platform"
 #endif

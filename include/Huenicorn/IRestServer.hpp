@@ -207,12 +207,12 @@ namespace Huenicorn
         return;
       }
 
-      if(!std::filesystem::exists(webFileFullPath) || m_webfileBlackList.contains(webFileName)){
+      if(!std::filesystem::exists(webFileFullPath) || m_webfileBlackList.contains(webFileName.string())){
         webFileName = "404.html";
         webFileFullPath = m_webroot / webFileName;
       }
 
-      std::string extension = webFileName.extension();
+      std::string extension = webFileName.extension().string();
       std::string contentType = "text/plain";
 
       if(m_contentTypes.find(extension) != m_contentTypes.end()){
