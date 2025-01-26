@@ -14,7 +14,7 @@ set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc)
 find_package(CURL REQUIRED)
-find_package(Crow REQUIRED)
+#find_package(Crow REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_library(MBEDTLS_LIBS mbedtls REQUIRED)
 find_library(MBEDTLS_X509 mbedx509 REQUIRED)
@@ -86,7 +86,6 @@ if(APPLE)
   include(cmake/platforms/MacOS.cmake)
 endif()
 
-target_compile_definitions(${BINARY_NAME} PUBLIC PROJECT_VERSION=${DISPLAYED_VERSION})
 
 set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)
 
