@@ -9,6 +9,7 @@ namespace Huenicorn
   class GnuLinuxAdapter : public IPlatformAdapter
   {
   public:
+    GnuLinuxAdapter():IPlatformAdapter{"Gnu/Linux"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;

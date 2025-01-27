@@ -18,7 +18,9 @@ namespace Huenicorn
      * @brief Constructor
      * 
      */
-    IPlatformAdapter(){}
+    IPlatformAdapter(const std::string& platformName):
+    m_platformName(platformName)
+    {}
 
 
     /**
@@ -26,6 +28,16 @@ namespace Huenicorn
      * 
      */
     virtual ~IPlatformAdapter(){}
+
+
+    /**
+     * @brief Getter for the platform name
+     * 
+     */
+    const std::string& getPlatformName() const
+    {
+      return m_platformName;
+    }
 
 
     /**
@@ -79,6 +91,7 @@ namespace Huenicorn
     virtual SharedGrabber _createGrabber(Config* config) const = 0;
 
     // Attributes
+    const std::string m_platformName;
     WeakGrabber m_grabber;
   };
 }

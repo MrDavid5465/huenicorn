@@ -59,7 +59,7 @@ void signalHandler(int signal)
 
 int main()
 {
-  Huenicorn::Logger::log("Starting Huenicorn version ", PROJECT_VERSION);
+  Huenicorn::Logger::log("Starting Huenicorn version ", PROJECT_VERSION, " for ", Huenicorn::platformAdapter.getPlatformName());
 
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);

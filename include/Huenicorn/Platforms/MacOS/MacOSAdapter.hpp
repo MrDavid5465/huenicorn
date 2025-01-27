@@ -7,6 +7,7 @@ namespace Huenicorn
   class MacOSAdapter : public IPlatformAdapter
   {
   public:
+    MacOSAdapter():IPlatformAdapter{"macOS"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;
