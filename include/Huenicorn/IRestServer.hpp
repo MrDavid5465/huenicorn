@@ -4,6 +4,8 @@
 #include <fstream>
 #include <future>
 #include <unordered_set>
+#include <optional>
+#include <utility>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
