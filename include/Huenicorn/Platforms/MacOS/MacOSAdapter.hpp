@@ -4,12 +4,10 @@
 
 namespace Huenicorn
 {
-  class Config;
-
-  class GnuLinuxAdapter : public IPlatformAdapter
+  class MacOSAdapter : public IPlatformAdapter
   {
   public:
-    GnuLinuxAdapter():IPlatformAdapter{"Gnu/Linux"}{}
+    MacOSAdapter():IPlatformAdapter{"macOS"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;

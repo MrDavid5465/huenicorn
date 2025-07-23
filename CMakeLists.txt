@@ -14,7 +14,7 @@ set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc)
 find_package(CURL REQUIRED)
-find_package(Crow REQUIRED)
+#find_package(Crow REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_library(MBEDTLS_LIBS mbedtls REQUIRED)
 find_library(MBEDTLS_X509 mbedx509 REQUIRED)
@@ -117,6 +117,7 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IPlatformAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
@@ -135,6 +136,14 @@ add_dependencies(${PROJECT_NAME} generate_version_header generate_webroot_header
 
 if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
+endif()
+
+if(APPLE) # For MacOS
+  include(cmake/platforms/MacOS.cmake)
+endif()
+
+if(WIN32) #For Windows
+  include(cmake/platforms/Windows.cmake)
 endif()
 
 set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)

@@ -17,9 +17,14 @@ namespace Huenicorn
 {
   std::filesystem::path GnuLinuxAdapter::getConfigFilePath() const
   {
-    const char* homeDir;
-    if((homeDir = getenv("HOME")) == NULL){
+    const char* homeDir = getenv("HOME");
+
+    if(!homeDir){
       homeDir = getpwuid(getuid())->pw_dir;
+    }
+
+    if(!homeDir){
+      throw std::runtime_error("Failed to get the current user name");
     }
 
     return std::filesystem::path(homeDir) / ".config/huenicorn";
@@ -29,7 +34,6 @@ namespace Huenicorn
   std::string GnuLinuxAdapter::getUsername() const{
     return std::string(getlogin());
   }
-
 
 
   void GnuLinuxAdapter::openWebBrowser(const std::string& url) const
