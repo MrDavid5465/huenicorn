@@ -2,8 +2,7 @@
 
 #include <vector>
 
-#include <opencv2/opencv.hpp>
-
+#include <Huenicorn/ImageData.hpp>
 #include <Huenicorn/Interpolation.hpp>
 #include <Huenicorn/Color.hpp>
 
@@ -25,7 +24,10 @@ namespace Huenicorn
      * @param targetWidth Target width of the output bitmap
      * @param interpolationType Subsampling interpolation type
      */
-    void rescale(cv::Mat& image, int targetWidth, Interpolation::Type interpolationType);
+    void rescale(const ImageData& inputImageData, ImageData& outputImageData, int outputWidth, Interpolation::Type interpolationType);
+
+
+    void rgbaToRgb(const ImageData& inputImageData, ImageData& outputImageData);
 
 
     /**
@@ -34,9 +36,8 @@ namespace Huenicorn
      * @param sourceImage Input image
      * @param a Top-left coordinates
      * @param b Bottom-right coordinates
-     * @return cv::Mat Crop of the image
      */
-    cv::Mat getSubImage(const cv::Mat& sourceImage, const glm::ivec2& a, const glm::ivec2& b);
+    void getSubImage(const ImageData& sourceImageData, ImageData& destImage, const glm::ivec2& a, const glm::ivec2& b);
 
 
     /**
@@ -45,13 +46,12 @@ namespace Huenicorn
      * @param image Input image
      * @return Color Dominant color
      */
-    Color getDominantColor(cv::Mat& image);
+    Color getDominantColor(ImageData& imageData);
 
 
     namespace Algorithms
     {
-      Color kMeans(const cv::Mat& image);
-      Color mean(const cv::Mat& image);
+      Color mean(const ImageData& imageData);
     }
   };
 }

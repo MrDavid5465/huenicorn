@@ -29,7 +29,7 @@ namespace Huenicorn
     */
     struct SafeDoubleBuffer
     {
-      std::array<cv::Mat, 2> frame;
+      std::array<ImageData, 2> frame;
       std::mutex mutex;
     };
 
@@ -65,6 +65,8 @@ namespace Huenicorn
     virtual ~PipewireGrabber();
 
 
+    virtual const std::string& name() const override;
+
     /**
      * @brief Returns the resolution of the selected display
      * 
@@ -87,7 +89,7 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of the last captured frame
      */
-    virtual void grabFrameSubsample(cv::Mat& cvImage) override;
+    virtual void grabFrameSubsample(ImageData& imageData) override;
 
 
   private:

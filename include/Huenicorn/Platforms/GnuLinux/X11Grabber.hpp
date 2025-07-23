@@ -12,19 +12,6 @@
 namespace Huenicorn
 {
   /**
-   * @brief Image data structure
-   * 
-   */
-  struct ImageData
-  {
-    std::vector<uint8_t> pixels;
-    int width;
-    int height;
-    int bitsPerPixel;
-  };
-
-
-  /**
    * @brief X11 implementation of screen grabber
    * 
    */
@@ -48,6 +35,8 @@ namespace Huenicorn
 
 
     // Getters
+    virtual const std::string& name() const override;
+
     /**
      * @brief Returns the resolution of the selected display
      * 
@@ -70,12 +59,11 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(cv::Mat& imageData) override;
+    virtual void grabFrameSubsample(ImageData& imageData) override;
 
 
   private:
     // Attributes
-    std::optional<ImageData> m_imageData;
     std::unique_ptr<XShmSegmentInfo> m_shmInfo;
 
     XImage* m_ximage{nullptr};

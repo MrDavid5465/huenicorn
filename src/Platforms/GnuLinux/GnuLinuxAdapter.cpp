@@ -47,7 +47,6 @@ namespace Huenicorn
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
     if(sessionType == "wayland"){
       auto grabber = std::make_shared<PipewireGrabber>(config);
-      Logger::log("Started Pipewire grabber.");
       return grabber;
     }
 #endif
@@ -55,7 +54,6 @@ namespace Huenicorn
 #ifdef X11_GRABBER_AVAILABLE
     if(sessionType == "x11"){
       auto grabber = std::make_shared<X11Grabber>(config);
-      Logger::log("Started X11 grabber.");
       return grabber;
     }
 #endif

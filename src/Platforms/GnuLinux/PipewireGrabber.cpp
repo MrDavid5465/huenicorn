@@ -48,6 +48,14 @@ namespace Huenicorn
   }
 
 
+  const std::string& PipewireGrabber::name() const
+  {
+    static const std::string s_identifier = "PipewireGrabber";
+    return s_identifier;
+  }
+
+
+
   IGrabber::Resolution PipewireGrabber::displayResolution() const
   {
     return {m_pwData.format.info.raw.size.width, m_pwData.format.info.raw.size.height};
@@ -60,10 +68,10 @@ namespace Huenicorn
   }
 
 
-  void PipewireGrabber::grabFrameSubsample(cv::Mat& cvImage)
+  void PipewireGrabber::grabFrameSubsample(ImageData& imageData)
   {
     auto lock = std::lock_guard(m_pwData.frameDoubleBuffer.mutex);
-    cvImage = m_pwData.frameDoubleBuffer.frame.at(0);
+    imageData = m_pwData.frameDoubleBuffer.frame.at(0);
   }
 
 
@@ -118,16 +126,18 @@ namespace Huenicorn
       return;
     }
 
-    cv::Mat rgbaFrame(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data);
-    ImageProcessing::rescale(rgbaFrame, pw->config->subsampleWidth(), pw->config->interpolation());
-    cv::cvtColor(rgbaFrame, rgbaFrame, cv::COLOR_RGBA2RGB);
+    ImageData capturedFrame{
+      .imageMatrix = cv::Mat(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data)
+    };
+
+    ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
+    ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
 
     {
       auto lock = std::lock_guard(pw->frameDoubleBuffer.mutex);
       std::swap(pw->frameDoubleBuffer.frame[0], pw->frameDoubleBuffer.frame[1]);
-      pw->frameDoubleBuffer.frame[0] = std::move(rgbaFrame);
+      pw->frameDoubleBuffer.frame[0] = std::move(capturedFrame);
     }
-
     pw_stream_queue_buffer(pw->stream, pwBuffer);
   }
 

@@ -403,6 +403,6 @@ namespace Huenicorn
 
     //  Image Processing
     SharedGrabber m_grabber;
-    cv::Mat m_cvImage;
+    ImageData m_frameData;
   };
 }

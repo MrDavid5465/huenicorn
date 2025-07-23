@@ -206,6 +206,8 @@ namespace Huenicorn
       return;
     }
 
+    Logger::log("Started ", m_grabber->name());
+
     if(!_initSettings()){
       Logger::error("Could not load suitable entertainment configuration.");
       return;
@@ -429,7 +431,6 @@ namespace Huenicorn
       // Falling back on dummy grabber
       if(!m_grabber){
         m_grabber = std::make_unique<DummyGrabber>(&m_config);
-        Logger::log("Started DummyGrabber.");
         return true;
       }
     }
@@ -571,13 +572,13 @@ namespace Huenicorn
 
   void HuenicornCore::_update()
   {
-    m_grabber->grabFrameSubsample(m_cvImage);
-    if(!m_cvImage.data){
+    m_grabber->grabFrameSubsample(m_frameData);
+    if(!m_frameData.hasData()){
       // Grabbers with asynchronous capture may produce slower than the core consumes
       return;
     }
 
-    cv::Mat subframeImage;
+    ImageData subframeImageData;
 
     for(auto& [channelId, channel] : m_channels){
       if(channel.state() == Channel::State::Inactive){
@@ -596,11 +597,11 @@ namespace Huenicorn
       else{
         const auto& uvs = channel.uvs();
 
-        glm::ivec2 a{uvs.min.x * m_cvImage.cols, uvs.min.y * m_cvImage.rows};
-        glm::ivec2 b{uvs.max.x * m_cvImage.cols, uvs.max.y * m_cvImage.rows};
+        glm::ivec2 a{uvs.min.x * m_frameData.width(), uvs.min.y * m_frameData.height()};
+        glm::ivec2 b{uvs.max.x * m_frameData.width(), uvs.max.y * m_frameData.height()};
 
-        ImageProcessing::getSubImage(m_cvImage, a, b).copyTo(subframeImage);
-        Color color = ImageProcessing::getDominantColor(subframeImage);
+        ImageProcessing::getSubImage(m_frameData, subframeImageData, a, b);
+        Color color = ImageProcessing::getDominantColor(subframeImageData);
 
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));

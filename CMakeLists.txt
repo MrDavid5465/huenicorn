@@ -114,6 +114,7 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HttpRequestUtils.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp

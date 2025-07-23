@@ -30,6 +30,8 @@ namespace Huenicorn
 
 
     // Getters
+    virtual const std::string& name() const override;
+
     /**
      * @brief Returns a dummy resolution
      * 
@@ -52,7 +54,7 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(cv::Mat& imageData) override;
+    virtual void grabFrameSubsample(ImageData& imageData) override;
 
 
   private:

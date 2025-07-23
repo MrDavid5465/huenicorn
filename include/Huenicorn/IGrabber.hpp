@@ -1,10 +1,12 @@
 #pragma once
 
 #include <algorithm>
-
-#include <opencv2/opencv.hpp>
+#include <memory>
+#include <vector>
 
 #include <glm/vec2.hpp>
+
+#include <Huenicorn/ImageData.hpp>
 
 namespace Huenicorn
 {
@@ -59,6 +61,14 @@ namespace Huenicorn
 
     // Getters
     /**
+     * @brief Returns the identifier of the grabber implementation
+     * 
+     * @return const std::string& Grabber identifier
+     */
+    virtual const std::string& name() const = 0;
+
+
+    /**
      * @brief Returns the resolution of the selected display
      * 
      * @return Resolution Resolution of the selected display
@@ -78,9 +88,9 @@ namespace Huenicorn
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
      * 
-     * @param cvImage Subsample of screen capture
+     * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(cv::Mat& cvImage) = 0;
+    virtual void grabFrameSubsample(ImageData& imageData) = 0;
 
 
     /**

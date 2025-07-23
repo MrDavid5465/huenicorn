@@ -67,6 +67,16 @@ namespace Huenicorn
   }
 
 
+
+  const std::string& X11Grabber::name() const
+  {
+    static const std::string s_identifier = "X11Grabber";
+    return s_identifier;
+  }
+
+
+
+
   glm::ivec2 X11Grabber::displayResolution() const
   {
     int width = 0;
@@ -81,41 +91,45 @@ namespace Huenicorn
   }
 
 
-  void X11Grabber::grabFrameSubsample(cv::Mat& cvImage)
+  void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
     Window root = DefaultRootWindow(m_display);
     int screenId = XDefaultScreen(m_display);
 
-    if(!m_imageData.has_value()){
+    //if(!m_imageData.has_value())
       XWindowAttributes attributes = XWindowAttributes();
       XGetWindowAttributes(m_display, root, &attributes);
+      /*
       m_imageData.emplace();
       m_imageData->width = attributes.width;
       m_imageData->height = attributes.height;
       m_imageData->pixels.resize(m_imageData->width * m_imageData->height * 4);
-    }
+      */
 
     XShmGetImage(m_display, RootWindow(m_display, screenId), m_ximage, 0, 0, AllPlanes);
 
-    m_imageData->bitsPerPixel = m_ximage->bits_per_pixel;
+    //m_imageData->bitsPerPixel = m_ximage->bits_per_pixel;
+    int bitsPerPixel = m_ximage->bits_per_pixel;
+    int width = attributes.width;
+    int height = attributes.height;
 
-    memcpy(m_imageData->pixels.data(), m_ximage->data, m_imageData->pixels.size());
+    //memcpy(m_imageData->pixels.data(), m_ximage->data, m_imageData->pixels.size());
 
-    cv::Mat image;
-    if(m_imageData->bitsPerPixel > 24){
-      image = cv::Mat(m_imageData->height, m_imageData->width, CV_8UC4, m_imageData->pixels.data());
+    ImageData grabbedImageData;
+    if(bitsPerPixel > 24){
+      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC4, m_ximage->data);
     }
     else{
-      image = cv::Mat(m_imageData->height, m_imageData->width, CV_8UC3, m_imageData->pixels.data());
+      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC3, m_ximage->data);
     }
 
-    ImageProcessing::rescale(image, m_config->subsampleWidth(), m_config->interpolation());
+    ImageProcessing::rescale(grabbedImageData, imageData, m_config->subsampleWidth(), m_config->interpolation());
 
-    if(image.channels() == 4){
-      cv::cvtColor(image, image, cv::COLOR_RGBA2RGB);
+    if(imageData.imageMatrix.channels() == 4){
+      cv::cvtColor(imageData.imageMatrix, imageData.imageMatrix, cv::COLOR_RGBA2RGB);
     }
 
-    cvImage = std::move(image);
+    //imageData = std::move(image);
   }
 
 

@@ -5,16 +5,16 @@ namespace Huenicorn
 {
   namespace ImageProcessing
   {
-    void rescale(cv::Mat& image, int targetWidth, Interpolation::Type interpolation)
+    void rescale(const ImageData& inputImageData, ImageData& outputImageData, int outputWidth, Interpolation::Type interpolation)
     {
-      int sourceHeight = image.rows;
-      int sourceWidth = image.cols;
+      int sourceHeight = inputImageData.height();
+      int sourceWidth = inputImageData.width();
 
-      if(sourceWidth < targetWidth){
+      if(sourceWidth < outputWidth){
         return;
       }
 
-      float scaleRatio = static_cast<float>(targetWidth) / sourceWidth;
+      float scaleRatio = static_cast<float>(outputWidth) / sourceWidth;
 
       int targetHeight = sourceHeight * scaleRatio;
 
@@ -34,61 +34,42 @@ namespace Huenicorn
           break;
       }
 
-      cv::resize(image, image, cv::Size(targetWidth, targetHeight), 0, 0, interpolationFlag);
+      cv::resize(inputImageData.imageMatrix, outputImageData.imageMatrix, cv::Size(outputWidth, targetHeight), 0, 0, interpolationFlag);
+    }
+
+  
+    void rgbaToRgb(const ImageData& inputImageData, ImageData& outputImageData)
+    {
+      cv::cvtColor(inputImageData.imageMatrix, outputImageData.imageMatrix, cv::COLOR_RGBA2RGB);
     }
 
 
-    cv::Mat getSubImage(const cv::Mat& sourceImage, const glm::ivec2& a, const glm::ivec2& b)
+    void getSubImage(const ImageData& inputImageData, ImageData& outputImageData, const glm::ivec2& a, const glm::ivec2& b)
     {
-      cv::Range cols(std::max(0, a.x), std::min(b.x, sourceImage.cols));
-      cv::Range rows(std::max(0, a.y), std::min(b.y, sourceImage.rows));
+      cv::Range cols(std::max(0, a.x), std::min(b.x, inputImageData.width()));
+      cv::Range rows(std::max(0, a.y), std::min(b.y, inputImageData.height()));
 
-      return sourceImage(rows, cols);
+      outputImageData.imageMatrix = inputImageData.imageMatrix(rows, cols);
     }
 
 
-    Color getDominantColor(cv::Mat& image)
+    Color getDominantColor(ImageData& inputImageData)
     {
-      if(image.cols < 1 || image.rows < 1){
+      if(inputImageData.width() < 1 || inputImageData.height() < 1){
         return {Color(0, 0, 0)};
       }
 
-      return Algorithms::mean(image);
+      return Algorithms::mean(inputImageData);
     }
 
 
     namespace Algorithms
     {
-      Color kMeans(const cv::Mat& image)
+      Color mean(const ImageData& imageData)
       {
-        unsigned k = 1;
-        Colors dominantColors;
-        dominantColors.reserve(k);
-        cv::Mat data = image.reshape(1, image.total());
-        data.convertTo(data, CV_32F);
+        const auto& imageMatrix = imageData.imageMatrix;
 
-        cv::TermCriteria criteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 10, 1.0);
-
-        std::vector<int> labels;
-        cv::Mat centers;
-        int flags = cv::KmeansFlags::KMEANS_PP_CENTERS;
-        //int flags = cv::KmeansFlags::KMEANS_RANDOM_CENTERS;
-        cv::kmeans(data, k, labels, criteria, 10, flags, centers);
-
-        centers.convertTo(centers, CV_8U);
-
-        for(int i = 0; i < centers.rows; i++){
-          const uint8_t* Mi = centers.ptr<uint8_t>(i);
-          dominantColors.emplace_back(Mi[2], Mi[1], Mi[0]);
-        }
-
-        return dominantColors.front();
-      }
-
-
-      Color mean(const cv::Mat& image)
-      {
-        cv::Mat data = image.reshape(3, image.total());
+        cv::Mat data = imageMatrix.reshape(3, imageMatrix.total());
         auto mean = cv::mean(data);
 
         return Color{
