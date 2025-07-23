@@ -1,10 +1,10 @@
-#include <Huenicorn/Platforms/GnuLinux/PipewireGrabber.hpp>
+#include <Grabbers/GnuLinux/Pipewire/PipewireGrabber.hpp>
 
 #include <sstream>
 #include <future>
 #include <fcntl.h>
 
-#include <Huenicorn/Platforms/GnuLinux/XdgDesktopPortal.hpp>
+#include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 #include <Huenicorn/ImageProcessing.hpp>
 #include <Huenicorn/Config.hpp>
 #include <Huenicorn/Logger.hpp>

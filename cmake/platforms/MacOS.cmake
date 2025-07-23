@@ -3,8 +3,8 @@ find_library(COREGRAPHICS CoreGraphics)
 find_package(OpenCV REQUIRED COMPONENTS imgproc opencv_highgui)
 
 target_sources(${BINARY_NAME} PRIVATE
-  include/Huenicorn/Platforms/MacOS/MacOSAdapter.hpp
-  src/Platforms/MacOS/MacOSAdapter.mm
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/MacOS/MacOSAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/MacOS/MacOSAdapter.mm
 )
 
 target_include_directories(${BINARY_NAME} PUBLIC

@@ -1,21 +1,21 @@
 #pragma once
 
 #ifdef __linux__
-#include <Huenicorn/Platforms/GnuLinux/GnuLinuxAdapter.hpp>
+#include <Adapters/GnuLinux/GnuLinuxAdapter.hpp>
 namespace Huenicorn
 {
   using PlatformAdapter = GnuLinuxAdapter;
   extern PlatformAdapter platformAdapter;
 }
 #elif __APPLE__
-#include <Huenicorn/Platforms/MacOS/MacOSAdapter.hpp>
+#include <Adapters/MacOS/MacOSAdapter.hpp>
 namespace Huenicorn
 {
   using PlatformAdapter = MacOSAdapter;
   extern PlatformAdapter platformAdapter;
 }
 #elif WIN32
-#include <Huenicorn/Platforms/Windows/WindowsAdapter.hpp>
+#include <Adapters/Windows/WindowsAdapter.hpp>
 namespace Huenicorn
 {
   using PlatformAdapter = WindowsAdapter;

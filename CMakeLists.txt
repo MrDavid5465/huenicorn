@@ -149,6 +149,7 @@ endif()
 set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)
 
 target_include_directories(${BINARY_NAME} PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR} # For adapters and grabbers
   ${OpenCV_INCLUDE_DIRS}
   include
   ${CMAKE_CURRENT_BINARY_DIR}/include

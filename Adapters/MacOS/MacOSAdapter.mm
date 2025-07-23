@@ -1,4 +1,4 @@
-#include <Huenicorn/Platforms/MacOS/MacOSAdapter.hpp>
+#include <Adapters/MacOS/MacOSAdapter.hpp>
 
 #include <memory>
 

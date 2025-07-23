@@ -13,7 +13,7 @@
 #include <spa/param/video/format-utils.h>
 #pragma GCC diagnostic pop
 
-#include <Huenicorn/Platforms/GnuLinux/XdgDesktopPortal.hpp>
+#include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 
 
 namespace Huenicorn

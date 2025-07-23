@@ -1,8 +1,8 @@
 find_package(OpenCV REQUIRED COMPONENTS imgproc opencv_highgui)
 
 target_sources(${BINARY_NAME} PRIVATE
-  include/Huenicorn/Platforms/Windows/WindowsAdapter.hpp
-  src/Platforms/Windows/WindowsAdapter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/Windows/WindowsAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/Windows/WindowsAdapter.cpp
 )
 
 target_include_directories(${BINARY_NAME} PUBLIC

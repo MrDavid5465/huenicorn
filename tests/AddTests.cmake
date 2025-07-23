@@ -49,8 +49,8 @@ add_executable(TestGrabber
 )
 
 target_sources(TestGrabber PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platforms/GnuLinux/GnuLinuxAdapter.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platforms/GnuLinux/GnuLinuxAdapter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.cpp
 )
 
 
@@ -94,6 +94,7 @@ endif()
 set_target_properties(TestGrabber PROPERTIES CXX_STANDARD 20)
 
 target_include_directories(TestGrabber PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR} # For adapters and grabbers
   include
 )
 

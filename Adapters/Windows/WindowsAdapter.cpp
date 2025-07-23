@@ -1,4 +1,4 @@
-#include <Huenicorn/Platforms/Windows/WindowsAdapter.hpp>
+#include <Adapters/Windows/WindowsAdapter.hpp>
 
 #include <memory>
 

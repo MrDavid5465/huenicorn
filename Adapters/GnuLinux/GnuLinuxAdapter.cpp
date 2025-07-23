@@ -1,4 +1,4 @@
-#include <Huenicorn/Platforms/GnuLinux/GnuLinuxAdapter.hpp>
+#include <Adapters/GnuLinux/GnuLinuxAdapter.hpp>
 
 #include <pwd.h>
 #include <unistd.h>
@@ -6,10 +6,10 @@
 #include <Huenicorn/Logger.hpp>
 
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
-#include <Huenicorn/Platforms/GnuLinux/PipewireGrabber.hpp>
+#include <Grabbers/GnuLinux/Pipewire/PipewireGrabber.hpp>
 #endif
 #ifdef X11_GRABBER_AVAILABLE
-#include <Huenicorn/Platforms/GnuLinux/X11Grabber.hpp>
+#include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
 #endif
 
 
