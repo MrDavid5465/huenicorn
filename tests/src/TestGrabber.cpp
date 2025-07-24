@@ -1,3 +1,4 @@
+#include <string>
 #include <thread>
 #include <chrono>
 
@@ -51,6 +52,8 @@ int main(int argc, char* argv[])
   }
   
   Logger::log("Started ", grabber->name());
+  const auto& displayResolution = grabber->displayResolution();
+  Logger::log("Screen res ", displayResolution.x, " ", displayResolution.y);
 
   ImageData imageData;
   Huenicorn::Timing::TimePoint start = Huenicorn::Timing::ClockType::now();
@@ -58,11 +61,16 @@ int main(int argc, char* argv[])
   
   std::filesystem::create_directory(frameDirRoot);
 
+  int i = 0;
   while(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() < 3){
     grabber->grabFrameSubsample(imageData);
 
     if(imageData.hasData()){
-      cv::imwrite(frameDirRoot / "frame.png", imageData.imageMatrix);
+      std::string str_i = std::to_string(i++);
+      std::filesystem::path filePath = frameDirRoot;
+      filePath /= ("frame_" + str_i + ".png");
+      Logger::log(filePath);
+      cv::imwrite(filePath, imageData.imageMatrix);
     }
 
     Logger::log("Update");
