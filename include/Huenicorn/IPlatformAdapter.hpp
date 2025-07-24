@@ -4,9 +4,13 @@
 #include <memory>
 
 #include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/DummyGrabber.hpp>
+#include <Huenicorn/Logger.hpp>
 
 namespace Huenicorn
 {
+  using UniqueGrabber = std::unique_ptr<IGrabber>;
+
   /**
    * @brief Wrapper interface for platform-specific functions and grabber selection
    * 
@@ -67,17 +71,24 @@ namespace Huenicorn
      * @brief Getter to instanciate / store valid grabber
      * 
      * @param config Huenicorn current configuration
-     * @return SharedGrabber Grabber instance
+     * @return UniqueGrabber Grabber instance
      */
-    SharedGrabber getGrabber(Config* config)
+    inline IGrabber* getGrabber(Config* config)
     {
-      SharedGrabber sharedGrabber = m_grabber.lock();
-      if(!sharedGrabber){
-        sharedGrabber = _createGrabber(config);
-        m_grabber = sharedGrabber;
+      if(!m_grabber){
+        try{
+          m_grabber = _createGrabber(config);
+        }
+        catch(const std::exception& e){
+          // Fallback to DummyGrabber
+          Logger::warn(e.what());
+          Logger::warn("Could not start propper grabber. Now falling back to DummyGrabber.");
+
+          m_grabber = std::make_unique<DummyGrabber>(config);
+        }
       }
 
-      return sharedGrabber;
+      return m_grabber.get();
     }
 
 
@@ -86,12 +97,12 @@ namespace Huenicorn
      * @brief Factory method for grabber
      * 
      * @param config Huenicorn current configuration
-     * @return SharedGrabber New grabber
+     * @return UniqueGrabber New grabber
      */
-    virtual SharedGrabber _createGrabber(Config* config) const = 0;
+    virtual UniqueGrabber _createGrabber(Config* config) = 0;
 
     // Attributes
     const std::string m_platformName;
-    WeakGrabber m_grabber;
+    UniqueGrabber m_grabber;
   };
 }

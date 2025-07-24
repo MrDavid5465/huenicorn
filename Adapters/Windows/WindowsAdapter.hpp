@@ -13,6 +13,6 @@ namespace Huenicorn
     virtual void openWebBrowser(const std::string& url) const override;
 
   protected:
-    virtual SharedGrabber _createGrabber(Config* config) const override;
+    virtual UniqueGrabber _createGrabber(Config* config) override;
   };
 }

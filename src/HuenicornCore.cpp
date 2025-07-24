@@ -421,29 +421,8 @@ namespace Huenicorn
 
   bool HuenicornCore::_initGrabber()
   {
-    try{
-      m_grabber = platformAdapter.getGrabber(&m_config);
-
-      if(m_grabber){
-        return true;
-      }
-
-      // Falling back on dummy grabber
-      if(!m_grabber){
-        m_grabber = std::make_unique<DummyGrabber>(&m_config);
-        return true;
-      }
-    }
-    catch(const std::exception& e){
-      Logger::error(e.what());
-      return false;
-    }
-
-    if(!m_grabber){
-      Logger::error("Could not find a compatible grabber for your graphic session.");
-    }
-
-    return false;
+    m_grabber = platformAdapter.getGrabber(&m_config);
+    return true;
   }
 
 

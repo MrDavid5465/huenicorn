@@ -44,21 +44,19 @@ namespace Huenicorn
   }
 
 
-  SharedGrabber GnuLinuxAdapter::_createGrabber(Config* config) const
+  UniqueGrabber GnuLinuxAdapter::_createGrabber(Config* config)
   {
     std::string sessionType = std::getenv("XDG_SESSION_TYPE");
 
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
     if(sessionType == "wayland"){
-      auto grabber = std::make_shared<PipewireGrabber>(config);
-      return grabber;
+      return std::make_unique<PipewireGrabber>(config);
     }
 #endif
 
 #ifdef X11_GRABBER_AVAILABLE
     if(sessionType == "x11"){
-      auto grabber = std::make_shared<X11Grabber>(config);
-      return grabber;
+      return std::make_unique<X11Grabber>(config);
     }
 #endif
 

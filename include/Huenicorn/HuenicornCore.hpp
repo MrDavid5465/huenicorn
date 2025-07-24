@@ -402,7 +402,7 @@ namespace Huenicorn
     ThreadedRestService m_webUIService;
 
     //  Image Processing
-    SharedGrabber m_grabber;
+    IGrabber* m_grabber;
     ImageData m_frameData;
   };
 }

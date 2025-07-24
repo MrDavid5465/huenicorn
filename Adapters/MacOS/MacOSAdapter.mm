@@ -27,7 +27,7 @@ namespace Huenicorn
   }
 
 
-  SharedGrabber MacOSAdapter::_createGrabber(Config* config) const
+  UniqueGrabber MacOSAdapter::_createGrabber(Config* config)
   {
     (void)config;
     return nullptr;

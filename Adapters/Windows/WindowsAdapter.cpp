@@ -33,7 +33,7 @@ namespace Huenicorn
   }
 
 
-  SharedGrabber WindowsAdapter::_createGrabber(Config* config) const
+  UniqueGrabber WindowsAdapter::_createGrabber(Config* config)
   {
     (void)config;
     return nullptr;
