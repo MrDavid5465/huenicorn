@@ -120,6 +120,7 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IPlatformAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Streamer.hpp
@@ -174,7 +175,6 @@ target_compile_options(${BINARY_NAME} PRIVATE
   -Wno-deprecated-declarations
   -Wno-deprecated-copy
 )
-
 
 if(${BUILD_TESTS})
   include(tests/AddTests.cmake)

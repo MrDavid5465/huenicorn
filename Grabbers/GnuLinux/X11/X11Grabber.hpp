@@ -4,6 +4,7 @@
 #include <optional>
 
 #include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/MonitorData.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
@@ -29,17 +30,21 @@ namespace Huenicorn
     };
 
 
-    struct Monitor
+    struct X11MonitorData : public MonitorData
     {
-      std::string name;
-      int xPos;
-      int yPos;
-      unsigned width;
-      unsigned height;
-      RROutput outputId;
-      RRCrtc crtcId;
-    };
+      X11MonitorData(const std::string name, unsigned width, unsigned height, int xPos, int yPos, RROutput outputId, RRCrtc crtcId):
+      MonitorData(name, width, height),
+      xPos(xPos),
+      yPos(yPos),
+      outputId(outputId),
+      crtcId(crtcId)
+      {}
 
+      int xPos{0};
+      int yPos{0};
+      RROutput outputId{0};
+      RRCrtc crtcId{0};
+    };
 
 
     class XShmData
@@ -56,7 +61,7 @@ namespace Huenicorn
       };
 
 
-      XShmData(Display* display, const Monitor& monitor);
+      XShmData(Display* display, X11MonitorData* monitor);
       ~XShmData();
 
       inline XImage* ximage() const
@@ -69,9 +74,6 @@ namespace Huenicorn
       std::unique_ptr<XShmSegmentInfo> m_shmInfo;
       std::unique_ptr<XImage, XImageDeleter> m_ximage;
     };
-
-
-    using Monitors = std::vector<Monitor>;
 
 
     // Constructor / destructor
@@ -87,11 +89,16 @@ namespace Huenicorn
      * @brief X11Grabber destructor
      * 
      */
-    virtual ~X11Grabber();
+    virtual ~X11Grabber(){}
 
 
     // Getters
     virtual const std::string& name() const override;
+
+    virtual bool hasCustomScreenManagement() const override
+    {
+      return true;
+    }
 
     /**
      * @brief Returns the resolution of the selected display
@@ -110,6 +117,8 @@ namespace Huenicorn
 
 
     // Methods
+    virtual void _initMonitorsList() override;
+
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
      * 
@@ -120,11 +129,9 @@ namespace Huenicorn
 
   private:
 
-    void _listMonitors(Monitors& monitors);
-    void _initXShmData(const Monitor& monitor);
+    bool _ensureXShmData();
 
-    Monitors m_monitors;
-    Monitor* m_selectedMonitor{nullptr};
+    X11MonitorData* m_selectedMonitor{nullptr};
 
     // Attributes
     std::unique_ptr<Display, DisplayDeleter> m_display;

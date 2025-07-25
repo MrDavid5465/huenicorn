@@ -78,6 +78,7 @@ namespace Huenicorn
       if(!m_grabber){
         try{
           m_grabber = _createGrabber(config);
+          m_grabber->init();
         }
         catch(const std::exception& e){
           // Fallback to DummyGrabber

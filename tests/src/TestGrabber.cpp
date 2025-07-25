@@ -11,29 +11,6 @@
 using namespace Huenicorn;
 using namespace std::chrono_literals;
 
-SharedGrabber initGrabber(Config& config)
-{
-  try{
-    auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
-
-    if(grabber){
-      return grabber;
-    }
-
-    // Falling back on dummy grabber
-    if(!grabber){
-      grabber = std::make_unique<DummyGrabber>(&config);
-      return grabber;
-    }
-  }
-  catch(const std::exception& e){
-    Logger::error(e.what());
-    return nullptr;
-  }
-
-  return nullptr;
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -45,10 +22,11 @@ int main(int argc, char* argv[])
   Config config("/tmp");
   config.setSubsampleWidth(20);
   std::filesystem::path frameDirRoot(argv[1]);
-  auto grabber = initGrabber(config);
+  auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
 
-  if(!grabber){
-    return 0;
+  
+  for(const auto& monitor : grabber->monitors()){
+    Logger::log(monitor.get()->name);
   }
   
   Logger::log("Started ", grabber->name());

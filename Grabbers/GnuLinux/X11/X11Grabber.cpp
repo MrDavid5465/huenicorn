@@ -13,7 +13,7 @@
 
 namespace Huenicorn
 {
-  X11Grabber::XShmData::XShmData(Display* display, const X11Grabber::Monitor& monitor):
+  X11Grabber::XShmData::XShmData(Display* display, X11Grabber::X11MonitorData* monitor):
   m_display(display)
   {
     int screenId = XDefaultScreen(m_display);
@@ -25,8 +25,8 @@ namespace Huenicorn
       ZPixmap,
       nullptr,
       m_shmInfo.get(),
-      monitor.width,
-      monitor.height
+      monitor->width,
+      monitor->height
     ));
 
     int size = m_ximage->bytes_per_line * m_ximage->height;
@@ -56,21 +56,6 @@ namespace Huenicorn
     if(!m_display){
       throw std::runtime_error("Could not open any X11 display");
     }
-
-    _listMonitors(m_monitors);
-
-    //m_selectedMonitor = &m_monitors.back();
-    m_selectedMonitor = &m_monitors.front();
-
-    _initXShmData(*m_selectedMonitor);
-  }
-
-
-  X11Grabber::~X11Grabber()
-  {
-    if(m_xshmData.has_value()){
-      m_xshmData.reset();
-    }
   }
 
 
@@ -93,7 +78,7 @@ namespace Huenicorn
 
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
-    if(!m_selectedMonitor || !m_xshmData.has_value()){
+    if(!_ensureXShmData()){
       return;
     }
 
@@ -128,10 +113,9 @@ namespace Huenicorn
   }
 
 
-  void X11Grabber::_listMonitors(Monitors& monitors)
+  void X11Grabber::_initMonitorsList()
   {
-    m_selectedMonitor = nullptr;
-    monitors.clear();
+    m_monitors.clear();
 
     if(!m_display.get()){
       throw std::runtime_error("No display available");
@@ -152,15 +136,15 @@ namespace Huenicorn
       if(outputInfo->connection == RR_Connected && outputInfo->crtc != 0){
         XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(m_display.get(), screenResources, outputInfo->crtc);
 
-        monitors.push_back(Monitor{
+        m_monitors.push_back(std::make_unique<X11MonitorData>(
           outputInfo->name,
-          crtcInfo->x,
-          crtcInfo->y,
           crtcInfo->width,
           crtcInfo->height,
+          crtcInfo->x,
+          crtcInfo->y,
           screenResources->outputs[i],
           outputInfo->crtc
-        });
+        ));
 
         XRRFreeCrtcInfo(crtcInfo);
       }
@@ -169,12 +153,24 @@ namespace Huenicorn
     }
 
     XRRFreeScreenResources(screenResources);
+
+    m_selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitors.front().get());
   }
 
 
-  void X11Grabber::_initXShmData(const Monitor& monitor)
+  bool X11Grabber::_ensureXShmData()
   {
+    if(!m_selectedMonitor){
+      return false;
+    }
+
+    if(m_xshmData.has_value()){
+      return true;
+    }
+
     m_xshmData.reset();
-    m_xshmData.emplace(m_display.get(), monitor);
+    m_xshmData.emplace(m_display.get(), m_selectedMonitor);
+
+    return true;
   }
 }

@@ -7,10 +7,13 @@
 #include <glm/vec2.hpp>
 
 #include <Huenicorn/ImageData.hpp>
+#include <Huenicorn/MonitorData.hpp>
 
 namespace Huenicorn
 {
   class Config;
+
+  using Monitors = std::vector<std::unique_ptr<MonitorData>>;
 
   /**
    * @brief Abstract class to implement for screen capture
@@ -54,6 +57,12 @@ namespace Huenicorn
     virtual ~IGrabber(){}
 
 
+    void init()
+    {
+      _initMonitorsList();
+    }
+
+
     // Getters
     /**
      * @brief Returns the identifier of the grabber implementation
@@ -61,6 +70,12 @@ namespace Huenicorn
      * @return const std::string& Grabber identifier
      */
     virtual const std::string& name() const = 0;
+
+
+    virtual bool hasCustomScreenManagement() const
+    {
+      return false;
+    }
 
 
     /**
@@ -88,6 +103,11 @@ namespace Huenicorn
     virtual void grabFrameSubsample(ImageData& imageData) = 0;
 
 
+    inline const Monitors& monitors() const
+    {
+      return m_monitors;
+    }
+
     /**
      * @brief Returns a list of available subsample resolutions
      * 
@@ -114,6 +134,13 @@ namespace Huenicorn
 
 
   protected:
+    // Protected methods
+    virtual void _initMonitorsList(){
+      if(hasCustomScreenManagement()){
+        throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
+      }
+    };
+
     // Protected static methods
     /**
      * @brief Computes a list of integer divisors for a given number
@@ -156,5 +183,7 @@ namespace Huenicorn
 
     //Attributes
     Config* m_config;
+    Monitors m_monitors;
+    MonitorData* m_selectedMonitor{nullptr};
   };
 }
