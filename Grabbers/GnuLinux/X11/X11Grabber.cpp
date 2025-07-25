@@ -1,11 +1,10 @@
 #include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
 
-#include <err.h>
-
-#include <cstring>
 
 #include <X11/Xutil.h>
 #include <sys/shm.h>
+
+#include <X11/extensions/Xrandr.h>
 
 #include <Huenicorn/Config.hpp>
 #include <Huenicorn/ImageProcessing.hpp>
@@ -13,6 +12,31 @@
 
 namespace Huenicorn
 {
+  // Deleters
+  void X11Grabber::DisplayDeleter::operator()(Display* ptr)
+  {
+    XCloseDisplay(ptr);
+    ptr = nullptr;
+  }
+
+
+  void X11Grabber::XShmData::XImageDeleter::operator()(XImage* ptr)
+  {
+    XDestroyImage(ptr);
+    ptr = nullptr;
+  }
+
+
+  // X11MonitorData
+  X11Grabber::X11MonitorData::X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, int xPos, int yPos, bool isPrimary):
+  MonitorData(name, width, height, refreshRate),
+  xPos(xPos),
+  yPos(yPos),
+  isPrimary(isPrimary)
+  {}
+
+
+  // XShmData
   X11Grabber::XShmData::XShmData(Display* display, int screenId, X11Grabber::X11MonitorData* monitor):
   m_display(display)
   {
@@ -47,6 +71,13 @@ namespace Huenicorn
   }
 
 
+  XImage* X11Grabber::XShmData::ximage() const
+  {
+    return m_ximage.get();
+  }
+
+
+  // X11 Grabber
   X11Grabber::X11Grabber(Config* config):
   IGrabber(config)
   {

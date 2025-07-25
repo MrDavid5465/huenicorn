@@ -9,7 +9,6 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 
-#include <X11/extensions/Xrandr.h>
 
 namespace Huenicorn
 {
@@ -22,22 +21,13 @@ namespace Huenicorn
   public:
     struct DisplayDeleter
     {
-      inline void operator()(Display* ptr)
-      {
-        XCloseDisplay(ptr);
-        ptr = nullptr;
-      }
+      void operator()(Display* ptr);
     };
 
 
     struct X11MonitorData : public MonitorData
     {
-      X11MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate, int xPos, int yPos, bool isPrimary):
-      MonitorData(name, width, height, refreshRate),
-      xPos(xPos),
-      yPos(yPos),
-      isPrimary(isPrimary)
-      {}
+      X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, int xPos, int yPos, bool isPrimary);
 
       int xPos{0};
       int yPos{0};
@@ -51,21 +41,14 @@ namespace Huenicorn
 
       struct XImageDeleter
       {
-        inline void operator()(XImage* ptr)
-        {
-          XDestroyImage(ptr);
-          ptr = nullptr;
-        }
+        void operator()(XImage* ptr);
       };
 
 
       XShmData(Display* display, int screenId, X11MonitorData* monitor);
       ~XShmData();
 
-      inline XImage* ximage() const
-      {
-        return m_ximage.get();
-      }
+      XImage* ximage() const;
 
     private:
       Display* m_display{nullptr};
