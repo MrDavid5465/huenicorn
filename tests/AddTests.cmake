@@ -35,6 +35,7 @@ add_executable(TestGrabber
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp

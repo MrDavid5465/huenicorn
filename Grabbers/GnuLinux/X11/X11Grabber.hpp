@@ -32,8 +32,8 @@ namespace Huenicorn
 
     struct X11MonitorData : public MonitorData
     {
-      X11MonitorData(const std::string name, unsigned width, unsigned height, int xPos, int yPos, bool isPrimary):
-      MonitorData(name, width, height),
+      X11MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate, int xPos, int yPos, bool isPrimary):
+      MonitorData(name, width, height, refreshRate),
       xPos(xPos),
       yPos(yPos),
       isPrimary(isPrimary)
@@ -59,7 +59,7 @@ namespace Huenicorn
       };
 
 
-      XShmData(Display* display, X11MonitorData* monitor);
+      XShmData(Display* display, int screenId, X11MonitorData* monitor);
       ~XShmData();
 
       inline XImage* ximage() const
@@ -134,6 +134,7 @@ namespace Huenicorn
     X11MonitorData* m_selectedMonitor{nullptr};
 
     // Attributes
+    int m_screenId; // Once and for all
     std::unique_ptr<Display, DisplayDeleter> m_display;
     std::optional<XShmData> m_xshmData;
   };

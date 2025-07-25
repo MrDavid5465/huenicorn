@@ -4,10 +4,11 @@ namespace Huenicorn
 {
   struct MonitorData
   {
-    MonitorData(const std::string name, unsigned width, unsigned height):
+    MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate):
     name(name),
     width(width),
-    height(height)
+    height(height),
+    refreshRate(refreshRate)
     {}
 
     virtual ~MonitorData() = default;
@@ -15,5 +16,6 @@ namespace Huenicorn
     std::string name{""};
     unsigned width{0};
     unsigned height{0};
+    double refreshRate{0};
   };
 }

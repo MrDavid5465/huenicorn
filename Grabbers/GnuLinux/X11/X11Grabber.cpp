@@ -13,10 +13,9 @@
 
 namespace Huenicorn
 {
-  X11Grabber::XShmData::XShmData(Display* display, X11Grabber::X11MonitorData* monitor):
+  X11Grabber::XShmData::XShmData(Display* display, int screenId, X11Grabber::X11MonitorData* monitor):
   m_display(display)
   {
-    int screenId = XDefaultScreen(m_display);
     m_shmInfo = std::make_unique<XShmSegmentInfo>();
 
     m_ximage.reset(XShmCreateImage(m_display,
@@ -56,6 +55,8 @@ namespace Huenicorn
     if(!m_display){
       throw std::runtime_error("Could not open any X11 display");
     }
+
+    m_screenId = XDefaultScreen(m_display.get()); // Once and for all
   }
 
 
@@ -95,10 +96,9 @@ namespace Huenicorn
       return;
     }
 
-    int screenId = XDefaultScreen(m_display.get());
     auto ximage = m_xshmData->ximage();
 
-    XShmGetImage(m_display.get(), RootWindow(m_display.get(), screenId), ximage, m_selectedMonitor->xPos, m_selectedMonitor->yPos, AllPlanes);
+    XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, m_selectedMonitor->xPos, m_selectedMonitor->yPos, AllPlanes);
 
     ImageData grabbedImageData;
     if(ximage->bits_per_pixel > 24){
@@ -117,12 +117,11 @@ namespace Huenicorn
 
   IGrabber::RefreshRate X11Grabber::displayRefreshRate() const
   {
-    int screenId = XDefaultScreen(m_display.get());
-    Window root = RootWindow(m_display.get(), screenId);
-    XRRScreenConfiguration* displayConfig = XRRGetScreenInfo(m_display.get(), root);
-    RefreshRate currentRate = XRRConfigCurrentRate(displayConfig);
+    if(!m_selectedMonitor){
+      throw std::runtime_error("No selected monitor");
+    }
 
-    return currentRate;
+    return m_selectedMonitor->refreshRate;
   }
 
 
@@ -148,12 +147,27 @@ namespace Huenicorn
     int minY = std::numeric_limits<int>::max();
     int maxX = std::numeric_limits<int>::min();
     int maxY = std::numeric_limits<int>::min();
+    double minRefreshRate = 1000.0; // Let's not take any risk about this
 
     for(int i = 0; i < monitorsQuantity; i++){
       XRROutputInfo* outputInfo = XRRGetOutputInfo(m_display.get(), screenResources, screenResources->outputs[i]);
 
       if(outputInfo->connection == RR_Connected && outputInfo->crtc != 0){
         XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(m_display.get(), screenResources, outputInfo->crtc);
+
+        double refreshRate = 0.0;
+        RRMode modeId = crtcInfo->mode;
+        for(int i = 0; i < screenResources->nmode; ++i){
+          if(screenResources->modes[i].id == modeId){
+            const XRRModeInfo& mode = screenResources->modes[i];
+            if(mode.hTotal && mode.vTotal){
+              refreshRate = static_cast<double>(mode.dotClock) / (mode.hTotal * mode.vTotal);
+            }
+            break;
+          }
+        }
+
+        minRefreshRate = std::min(refreshRate, minRefreshRate);
 
         int x = crtcInfo->x;
         int y = crtcInfo->y;
@@ -164,6 +178,7 @@ namespace Huenicorn
           outputInfo->name,
           width,
           height,
+          refreshRate,
           x,
           y,
           screenResources->outputs[i] == primaryId
@@ -186,6 +201,7 @@ namespace Huenicorn
         "Combined displays",
         maxX - minX,
         maxY - minY,
+        minRefreshRate,
         minX,
         minY,
         false
@@ -208,7 +224,7 @@ namespace Huenicorn
     }
 
     m_xshmData.reset();
-    m_xshmData.emplace(m_display.get(), m_selectedMonitor);
+    m_xshmData.emplace(m_display.get(), m_screenId, m_selectedMonitor);
 
     return true;
   }
