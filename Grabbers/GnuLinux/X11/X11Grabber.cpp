@@ -76,6 +76,19 @@ namespace Huenicorn
   }
 
 
+  void X11Grabber::selectMonitor(MonitorData* monitor)
+  {
+    X11MonitorData* x11Monitor = dynamic_cast<X11MonitorData*>(monitor);
+
+    if(!x11Monitor){
+      return;
+    }
+
+    m_xshmData.reset();
+    m_selectedMonitor = x11Monitor;
+  }
+
+
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
     if(!_ensureXShmData()){
@@ -129,6 +142,12 @@ namespace Huenicorn
       throw std::runtime_error("No screen available");
     }
 
+    RROutput primaryId = XRRGetOutputPrimary(m_display.get(), root);
+
+    int minX = std::numeric_limits<int>::max();
+    int minY = std::numeric_limits<int>::max();
+    int maxX = std::numeric_limits<int>::min();
+    int maxY = std::numeric_limits<int>::min();
 
     for(int i = 0; i < monitorsQuantity; i++){
       XRROutputInfo* outputInfo = XRRGetOutputInfo(m_display.get(), screenResources, screenResources->outputs[i]);
@@ -136,15 +155,24 @@ namespace Huenicorn
       if(outputInfo->connection == RR_Connected && outputInfo->crtc != 0){
         XRRCrtcInfo* crtcInfo = XRRGetCrtcInfo(m_display.get(), screenResources, outputInfo->crtc);
 
+        int x = crtcInfo->x;
+        int y = crtcInfo->y;
+        int width = crtcInfo->width;
+        int height = crtcInfo->height;
+
         m_monitors.push_back(std::make_unique<X11MonitorData>(
           outputInfo->name,
-          crtcInfo->width,
-          crtcInfo->height,
-          crtcInfo->x,
-          crtcInfo->y,
-          screenResources->outputs[i],
-          outputInfo->crtc
+          width,
+          height,
+          x,
+          y,
+          screenResources->outputs[i] == primaryId
         ));
+
+        minX = std::min(minX, x);
+        minY = std::min(minY, y);
+        maxX = std::max(maxX, x + width);
+        maxY = std::max(maxY, y + height);
 
         XRRFreeCrtcInfo(crtcInfo);
       }
@@ -152,9 +180,20 @@ namespace Huenicorn
       XRRFreeOutputInfo(outputInfo);
     }
 
-    XRRFreeScreenResources(screenResources);
+    // Add whole display surface to choices if there are multiple screens
+    if(m_monitors.size() > 1){
+      m_monitors.push_back(std::make_unique<X11MonitorData>(
+        "Combined displays",
+        maxX - minX,
+        maxY - minY,
+        minX,
+        minY,
+        false
+      ));
+    }
 
-    m_selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitors.front().get());
+
+    XRRFreeScreenResources(screenResources);
   }
 
 

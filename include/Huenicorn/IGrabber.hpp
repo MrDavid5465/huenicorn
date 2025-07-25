@@ -62,7 +62,6 @@ namespace Huenicorn
       _initMonitorsList();
     }
 
-
     // Getters
     /**
      * @brief Returns the identifier of the grabber implementation
@@ -95,6 +94,14 @@ namespace Huenicorn
 
 
     // Methods
+    virtual void selectMonitor(MonitorData* monitor)
+    {
+      if(hasCustomScreenManagement()){
+        throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
+      }
+    }
+
+
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
      * 

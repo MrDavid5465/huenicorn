@@ -23,24 +23,35 @@ int main(int argc, char* argv[])
   config.setSubsampleWidth(20);
   std::filesystem::path frameDirRoot(argv[1]);
   auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
+  Logger::log("Started ", grabber->name());
 
-  
-  for(const auto& monitor : grabber->monitors()){
+  const auto& monitors = grabber->monitors();
+  for(const auto& monitor : monitors){
     Logger::log(monitor.get()->name);
   }
-  
-  Logger::log("Started ", grabber->name());
-  const auto& displayResolution = grabber->displayResolution();
-  Logger::log("Screen res ", displayResolution.x, " ", displayResolution.y);
+
+  grabber->selectMonitor(monitors.front().get());
+  //grabber->selectMonitor(monitors.back().get());
+
+  try{
+    const auto& displayResolution = grabber->displayResolution();
+    Logger::log("Screen res ", displayResolution.x, " ", displayResolution.y);
+  }
+  catch(const std::exception& e){
+    Logger::error(e.what());
+  }
 
   ImageData imageData;
   Huenicorn::Timing::TimePoint start = Huenicorn::Timing::ClockType::now();
   Huenicorn::Timing::TimePoint now = Huenicorn::Timing::ClockType::now();
-  
+
   std::filesystem::create_directory(frameDirRoot);
 
   int i = 0;
   while(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() < 3){
+  
+    grabber->selectMonitor(monitors.at(i % monitors.size()).get()); // Let's get mean !
+
     grabber->grabFrameSubsample(imageData);
 
     if(imageData.hasData()){

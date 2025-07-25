@@ -32,18 +32,16 @@ namespace Huenicorn
 
     struct X11MonitorData : public MonitorData
     {
-      X11MonitorData(const std::string name, unsigned width, unsigned height, int xPos, int yPos, RROutput outputId, RRCrtc crtcId):
+      X11MonitorData(const std::string name, unsigned width, unsigned height, int xPos, int yPos, bool isPrimary):
       MonitorData(name, width, height),
       xPos(xPos),
       yPos(yPos),
-      outputId(outputId),
-      crtcId(crtcId)
+      isPrimary(isPrimary)
       {}
 
       int xPos{0};
       int yPos{0};
-      RROutput outputId{0};
-      RRCrtc crtcId{0};
+      bool isPrimary{false};
     };
 
 
@@ -117,7 +115,7 @@ namespace Huenicorn
 
 
     // Methods
-    virtual void _initMonitorsList() override;
+    virtual void selectMonitor(MonitorData* monitor) override;
 
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
@@ -126,6 +124,8 @@ namespace Huenicorn
      */
     virtual void grabFrameSubsample(ImageData& imageData) override;
 
+  protected:
+    virtual void _initMonitorsList() override;
 
   private:
 
