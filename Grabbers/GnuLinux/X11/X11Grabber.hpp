@@ -129,6 +129,7 @@ namespace Huenicorn
 
   private:
 
+    void _ensureXThreadsInit();
     bool _ensureXShmData();
 
     X11MonitorData* m_selectedMonitor{nullptr};

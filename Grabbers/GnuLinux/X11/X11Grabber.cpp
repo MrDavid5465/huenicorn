@@ -50,6 +50,8 @@ namespace Huenicorn
   X11Grabber::X11Grabber(Config* config):
   IGrabber(config)
   {
+    _ensureXThreadsInit();
+
     m_display.reset(XOpenDisplay(nullptr));
 
     if(!m_display){
@@ -208,8 +210,19 @@ namespace Huenicorn
       ));
     }
 
-
     XRRFreeScreenResources(screenResources);
+  }
+
+
+  void X11Grabber::_ensureXThreadsInit()
+  {
+    static bool initialized = [](){
+      return XInitThreads();
+    }();
+
+    if(!initialized){
+      throw std::runtime_error("XInitThreads failed");
+    }
   }
 
 
