@@ -13,7 +13,11 @@ namespace Huenicorn
 {
   class Config;
 
-  using Monitors = std::vector<std::unique_ptr<MonitorData>>;
+  using SharedMonitor = std::shared_ptr<MonitorData>;
+  using WeakMonitor = std::weak_ptr<MonitorData>;
+  using Monitors = std::vector<SharedMonitor>;
+  using WeakMonitors = std::vector<WeakMonitor>;
+
 
   /**
    * @brief Abstract class to implement for screen capture
@@ -21,6 +25,18 @@ namespace Huenicorn
    */
   class IGrabber
   {
+  protected:
+    struct MonitorSelectionData
+    {
+      Monitors monitors;
+      WeakMonitor selectedMonitor;
+
+      bool ready() const
+      {
+        return !selectedMonitor.expired() && monitors.size() > 0;
+      }
+    };
+
   public:
     // Type definitions
     using Divisors = std::vector<int>;
@@ -94,7 +110,7 @@ namespace Huenicorn
 
 
     // Methods
-    virtual void selectMonitor(MonitorData* monitor)
+    virtual void selectMonitor(const WeakMonitor& monitor)
     {
       if(hasCustomScreenManagement()){
         throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
@@ -110,9 +126,17 @@ namespace Huenicorn
     virtual void grabFrameSubsample(ImageData& imageData) = 0;
 
 
-    inline const Monitors& monitors() const
+    inline WeakMonitors monitors() const
     {
-      return m_monitors;
+      WeakMonitors weakMonitors;
+
+      {
+        std::lock_guard lock(m_monitorMutex);
+        for(const auto& ptr : m_monitorSelectionData.monitors){
+          weakMonitors.emplace_back(ptr);
+        }
+      }
+      return weakMonitors;
     }
 
     /**
@@ -190,7 +214,7 @@ namespace Huenicorn
 
     //Attributes
     Config* m_config;
-    Monitors m_monitors;
-    MonitorData* m_selectedMonitor{nullptr};
+    MonitorSelectionData m_monitorSelectionData;
+    mutable std::mutex m_monitorMutex;
   };
 }

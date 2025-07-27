@@ -4,10 +4,13 @@
 #include <optional>
 
 #include <Huenicorn/IGrabber.hpp>
-#include <Huenicorn/MonitorData.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
+
+#include <Huenicorn/MonitorData.hpp>
+#include <Grabbers/GnuLinux/X11/X11MonitorWatcher.hpp>
+#include <Grabbers/GnuLinux/X11/INotifiable.hpp>
 
 
 namespace Huenicorn
@@ -16,8 +19,10 @@ namespace Huenicorn
    * @brief X11 implementation of screen grabber
    * 
    */
-  class X11Grabber : public IGrabber
+  class X11Grabber : public IGrabber, public INotifiable
   {
+  friend X11MonitorWatcher;
+
   public:
     struct DisplayDeleter
     {
@@ -45,7 +50,7 @@ namespace Huenicorn
       };
 
 
-      XShmData(Display* display, int screenId, X11MonitorData* monitor);
+      XShmData(Display* display, int screenId, int width, int height);
       ~XShmData();
 
       XImage* ximage() const;
@@ -98,7 +103,7 @@ namespace Huenicorn
 
 
     // Methods
-    virtual void selectMonitor(MonitorData* monitor) override;
+    virtual void selectMonitor(const WeakMonitor& monitor) override;
 
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
@@ -111,15 +116,16 @@ namespace Huenicorn
     virtual void _initMonitorsList() override;
 
   private:
+    virtual void _notify() override;
 
     void _ensureXThreadsInit();
+    bool _ensureMonitorSelection();
     bool _ensureXShmData();
-
-    X11MonitorData* m_selectedMonitor{nullptr};
 
     // Attributes
     int m_screenId; // Once and for all
     std::unique_ptr<Display, DisplayDeleter> m_display;
+    std::optional<X11MonitorWatcher> m_monitorWatcher;
     std::optional<XShmData> m_xshmData;
   };
 }

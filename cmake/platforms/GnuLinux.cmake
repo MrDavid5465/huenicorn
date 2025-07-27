@@ -23,6 +23,9 @@ if(${X11_FOUND})
   message("Able to build X11 Grabber !")
 
   set(X11_GRABBER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11MonitorWatcher.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11MonitorWatcher.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/INotifiable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.hpp
   )
@@ -44,7 +47,6 @@ endif()
 if(NOT (PIPEWIRER_GRABBER_AVAILABLE OR X11_GRABBER_AVAILABLE))
   message(FATAL_ERROR "Missing dependencies to compile a least one grabber")
 endif()
-
 
 if(X11_GRABBER_AVAILABLE)
   target_compile_definitions(${BINARY_NAME} PUBLIC X11_GRABBER_AVAILABLE=1)

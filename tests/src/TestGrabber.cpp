@@ -19,13 +19,12 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
   auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
   Logger::log("Started ", grabber->name());
 
-  const auto& monitors = grabber->monitors();
-  for(const auto& monitor : monitors){
-    Logger::log(monitor.get()->name);
+  {
+    const auto& monitors = grabber->monitors();
+    for(const auto& monitor : monitors){
+      Logger::log(monitor.lock()->name);
+    }
   }
-
-  grabber->selectMonitor(monitors.front().get());
-  //grabber->selectMonitor(monitors.back().get());
 
   try{
     const auto& displayResolution = grabber->displayResolution();
@@ -36,15 +35,18 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
   }
 
   ImageData imageData;
-  Huenicorn::Timing::TimePoint start = Huenicorn::Timing::ClockType::now();
-  Huenicorn::Timing::TimePoint now = Huenicorn::Timing::ClockType::now();
 
   std::filesystem::create_directory(frameDirRoot);
 
   int i = 0;
-  while(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() < 3){
+  Huenicorn::Timing::TimePoint start = Huenicorn::Timing::ClockType::now();
+  Huenicorn::Timing::TimePoint now = Huenicorn::Timing::ClockType::now();
+  while(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() < 20){
+    const auto& monitors = grabber->monitors();
   
-    grabber->selectMonitor(monitors.at(i % monitors.size()).get()); // Let's get mean !
+    if(monitors.size()){
+      grabber->selectMonitor(monitors.at(i % monitors.size())); // Let's get mean !
+    }
 
     grabber->grabFrameSubsample(imageData);
 
@@ -56,10 +58,20 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
       cv::imwrite(filePath, imageData.imageMatrix);
     }
 
-    Logger::log("Update");
+    //Logger::log("Update");
     std::this_thread::sleep_for(0.2s);
     now = Huenicorn::Timing::ClockType::now();
   }
+}
+
+
+void testMonitorEvents()
+{
+  Config config("/tmp");
+  config.setSubsampleWidth(20);
+  auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
+  Logger::log("Started ", grabber->name());
+  std::this_thread::sleep_for(20s);
 }
 
 
@@ -73,6 +85,7 @@ int main(int argc, char* argv[])
   std::filesystem::path frameDirRoot(argv[1]);
 
   testGrabber(frameDirRoot);
+  //testMonitorEvents();
   Logger::log("Done");
 
   return 0;

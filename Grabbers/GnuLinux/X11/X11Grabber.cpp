@@ -8,6 +8,7 @@
 
 #include <Huenicorn/Config.hpp>
 #include <Huenicorn/ImageProcessing.hpp>
+#include <Huenicorn/Logger.hpp>
 
 
 namespace Huenicorn
@@ -37,7 +38,7 @@ namespace Huenicorn
 
 
   // XShmData
-  X11Grabber::XShmData::XShmData(Display* display, int screenId, X11Grabber::X11MonitorData* monitor):
+  X11Grabber::XShmData::XShmData(Display* display, int screenId, int width, int height):
   m_display(display)
   {
     m_shmInfo = std::make_unique<XShmSegmentInfo>();
@@ -48,8 +49,8 @@ namespace Huenicorn
       ZPixmap,
       nullptr,
       m_shmInfo.get(),
-      monitor->width,
-      monitor->height
+      width,
+      height
     ));
 
     int size = m_ximage->bytes_per_line * m_ximage->height;
@@ -85,6 +86,8 @@ namespace Huenicorn
 
     m_display.reset(XOpenDisplay(nullptr));
 
+    m_monitorWatcher.emplace(this);
+
     if(!m_display){
       throw std::runtime_error("Could not open any X11 display");
     }
@@ -102,45 +105,65 @@ namespace Huenicorn
 
   glm::ivec2 X11Grabber::displayResolution() const
   {
-    if(!m_selectedMonitor){
+    auto selectedMonitor = m_monitorSelectionData.selectedMonitor.lock();
+    if(!selectedMonitor){
       throw std::runtime_error("No selected monitor");
     }
 
-    return {m_selectedMonitor->width, m_selectedMonitor->height};
+    return {selectedMonitor->width, selectedMonitor->height};
   }
 
 
-  void X11Grabber::selectMonitor(MonitorData* monitor)
+  IGrabber::RefreshRate X11Grabber::displayRefreshRate() const
   {
-    X11MonitorData* x11Monitor = dynamic_cast<X11MonitorData*>(monitor);
-
-    if(!x11Monitor){
-      return;
+    auto selectedMonitor = m_monitorSelectionData.selectedMonitor.lock();
+    if(!selectedMonitor){
+      throw std::runtime_error("No selected monitor");
     }
 
+    return selectedMonitor->refreshRate;
+  }
+
+
+  void X11Grabber::selectMonitor(const WeakMonitor& monitor)
+  {
+    std::lock_guard lock(m_monitorMutex);
     m_xshmData.reset();
-    m_selectedMonitor = x11Monitor;
+    m_monitorSelectionData.selectedMonitor = monitor;
+    Logger::log("selected ", m_monitorSelectionData.selectedMonitor.lock()->name);
   }
 
 
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
+    if(!_ensureMonitorSelection()){
+      return;
+    }
+
     if(!_ensureXShmData()){
       return;
     }
 
+    int width;
+    int height;
     auto ximage = m_xshmData->ximage();
 
-    XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, m_selectedMonitor->xPos, m_selectedMonitor->yPos, AllPlanes);
+    {
+      std::lock_guard lock(m_monitorMutex);
+      auto selectedMonitor = dynamic_pointer_cast<X11MonitorData>(m_monitorSelectionData.selectedMonitor.lock());
+      width = selectedMonitor->width;
+      height = selectedMonitor->height;
+      XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, selectedMonitor->xPos, selectedMonitor->yPos, AllPlanes);
+    }
 
     ImageData grabbedImageData;
     if(ximage->bits_per_pixel > 24){
-      grabbedImageData.imageMatrix = cv::Mat(m_selectedMonitor->height, m_selectedMonitor->width, CV_8UC4, ximage->data);
+      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC4, ximage->data);
       ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
       ImageProcessing::rgbaToRgb(grabbedImageData, grabbedImageData);
     }
     else{
-      grabbedImageData.imageMatrix = cv::Mat(m_selectedMonitor->height, m_selectedMonitor->width, CV_8UC3, ximage->data);
+      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC3, ximage->data);
       ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
     }
 
@@ -148,19 +171,20 @@ namespace Huenicorn
   }
 
 
-  IGrabber::RefreshRate X11Grabber::displayRefreshRate() const
+  void X11Grabber::_notify()
   {
-    if(!m_selectedMonitor){
-      throw std::runtime_error("No selected monitor");
+    {
+      Logger::log("Reset monitor list");
+      std::lock_guard lock(m_monitorMutex);
+      m_monitorSelectionData.selectedMonitor.reset();
+      m_monitorSelectionData.monitors.clear();
     }
-
-    return m_selectedMonitor->refreshRate;
   }
 
 
   void X11Grabber::_initMonitorsList()
   {
-    m_monitors.clear();
+    MonitorSelectionData monitorSelectionData;
 
     if(!m_display.get()){
       throw std::runtime_error("No display available");
@@ -207,7 +231,7 @@ namespace Huenicorn
         int width = crtcInfo->width;
         int height = crtcInfo->height;
 
-        m_monitors.push_back(std::make_unique<X11MonitorData>(
+        monitorSelectionData.monitors.push_back(std::make_shared<X11MonitorData>(
           outputInfo->name,
           width,
           height,
@@ -229,8 +253,8 @@ namespace Huenicorn
     }
 
     // Add whole display surface to choices if there are multiple screens
-    if(m_monitors.size() > 1){
-      m_monitors.push_back(std::make_unique<X11MonitorData>(
+    if(monitorSelectionData.monitors.size() > 1){
+      monitorSelectionData.monitors.push_back(std::make_shared<X11MonitorData>(
         "Combined displays",
         maxX - minX,
         maxY - minY,
@@ -239,6 +263,11 @@ namespace Huenicorn
         minY,
         false
       ));
+    }
+
+    {
+      std::lock_guard lock(m_monitorMutex);
+      std::swap(m_monitorSelectionData, monitorSelectionData);
     }
 
     XRRFreeScreenResources(screenResources);
@@ -257,9 +286,34 @@ namespace Huenicorn
   }
 
 
+  bool X11Grabber::_ensureMonitorSelection()
+  {
+    if(m_monitorSelectionData.ready()){
+      return true;
+    }
+
+    _initMonitorsList();
+
+    for(const auto& monitor : m_monitorSelectionData.monitors){
+      if(static_pointer_cast<X11MonitorData>(monitor)->isPrimary){
+        m_monitorSelectionData.selectedMonitor = monitor;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
   bool X11Grabber::_ensureXShmData()
   {
-    if(!m_selectedMonitor){
+    int width;
+    int height;
+    if(auto monitor = m_monitorSelectionData.selectedMonitor.lock()){
+      width = monitor->width;
+      height = monitor->height;
+    }
+    else{
       return false;
     }
 
@@ -268,7 +322,7 @@ namespace Huenicorn
     }
 
     m_xshmData.reset();
-    m_xshmData.emplace(m_display.get(), m_screenId, m_selectedMonitor);
+    m_xshmData.emplace(m_display.get(), m_screenId, width, height);
 
     return true;
   }
