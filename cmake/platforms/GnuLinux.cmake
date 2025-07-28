@@ -23,9 +23,6 @@ if(${X11_FOUND})
   message("Able to build X11 Grabber !")
 
   set(X11_GRABBER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11MonitorWatcher.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11MonitorWatcher.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/INotifiable.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.hpp
   )

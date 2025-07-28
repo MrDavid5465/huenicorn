@@ -8,6 +8,8 @@
 #include <Huenicorn/Logger.hpp>
 #include <Huenicorn/DummyGrabber.hpp>
 
+#include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
+
 using namespace Huenicorn;
 using namespace std::chrono_literals;
 
@@ -21,9 +23,19 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
 
   {
     const auto& monitors = grabber->monitors();
+    unsigned primaryId;
+
+    int i = 0;
     for(const auto& monitor : monitors){
-      Logger::log(monitor.lock()->name);
+      Logger::log(monitor->name);
+
+      if(static_cast<X11Grabber::X11MonitorData*>(monitor.get())->isPrimary){
+        primaryId = i;
+      }
+
+      i++;
     }
+    grabber->selectMonitor(primaryId);
   }
 
   try{
@@ -45,7 +57,7 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
     const auto& monitors = grabber->monitors();
   
     if(monitors.size()){
-      grabber->selectMonitor(monitors.at(i % monitors.size())); // Let's get mean !
+      //grabber->selectMonitor(i % monitors.size()); // Let's get mean !
     }
 
     grabber->grabFrameSubsample(imageData);

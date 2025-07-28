@@ -6,11 +6,10 @@
 #include <Huenicorn/IGrabber.hpp>
 
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
 #include <X11/extensions/XShm.h>
 
 #include <Huenicorn/MonitorData.hpp>
-#include <Grabbers/GnuLinux/X11/X11MonitorWatcher.hpp>
-#include <Grabbers/GnuLinux/X11/INotifiable.hpp>
 
 
 namespace Huenicorn
@@ -19,10 +18,8 @@ namespace Huenicorn
    * @brief X11 implementation of screen grabber
    * 
    */
-  class X11Grabber : public IGrabber, public INotifiable
+  class X11Grabber : public IGrabber
   {
-  friend X11MonitorWatcher;
-
   public:
     struct DisplayDeleter
     {
@@ -30,13 +27,37 @@ namespace Huenicorn
     };
 
 
+    struct CrtcInfoDeleter
+    {
+      void operator()(XRRCrtcInfo* ptr);
+    };
+
+    using UniqueCrtcInfo = std::unique_ptr<XRRCrtcInfo, CrtcInfoDeleter>;
+
+
+    struct ScreenResourcesDeleter
+    {
+      void operator()(XRRScreenResources* ptr);
+    };
+
+    using UniqueScreenResources = std::unique_ptr<XRRScreenResources, ScreenResourcesDeleter>;
+
+
+    struct OutputInfoDeleter
+    {
+      void operator()(XRROutputInfo* ptr);
+    };
+
+    using UniqueOutputInfo = std::unique_ptr<XRROutputInfo, OutputInfoDeleter>;
+
+
     struct X11MonitorData : public MonitorData
     {
-      X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, int xPos, int yPos, bool isPrimary);
+      X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId);
 
       int xPos{0};
       int yPos{0};
-      bool isPrimary{false};
+      RROutput outputId{0};
     };
 
 
@@ -101,9 +122,10 @@ namespace Huenicorn
      */
     virtual RefreshRate displayRefreshRate() const override;
 
+    bool isMonitorStillValid(const X11MonitorData& mon);
 
     // Methods
-    virtual void selectMonitor(const WeakMonitor& monitor) override;
+    virtual void selectMonitor(unsigned monitorId) override;
 
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
@@ -116,7 +138,7 @@ namespace Huenicorn
     virtual void _initMonitorsList() override;
 
   private:
-    virtual void _notify() override;
+    //virtual void _notify() override;
 
     void _ensureXThreadsInit();
     bool _ensureMonitorSelection();
@@ -125,7 +147,6 @@ namespace Huenicorn
     // Attributes
     int m_screenId; // Once and for all
     std::unique_ptr<Display, DisplayDeleter> m_display;
-    std::optional<X11MonitorWatcher> m_monitorWatcher;
     std::optional<XShmData> m_xshmData;
   };
 }

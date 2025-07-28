@@ -6,11 +6,12 @@ namespace Huenicorn
 {
   struct MonitorData
   {
-    MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate):
+    MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate, bool isPrimary):
     name(name),
     width(width),
     height(height),
-    refreshRate(refreshRate)
+    refreshRate(refreshRate),
+    isPrimary(isPrimary)
     {}
 
     virtual ~MonitorData() = default;
@@ -19,5 +20,6 @@ namespace Huenicorn
     unsigned width{0};
     unsigned height{0};
     double refreshRate{0};
+    bool isPrimary{false};
   };
 }

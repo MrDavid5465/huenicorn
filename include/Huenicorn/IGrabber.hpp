@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include <glm/vec2.hpp>
 
@@ -13,10 +14,8 @@ namespace Huenicorn
 {
   class Config;
 
-  using SharedMonitor = std::shared_ptr<MonitorData>;
-  using WeakMonitor = std::weak_ptr<MonitorData>;
-  using Monitors = std::vector<SharedMonitor>;
-  using WeakMonitors = std::vector<WeakMonitor>;
+  using UniqueMonitor = std::shared_ptr<MonitorData>;
+  using Monitors = std::vector<UniqueMonitor>;
 
 
   /**
@@ -29,11 +28,11 @@ namespace Huenicorn
     struct MonitorSelectionData
     {
       Monitors monitors;
-      WeakMonitor selectedMonitor;
+      std::optional<unsigned> selectedMonitorId;
 
-      bool ready() const
+      MonitorData* selectedMonitor() const
       {
-        return !selectedMonitor.expired() && monitors.size() > 0;
+        return monitors.at(selectedMonitorId.value()).get();
       }
     };
 
@@ -110,7 +109,7 @@ namespace Huenicorn
 
 
     // Methods
-    virtual void selectMonitor(const WeakMonitor& monitor)
+    virtual void selectMonitor(unsigned monitorId)
     {
       if(hasCustomScreenManagement()){
         throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
@@ -126,17 +125,9 @@ namespace Huenicorn
     virtual void grabFrameSubsample(ImageData& imageData) = 0;
 
 
-    inline WeakMonitors monitors() const
+    inline Monitors monitors() const
     {
-      WeakMonitors weakMonitors;
-
-      {
-        std::lock_guard lock(m_monitorMutex);
-        for(const auto& ptr : m_monitorSelectionData.monitors){
-          weakMonitors.emplace_back(ptr);
-        }
-      }
-      return weakMonitors;
+      return m_monitorSelectionData.monitors;
     }
 
     /**
@@ -215,6 +206,6 @@ namespace Huenicorn
     //Attributes
     Config* m_config;
     MonitorSelectionData m_monitorSelectionData;
-    mutable std::mutex m_monitorMutex;
+    //mutable std::mutex m_monitorMutex;
   };
 }
