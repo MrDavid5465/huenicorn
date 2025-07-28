@@ -5,6 +5,7 @@
 
 #include <Huenicorn/IGrabber.hpp>
 
+#include <X11/Xutil.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <X11/extensions/XShm.h>
@@ -14,6 +15,14 @@
 
 namespace Huenicorn
 {
+  inline void DestroyXImage(XImage* img){
+    if(img){
+      XDestroyImage(img);
+    }
+  }
+
+
+
   /**
    * @brief X11 implementation of screen grabber
    * 
@@ -21,34 +30,29 @@ namespace Huenicorn
   class X11Grabber : public IGrabber
   {
   public:
-    struct DisplayDeleter
+    template <auto FreeFunc>
+    struct XDeleter
     {
-      void operator()(Display* ptr);
+      template <typename T>
+      void operator()(T* ptr) const noexcept
+      {
+        if(ptr){
+          FreeFunc(ptr);
+          ptr = nullptr;
+        }
+      }
     };
 
 
-    struct CrtcInfoDeleter
-    {
-      void operator()(XRRCrtcInfo* ptr);
-    };
+    template <typename T, auto FreeFunc>
+    using XUniquePtr = std::unique_ptr<T, XDeleter<FreeFunc>>;
 
-    using UniqueCrtcInfo = std::unique_ptr<XRRCrtcInfo, CrtcInfoDeleter>;
+    using UniqueDisplay = XUniquePtr<Display,    XCloseDisplay>;
+    using UniqueOutputInfo = XUniquePtr<XRROutputInfo,    XRRFreeOutputInfo>;
+    using UniqueCrtcInfo   = XUniquePtr<XRRCrtcInfo,      XRRFreeCrtcInfo>;
+    using UniqueScreenResources  = XUniquePtr<XRRScreenResources, XRRFreeScreenResources>;
+    using UniqueXImage = XUniquePtr<XImage, DestroyXImage>;
 
-
-    struct ScreenResourcesDeleter
-    {
-      void operator()(XRRScreenResources* ptr);
-    };
-
-    using UniqueScreenResources = std::unique_ptr<XRRScreenResources, ScreenResourcesDeleter>;
-
-
-    struct OutputInfoDeleter
-    {
-      void operator()(XRROutputInfo* ptr);
-    };
-
-    using UniqueOutputInfo = std::unique_ptr<XRROutputInfo, OutputInfoDeleter>;
 
 
     struct X11MonitorData : public MonitorData
@@ -79,7 +83,7 @@ namespace Huenicorn
     private:
       Display* m_display{nullptr};
       std::unique_ptr<XShmSegmentInfo> m_shmInfo;
-      std::unique_ptr<XImage, XImageDeleter> m_ximage;
+      UniqueXImage m_ximage;
     };
 
 
@@ -122,7 +126,7 @@ namespace Huenicorn
      */
     virtual RefreshRate displayRefreshRate() const override;
 
-    bool isMonitorStillValid(const X11MonitorData& mon);
+    bool isMonitorStillValid(X11MonitorData* monitor);
 
     // Methods
     virtual void selectMonitor(unsigned monitorId) override;
@@ -146,7 +150,7 @@ namespace Huenicorn
 
     // Attributes
     int m_screenId; // Once and for all
-    std::unique_ptr<Display, DisplayDeleter> m_display;
-    std::optional<XShmData> m_xshmData;
+    UniqueDisplay m_display;
+    std::unique_ptr<XShmData> m_xshmData;
   };
 }

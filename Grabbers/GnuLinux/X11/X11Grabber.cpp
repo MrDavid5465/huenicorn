@@ -13,39 +13,6 @@
 
 namespace Huenicorn
 {
-  // Deleters
-  void X11Grabber::DisplayDeleter::operator()(Display* ptr)
-  {
-    XCloseDisplay(ptr);
-    ptr = nullptr;
-  }
-
-  void X11Grabber::CrtcInfoDeleter::operator()(XRRCrtcInfo* ptr)
-  {
-    XRRFreeCrtcInfo(ptr);
-    ptr = nullptr;
-  }
-
-  void X11Grabber::XShmData::XImageDeleter::operator()(XImage* ptr)
-  {
-    XDestroyImage(ptr);
-    ptr = nullptr;
-  }
-
-  void X11Grabber::ScreenResourcesDeleter::operator()(XRRScreenResources* ptr)
-  {
-    XRRFreeScreenResources(ptr);
-    ptr = nullptr;
-  }
-  
-
-  void X11Grabber::OutputInfoDeleter::operator()(XRROutputInfo* ptr)
-  {
-    XRRFreeOutputInfo(ptr);
-    ptr = nullptr;
-  }
-
-
   // X11MonitorData
   X11Grabber::X11MonitorData::X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId):
   MonitorData(name, width, height, refreshRate, isPrimary),
@@ -155,7 +122,7 @@ namespace Huenicorn
   }
 
 
-  bool X11Grabber::isMonitorStillValid(const X11MonitorData& mon)
+  bool X11Grabber::isMonitorStillValid(X11MonitorData* monitor)
   {
     Display* display = m_display.get();
     UniqueScreenResources res(XRRGetScreenResourcesCurrent(display, DefaultRootWindow(display)));
@@ -165,7 +132,7 @@ namespace Huenicorn
 
     bool valid = false;
 
-    UniqueOutputInfo outputInfo(XRRGetOutputInfo(display, res.get(), mon.outputId));
+    UniqueOutputInfo outputInfo(XRRGetOutputInfo(display, res.get(), monitor->outputId));
 
     if(outputInfo&& outputInfo->crtc != 0 && outputInfo->connection == RR_Connected){
       Logger::log(outputInfo->crtc);
@@ -179,17 +146,10 @@ namespace Huenicorn
   }
 
 
-
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
-    /*
-    if(!_ensureMonitorSelection()){
-      return;
-    }
-    */
-
     auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
-    if(!isMonitorStillValid(*selectedMonitor)){
+    if(!isMonitorStillValid(selectedMonitor)){
       Logger::warn("Monitor disconnected or mode changed — skipping grab.");
       return;
     }
@@ -293,10 +253,10 @@ namespace Huenicorn
         maxX - minX,
         maxY - minY,
         minRefreshRate,
+        false,
         minX,
         minY,
-        false,
-        0, 0, 0
+        0
       ));
     }
     */
@@ -317,46 +277,17 @@ namespace Huenicorn
   }
 
 
-  bool X11Grabber::_ensureMonitorSelection()
-  {
-    /*
-    if(m_monitorSelectionData.ready()){
-      return true;
-    }
-
-    _initMonitorsList();
-
-    for(const auto& monitor : m_monitorSelectionData.monitors){
-      if(static_pointer_cast<X11MonitorData>(monitor)->isPrimary){
-        m_monitorSelectionData.selectedMonitor = monitor;
-        return true;
-      }
-    }
-    */
-
-    return false;
-  }
-
-
   bool X11Grabber::_ensureXShmData()
   {
-    int width;
-    int height;
-    if(auto monitor = m_monitorSelectionData.selectedMonitor()){
-      width = monitor->width;
-      height = monitor->height;
-    }
-    else{
-      return false;
-    }
-
-    if(m_xshmData.has_value()){
+    if(m_xshmData){
       return true;
     }
 
-    m_xshmData.reset();
-    m_xshmData.emplace(m_display.get(), m_screenId, width, height);
+    if(auto monitor = m_monitorSelectionData.selectedMonitor()){
+      m_xshmData = std::make_unique<XShmData>(m_display.get(), m_screenId, monitor->width, monitor->height);
+      return true;
+    }
 
-    return true;
+    return false;
   }
 }
