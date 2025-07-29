@@ -52,7 +52,6 @@ namespace Huenicorn
     using UniqueXImage = XUniquePtr<XImage, DestroyXImage>;
 
 
-
     struct X11MonitorData : public MonitorData
     {
       X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId);
@@ -140,8 +139,9 @@ namespace Huenicorn
     virtual void _initMonitorsList() override;
 
   private:
-    //virtual void _notify() override;
+    static const std::vector<int> s_xRandrEventFlags;
 
+    bool _handleXRandrEvents();
     void _ensureXThreadsInit();
     bool _ensureMonitorSelection();
     bool _ensureXShmData();
@@ -149,6 +149,9 @@ namespace Huenicorn
     // Attributes
     int m_screenId; // Once and for all
     UniqueDisplay m_display;
+    int m_xrandrEventBase;
+    int m_xrandrErrorBase;
+
     std::unique_ptr<XShmData> m_xshmData;
   };
 }

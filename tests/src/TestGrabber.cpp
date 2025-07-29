@@ -53,9 +53,14 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
   int i = 0;
   Huenicorn::Timing::TimePoint start = Huenicorn::Timing::ClockType::now();
   Huenicorn::Timing::TimePoint now = Huenicorn::Timing::ClockType::now();
+
+  int frameDurations = 0;
+  int count = 0;
+
   while(std::chrono::duration_cast<std::chrono::seconds>(now - start).count() < 20){
+    Huenicorn::Timing::TimePoint iterationStart = Huenicorn::Timing::ClockType::now();
     const auto& monitors = grabber->monitors();
-  
+
     if(monitors.size()){
       //grabber->selectMonitor(i % monitors.size()); // Let's get mean !
     }
@@ -71,9 +76,18 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
     }
 
     //Logger::log("Update");
-    std::this_thread::sleep_for(0.2s);
+    std::this_thread::sleep_for(0.1s);
     now = Huenicorn::Timing::ClockType::now();
+    frameDurations += std::chrono::duration_cast<std::chrono::milliseconds>(now - iterationStart).count();
+    count++;
+  
+    // 150.708 FPS with new way of checking
+    // 130.447 FPS without monitor safety
+    // 65.9715 with safety...
   }
+
+  Logger::log("Average FPS : ", (1.0f / (static_cast<float>(frameDurations) / count)) * 1000);
+
 }
 
 

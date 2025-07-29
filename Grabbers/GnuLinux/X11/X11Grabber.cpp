@@ -13,6 +13,12 @@
 
 namespace Huenicorn
 {
+  const std::vector<int> X11Grabber::s_xRandrEventFlags = {
+    RRScreenChangeNotify,
+    RRNotify_OutputChange
+  };
+
+
   // X11MonitorData
   X11Grabber::X11MonitorData::X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId):
   MonitorData(name, width, height, refreshRate, isPrimary),
@@ -75,6 +81,14 @@ namespace Huenicorn
       throw std::runtime_error("Could not open any X11 display");
     }
 
+    int combinedEventFlags = 0;
+    for(auto eventFlag : s_xRandrEventFlags){
+      combinedEventFlags |= eventFlag;
+    }
+
+    XRRQueryExtension(m_display.get(), &m_xrandrEventBase, &m_xrandrErrorBase);
+    XRRSelectInput(m_display.get(), DefaultRootWindow(m_display.get()), combinedEventFlags);
+
     m_screenId = XDefaultScreen(m_display.get()); // Once and for all
   }
 
@@ -122,52 +136,33 @@ namespace Huenicorn
   }
 
 
-  bool X11Grabber::isMonitorStillValid(X11MonitorData* monitor)
+  bool X11Grabber::_handleXRandrEvents()
   {
-    if(!monitor){
-      return false;
-    }
-
     Display* display = m_display.get();
-    UniqueScreenResources res(XRRGetScreenResourcesCurrent(display, DefaultRootWindow(display)));
-    if(!res){
-      return false;
+
+    while(XPending(display)){
+      XEvent e;
+      XNextEvent(display, &e);
+
+      int flag = e.type - m_xrandrEventBase;
+
+      for(auto registeredFlag : s_xRandrEventFlags){
+        if(flag == registeredFlag){
+          return true;
+        }
+      }
     }
 
-    UniqueOutputInfo outputInfo(XRRGetOutputInfo(display, res.get(), monitor->outputId));
-
-    if(!outputInfo){
-      return false;
-    }
-
-    if(outputInfo->crtc == 0 || outputInfo->connection != RR_Connected){
-      return false;
-    }
-
-    UniqueCrtcInfo crtcInfo(XRRGetCrtcInfo(display, res.get(), outputInfo->crtc));
-
-    if(!crtcInfo){
-      return false;
-    }
-
-    if(crtcInfo->mode == None || crtcInfo->width == 0 || crtcInfo->height == 0){
-      return false;
-    }
-
-    if(crtcInfo->width != monitor->width || crtcInfo->height != monitor->height){
-      return false;
-    }
-
-    return true;
+    return false;
   }
 
 
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
-    auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
-    if(!isMonitorStillValid(selectedMonitor)){
+    if(_handleXRandrEvents()){
       Logger::warn("Monitor disconnected or mode changed — skipping grab.");
       _initMonitorsList();
+      m_xshmData.reset();
       return;
     }
 
@@ -175,9 +170,11 @@ namespace Huenicorn
       return;
     }
 
+    auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
     int width = selectedMonitor->width;
     int height = selectedMonitor->height;
     auto ximage = m_xshmData->ximage();
+
     XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, selectedMonitor->xPos, selectedMonitor->yPos, AllPlanes);
 
     ImageData grabbedImageData;
@@ -263,7 +260,6 @@ namespace Huenicorn
 
         if(isPrimary){
           monitorSelectionData.selectedMonitorId = monitorSelectionData.monitors.size() - 1;
-          m_xshmData.reset();
         }
       }
     }
