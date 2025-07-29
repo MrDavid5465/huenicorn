@@ -9,6 +9,7 @@
 
 #include <Huenicorn/ImageData.hpp>
 #include <Huenicorn/MonitorData.hpp>
+#include <Huenicorn/Logger.hpp>
 
 namespace Huenicorn
 {
@@ -32,7 +33,14 @@ namespace Huenicorn
 
       MonitorData* selectedMonitor() const
       {
-        return monitors.at(selectedMonitorId.value()).get();
+        try{
+          return monitors.at(selectedMonitorId.value()).get();
+        }
+        catch(const std::exception& e){
+          Logger::warn("No selected monitor");
+        }
+
+        return nullptr;
       }
     };
 

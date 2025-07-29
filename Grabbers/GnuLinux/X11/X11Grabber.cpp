@@ -124,25 +124,41 @@ namespace Huenicorn
 
   bool X11Grabber::isMonitorStillValid(X11MonitorData* monitor)
   {
+    if(!monitor){
+      return false;
+    }
+
     Display* display = m_display.get();
     UniqueScreenResources res(XRRGetScreenResourcesCurrent(display, DefaultRootWindow(display)));
     if(!res){
       return false;
     }
 
-    bool valid = false;
-
     UniqueOutputInfo outputInfo(XRRGetOutputInfo(display, res.get(), monitor->outputId));
 
-    if(outputInfo&& outputInfo->crtc != 0 && outputInfo->connection == RR_Connected){
-      Logger::log(outputInfo->crtc);
-      UniqueCrtcInfo crtcInfo(XRRGetCrtcInfo(display, res.get(), outputInfo->crtc));
-      if(crtcInfo && crtcInfo->mode != None){
-        valid = true;
-      }
+    if(!outputInfo){
+      return false;
     }
 
-    return valid;
+    if(outputInfo->crtc == 0 || outputInfo->connection != RR_Connected){
+      return false;
+    }
+
+    UniqueCrtcInfo crtcInfo(XRRGetCrtcInfo(display, res.get(), outputInfo->crtc));
+
+    if(!crtcInfo){
+      return false;
+    }
+
+    if(crtcInfo->mode == None || crtcInfo->width == 0 || crtcInfo->height == 0){
+      return false;
+    }
+
+    if(crtcInfo->width != monitor->width || crtcInfo->height != monitor->height){
+      return false;
+    }
+
+    return true;
   }
 
 
@@ -151,6 +167,7 @@ namespace Huenicorn
     auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
     if(!isMonitorStillValid(selectedMonitor)){
       Logger::warn("Monitor disconnected or mode changed — skipping grab.");
+      _initMonitorsList();
       return;
     }
 
@@ -226,13 +243,14 @@ namespace Huenicorn
         int y = crtcInfo->y;
         int width = crtcInfo->width;
         int height = crtcInfo->height;
+        bool isPrimary = (screenResources->outputs[i] == primaryId);
 
         monitorSelectionData.monitors.push_back(std::make_unique<X11MonitorData>(
           outputInfo->name,
           width,
           height,
           refreshRate,
-          screenResources->outputs[i] == primaryId,
+          isPrimary,
           x,
           y,
           screenResources->outputs[i]
@@ -242,6 +260,11 @@ namespace Huenicorn
         minY = std::min(minY, y);
         maxX = std::max(maxX, x + width);
         maxY = std::max(maxY, y + height);
+
+        if(isPrimary){
+          monitorSelectionData.selectedMonitorId = monitorSelectionData.monitors.size() - 1;
+          m_xshmData.reset();
+        }
       }
     }
 
