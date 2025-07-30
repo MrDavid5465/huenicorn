@@ -13,20 +13,38 @@
 
 namespace Huenicorn
 {
-  inline void DestroyXImage(XImage* img){
-    if(img){
-      XDestroyImage(img);
-    }
-  }
-
-
-
   /**
    * @brief X11 implementation of screen grabber
    * 
    */
   class X11Grabber : public IGrabber
   {
+    struct XRandrBases
+    {
+      int eventBase;
+      int errorBase;
+    };
+
+
+
+    class X11MonitorCache
+    {
+    public:
+      X11MonitorCache(Display* display);
+
+      bool updateRequired();
+      bool isConnected(RROutput output);
+
+    private:
+      void _refresh();
+
+      Display* m_display;
+      Window m_root;
+      std::unordered_map<RROutput, bool> m_connectedOutputs;
+    };
+    friend X11MonitorCache;
+
+
   public:
     template <auto FreeFunc>
     struct XDeleter
@@ -41,6 +59,12 @@ namespace Huenicorn
       }
     };
 
+    static inline void destroyXImage(XImage* img)
+    {
+      if(img){
+        XDestroyImage(img);
+      }
+    }
 
     template <typename T, auto FreeFunc>
     using XUniquePtr = std::unique_ptr<T, XDeleter<FreeFunc>>;
@@ -49,7 +73,7 @@ namespace Huenicorn
     using UniqueOutputInfo = XUniquePtr<XRROutputInfo,    XRRFreeOutputInfo>;
     using UniqueCrtcInfo   = XUniquePtr<XRRCrtcInfo,      XRRFreeCrtcInfo>;
     using UniqueScreenResources  = XUniquePtr<XRRScreenResources, XRRFreeScreenResources>;
-    using UniqueXImage = XUniquePtr<XImage, DestroyXImage>;
+    using UniqueXImage = XUniquePtr<XImage, X11Grabber::destroyXImage>;
 
 
     struct X11MonitorData : public MonitorData
@@ -139,19 +163,20 @@ namespace Huenicorn
     virtual void _initMonitorsList() override;
 
   private:
-    static const std::vector<int> s_xRandrEventFlags;
 
-    bool _handleXRandrEvents();
+    //bool _handleXRandrEvents();
     void _ensureXThreadsInit();
+    void _initDisplayEvents();
     bool _ensureMonitorSelection();
     bool _ensureXShmData();
 
     // Attributes
     int m_screenId; // Once and for all
     UniqueDisplay m_display;
-    int m_xrandrEventBase;
-    int m_xrandrErrorBase;
+    std::unique_ptr<X11MonitorCache> m_x11MonitorCache;
 
     std::unique_ptr<XShmData> m_xshmData;
+    static const std::vector<int> s_xRandrEventFlags;
+    static XRandrBases s_xrandrBases;
   };
 }

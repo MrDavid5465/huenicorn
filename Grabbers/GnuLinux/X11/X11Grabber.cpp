@@ -18,6 +18,51 @@ namespace Huenicorn
     RRNotify_OutputChange
   };
 
+  X11Grabber::XRandrBases X11Grabber::s_xrandrBases = {};
+
+
+
+  X11Grabber::X11MonitorCache::X11MonitorCache(Display* display):
+  m_display(display),
+  m_root(DefaultRootWindow(m_display))
+  {
+    _refresh();
+  }
+
+
+  bool X11Grabber::X11MonitorCache::updateRequired()
+  {
+    while(XPending(m_display)){
+      XEvent e;
+      XNextEvent(m_display, &e);
+      int type = e.type - X11Grabber::s_xrandrBases.eventBase;
+      if(type == RRScreenChangeNotify || type == RRNotify_OutputChange){
+        _refresh();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
+  bool X11Grabber::X11MonitorCache::isConnected(RROutput output)
+  {
+    auto it = m_connectedOutputs.find(output);
+    return it != m_connectedOutputs.end() && it->second;
+  }
+
+
+  void X11Grabber::X11MonitorCache::_refresh()
+  {
+    UniqueScreenResources res(XRRGetScreenResourcesCurrent(m_display, m_root));
+    m_connectedOutputs.clear();
+    for(int i = 0; i < res->noutput; i++){
+      UniqueOutputInfo info(XRRGetOutputInfo(m_display, res.get(), res->outputs[i]));
+      m_connectedOutputs[res->outputs[i]] = (info && info->connection == RR_Connected && info->crtc);
+    }
+  }
+
 
   // X11MonitorData
   X11Grabber::X11MonitorData::X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId):
@@ -68,6 +113,16 @@ namespace Huenicorn
     return m_ximage.get();
   }
 
+  void X11Grabber::_initDisplayEvents()
+  {
+    int combinedEventFlags = 0;
+    for(auto eventFlag : s_xRandrEventFlags){
+      combinedEventFlags |= eventFlag;
+    }
+
+    XRRSelectInput(m_display.get(), DefaultRootWindow(m_display.get()), combinedEventFlags);
+    XRRQueryExtension(m_display.get(), &s_xrandrBases.eventBase, &s_xrandrBases.errorBase);
+  }
 
   // X11 Grabber
   X11Grabber::X11Grabber(Config* config):
@@ -81,13 +136,8 @@ namespace Huenicorn
       throw std::runtime_error("Could not open any X11 display");
     }
 
-    int combinedEventFlags = 0;
-    for(auto eventFlag : s_xRandrEventFlags){
-      combinedEventFlags |= eventFlag;
-    }
-
-    XRRQueryExtension(m_display.get(), &m_xrandrEventBase, &m_xrandrErrorBase);
-    XRRSelectInput(m_display.get(), DefaultRootWindow(m_display.get()), combinedEventFlags);
+    _initDisplayEvents();
+    m_x11MonitorCache = std::make_unique<X11MonitorCache>(m_display.get());
 
     m_screenId = XDefaultScreen(m_display.get()); // Once and for all
   }
@@ -136,34 +186,16 @@ namespace Huenicorn
   }
 
 
-  bool X11Grabber::_handleXRandrEvents()
-  {
-    Display* display = m_display.get();
-
-    while(XPending(display)){
-      XEvent e;
-      XNextEvent(display, &e);
-
-      int flag = e.type - m_xrandrEventBase;
-
-      for(auto registeredFlag : s_xRandrEventFlags){
-        if(flag == registeredFlag){
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
 
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
-    if(_handleXRandrEvents()){
+    if(
+      m_x11MonitorCache->updateRequired() ||
+      !m_x11MonitorCache->isConnected(static_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor())->outputId)
+    ){
       Logger::warn("Monitor disconnected or mode changed — skipping grab.");
       _initMonitorsList();
       m_xshmData.reset();
-      return;
     }
 
     if(!_ensureXShmData()){
@@ -171,6 +203,7 @@ namespace Huenicorn
     }
 
     auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
+
     int width = selectedMonitor->width;
     int height = selectedMonitor->height;
     auto ximage = m_xshmData->ximage();
