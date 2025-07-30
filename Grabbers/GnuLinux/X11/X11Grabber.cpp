@@ -13,6 +13,7 @@
 
 namespace Huenicorn
 {
+  /*
   const std::vector<int> X11Grabber::s_xRandrEventFlags = {
     RRScreenChangeNotify,
     RRNotify_OutputChange
@@ -62,6 +63,7 @@ namespace Huenicorn
       m_connectedOutputs[res->outputs[i]] = (info && info->connection == RR_Connected && info->crtc);
     }
   }
+  */
 
 
   // X11MonitorData
@@ -113,6 +115,8 @@ namespace Huenicorn
     return m_ximage.get();
   }
 
+
+  /*
   void X11Grabber::_initDisplayEvents()
   {
     int combinedEventFlags = 0;
@@ -123,6 +127,8 @@ namespace Huenicorn
     XRRSelectInput(m_display.get(), DefaultRootWindow(m_display.get()), combinedEventFlags);
     XRRQueryExtension(m_display.get(), &s_xrandrBases.eventBase, &s_xrandrBases.errorBase);
   }
+  */
+
 
   // X11 Grabber
   X11Grabber::X11Grabber(Config* config):
@@ -136,8 +142,10 @@ namespace Huenicorn
       throw std::runtime_error("Could not open any X11 display");
     }
 
+    /*
     _initDisplayEvents();
     m_x11MonitorCache = std::make_unique<X11MonitorCache>(m_display.get());
+    */
 
     m_screenId = XDefaultScreen(m_display.get()); // Once and for all
   }
@@ -189,6 +197,7 @@ namespace Huenicorn
 
   void X11Grabber::grabFrameSubsample(ImageData& imageData)
   {
+    /*
     if(
       m_x11MonitorCache->updateRequired() ||
       !m_x11MonitorCache->isConnected(static_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor())->outputId)
@@ -197,6 +206,7 @@ namespace Huenicorn
       _initMonitorsList();
       m_xshmData.reset();
     }
+    */
 
     if(!_ensureXShmData()){
       return;

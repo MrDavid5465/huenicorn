@@ -8,8 +8,6 @@
 #include <Huenicorn/Logger.hpp>
 #include <Huenicorn/DummyGrabber.hpp>
 
-#include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
-
 using namespace Huenicorn;
 using namespace std::chrono_literals;
 
@@ -29,7 +27,7 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
     for(const auto& monitor : monitors){
       Logger::log(monitor->name);
 
-      if(static_cast<X11Grabber::X11MonitorData*>(monitor.get())->isPrimary){
+      if(monitor.get()->isPrimary){
         primaryId = i;
       }
 

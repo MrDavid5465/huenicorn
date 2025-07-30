@@ -19,6 +19,7 @@ namespace Huenicorn
    */
   class X11Grabber : public IGrabber
   {
+    /*
     struct XRandrBases
     {
       int eventBase;
@@ -43,6 +44,7 @@ namespace Huenicorn
       std::unordered_map<RROutput, bool> m_connectedOutputs;
     };
     friend X11MonitorCache;
+    */
 
 
   public:
@@ -164,19 +166,18 @@ namespace Huenicorn
 
   private:
 
-    //bool _handleXRandrEvents();
     void _ensureXThreadsInit();
-    void _initDisplayEvents();
+    //void _initDisplayEvents();
     bool _ensureMonitorSelection();
     bool _ensureXShmData();
 
     // Attributes
     int m_screenId; // Once and for all
     UniqueDisplay m_display;
-    std::unique_ptr<X11MonitorCache> m_x11MonitorCache;
+    //std::unique_ptr<X11MonitorCache> m_x11MonitorCache;
 
     std::unique_ptr<XShmData> m_xshmData;
-    static const std::vector<int> s_xRandrEventFlags;
-    static XRandrBases s_xrandrBases;
+    //static const std::vector<int> s_xRandrEventFlags;
+    //static XRandrBases s_xrandrBases;
   };
 }
