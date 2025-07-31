@@ -117,7 +117,7 @@ namespace Huenicorn
 
 
     // Methods
-    virtual void selectMonitor(unsigned monitorId)
+    virtual void selectMonitor(unsigned /*monitorId*/)
     {
       if(hasCustomScreenManagement()){
         throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
@@ -214,6 +214,5 @@ namespace Huenicorn
     //Attributes
     Config* m_config;
     MonitorSelectionData m_monitorSelectionData;
-    //mutable std::mutex m_monitorMutex;
   };
 }
