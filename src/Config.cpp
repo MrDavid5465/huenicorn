@@ -4,10 +4,13 @@
 #include <fstream>
 
 #include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Serialization/Config.hpp>
 
 
 namespace Huenicorn
 {
+  using namespace Serialization;
+
   Config::Config(const std::filesystem::path& settingsRoot):
   m_configFilePath(settingsRoot / "config.json")
   {
@@ -23,94 +26,93 @@ namespace Huenicorn
 
   bool Config::initialSetupOk() const
   {
-    return m_bridgeAddress.has_value() && m_credentials.has_value();
+    try{
+      const auto& data = m_configData.value();
+      const auto& bridgeAddress = data.bridgeAddress;
+      const auto& credentials = data.credentials;
+
+      return bridgeAddress.has_value() && credentials.has_value();
+    }
+    catch(const std::exception& e){
+      return false;
+    }
+
+    return true;
   }
 
 
   int Config::restServerPort() const
   {
-    return m_restServerPort;
+    return m_configData.value().restServerPort.value();
   }
 
 
   const std::string& Config::boundBackendIP() const
   {
-    return m_boundBackendIP;
+    return m_configData.value().boundBackendIP.value();
   }
 
 
   unsigned Config::refreshRate() const
   {
-    return m_refreshRate;
+    return m_configData.value().refreshRate.value();
   }
 
 
   unsigned Config::subsampleWidth() const
   {
-    return m_subsampleWidth;
+    return m_configData.value().subsampleWidth.value();
   }
 
 
   Interpolation::Type Config::interpolation() const
   {
-    return m_interpolation;
+    return m_configData.value().interpolation.value();
   }
 
 
   const std::optional<std::string>& Config::bridgeAddress() const
   {
-    return m_bridgeAddress;
-  }
-
-
-  const std::string& Config::username() const
-  {
-    return m_credentials.value().username();
-  }
-
-
-  const std::string& Config::clientkey() const
-  {
-    return m_credentials.value().clientkey();
+    return m_configData.value().bridgeAddress;
   }
 
 
   const std::optional<std::string>& Config::profileName() const
   {
-    return m_profileName;
+    return m_configData.value().profileName;
   }
 
 
   const std::optional<Credentials>& Config::credentials() const
   {
-    return m_credentials;
+    return m_configData.value().credentials;
   }
 
 
   void Config::setBridgeAddress(const std::string& bridgeAddress)
   {
-    m_bridgeAddress.emplace(bridgeAddress);
+    m_configData.value().bridgeAddress.emplace(bridgeAddress);
     _save();
   }
 
 
   void Config::setCredentials(const Credentials& credentials)
   {
-    m_credentials.emplace(credentials);
+    m_configData.value().credentials.emplace(credentials);
     _save();
   }
 
 
   void Config::setProfileName(const std::string& profileName)
   {
-    m_profileName.emplace(profileName);
+    m_configData.value().profileName.emplace(profileName);
     _save();
   }
 
 
   void Config::setSubsampleWidth(unsigned subsampleWidth)
   {
-    m_subsampleWidth = subsampleWidth;
+    m_configData.value().subsampleWidth = subsampleWidth;
     _save();
   }
 
@@ -121,92 +123,69 @@ namespace Huenicorn
       refreshRate = 1;
     }
 
-    m_refreshRate = refreshRate;
+    m_configData.value().refreshRate = refreshRate;
     _save();
   }
 
 
   void Config::setInterpolation(Interpolation::Type interpolation)
   {
-    m_interpolation = interpolation;
+    m_configData.value().interpolation = interpolation;
     _save();
   }
 
 
   bool Config::_loadConfigFile()
   {
-    nlohmann::json jsonConfigRoot = nlohmann::json::object();
+    const Data defaultConfigData = {
+      .restServerPort = 8215,
+      .boundBackendIP = "0.0.0.0",
+      .bridgeAddress = {},
+      .credentials = {},
+      .profileName = {},
+      .refreshRate = 0,
+      .subsampleWidth = 0,
+      .interpolation = Interpolation::Type::Area
+    };
+
+    Json jsonConfig = Json::object();
+    if(!std::filesystem::exists(m_configFilePath)){
+      m_configData.emplace(defaultConfigData);
+      _save();
+      return false;
+    }
+
+    jsonConfig = Json::parse(std::ifstream(m_configFilePath));
+    m_configData = jsonConfig.get<Data>();
+
     bool requireSave = false;
 
-    if(std::filesystem::exists(m_configFilePath)){
-      jsonConfigRoot = nlohmann::json::parse(std::ifstream(m_configFilePath));
-    }
+    auto& configData = m_configData.value();
 
-    if(jsonConfigRoot.contains("restServerPort")){
-      m_restServerPort = jsonConfigRoot.at("restServerPort");
-    }
-    else{
+    if(!configData.restServerPort.has_value()){
+      configData.restServerPort = defaultConfigData.restServerPort.value();
       requireSave = true;
     }
 
-    if(jsonConfigRoot.contains("boundBackendIP")){
-      m_boundBackendIP = jsonConfigRoot.at("boundBackendIP");
-    }
-    else{
+    if(!configData.boundBackendIP.has_value()){
+      configData.boundBackendIP = defaultConfigData.boundBackendIP.value();
       requireSave = true;
     }
 
-    bool ready = true;
-    if(!jsonConfigRoot.contains("bridgeAddress")){
-      ready = false;
-    }
-    else{
-      m_bridgeAddress.emplace(jsonConfigRoot.at("bridgeAddress"));
-    }
-
-    if(!jsonConfigRoot.contains("credentials")){
+    if(
+      !configData.bridgeAddress.has_value()
+      ||
+      !configData.credentials.has_value()
+    ){
+      Logger::warn("Incomplete config. Initial setup is required");
       return false;
-    }
-    else{
-      const auto& jsonCredentials = jsonConfigRoot.at("credentials");
-      if(!jsonCredentials.contains("username")){
-        Logger::error("Missing 'username' in config");
-        return false;
-      }
-
-      if(!jsonCredentials.contains("clientkey")){
-        Logger::error("Missing 'clientkey' in config");
-        return false;
-      }
-
-      m_credentials.emplace(jsonCredentials.get<Credentials>());
-    }
-
-    if(!ready){
-      return false;
-    }
-
-    if(jsonConfigRoot.contains("profileName")){
-      m_profileName.emplace(jsonConfigRoot.at("profileName"));
-    }
-
-    if(jsonConfigRoot.contains("refreshRate")){
-      m_refreshRate = jsonConfigRoot.at("refreshRate");
-    }
-
-    if(jsonConfigRoot.contains("subsampleWidth")){
-      m_subsampleWidth = jsonConfigRoot.at("subsampleWidth");
-    }
-
-    if(jsonConfigRoot.contains("interpolation")){
-      m_interpolation = jsonConfigRoot.at("interpolation");
     }
 
     if(requireSave){
       _save();
     }
 
-    return !jsonConfigRoot.empty();
+    return true;
   }
 
 
@@ -217,30 +196,6 @@ namespace Huenicorn
     }
 
     std::ofstream configFile(m_configFilePath);
-    configFile << nlohmann::json(*this).dump(2) << "\n";
-  }
-
-
-  void to_json(nlohmann::json& jsonConfig, const Config& config)
-  {
-    jsonConfig = {
-      {"subsampleWidth", config.subsampleWidth()},
-      {"refreshRate", config.refreshRate()},
-      {"restServerPort", config.restServerPort()},
-      {"interpolation", config.interpolation()},
-      {"boundBackendIP", config.boundBackendIP()}
-    };
-
-    if(config.bridgeAddress().has_value()){
-      jsonConfig["bridgeAddress"] = config.bridgeAddress().value();
-    }
-
-    if(config.credentials().has_value()){
-      jsonConfig["credentials"] = nlohmann::json(config.credentials().value());
-    }
-
-    if(config.profileName().has_value()){
-      jsonConfig["profileName"] = config.profileName().value();
-    }
+    configFile << Json(m_configData.value()).dump(2) << "\n";
   }
 }

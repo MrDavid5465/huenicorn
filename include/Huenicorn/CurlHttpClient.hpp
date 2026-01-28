@@ -48,7 +48,7 @@ namespace Huenicorn
      * @param method HTTP method
      * @param body HTTP request body
      * @param headers HTTP request headers
-     * @return nlohmann::json JSON response
+     * @return Json JSON response
      */
     virtual std::optional<Response> sendRequest(const std::string& url, const std::string& method, const std::string& body = "", const Headers& headers = {}) override;
   };

@@ -2,6 +2,8 @@
 
 #include <glm/common.hpp>
 
+#include <Huenicorn/Serialization/Channel.hpp>
+
 
 namespace Huenicorn
 {
@@ -113,24 +115,4 @@ namespace Huenicorn
     m_state = State::Inactive;
   }
 
-
-  void to_json(nlohmann::json& jsonChannel, const Channel& channel)
-  {
-    jsonChannel = {
-      {"active", channel.state() == Channel::State::Active},
-      {"uvs", nlohmann::json(channel.uvs())},
-      {"gammaFactor", channel.gammaFactor()},
-      {"devices", nlohmann::json(channel.devices())}
-    };
-  }
-
-
-  void to_json(nlohmann::json& jsonChannels, const Channels& channels)
-  {
-    jsonChannels = nlohmann::json::array();
-    for(const auto& channel : channels){
-      auto& it = jsonChannels.emplace_back(nlohmann::json(channel.second));
-      it["channelId"] = channel.first;
-    }
-  }
 }

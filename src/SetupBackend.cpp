@@ -87,7 +87,7 @@ namespace Huenicorn
 
   void SetupBackend::_getVersion(crow::response& res) const
   {
-    nlohmann::json jsonResponse = {
+    Serialization::Json jsonResponse = {
       {"version", m_huenicornCore->version()},
     };
 
@@ -124,7 +124,7 @@ namespace Huenicorn
 
   void SetupBackend::_autodetectBridge(crow::response& res)
   {
-    nlohmann::json jsonResponse = m_huenicornCore->autodetectedBridge();
+    Serialization::Json jsonResponse = m_huenicornCore->autodetectedBridge();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -134,7 +134,7 @@ namespace Huenicorn
 
   void SetupBackend::_configFilePath(crow::response& res)
   {
-    nlohmann::json jsonResponse = {{"configFilePath", m_huenicornCore->configFilePath()}};
+    Serialization::Json jsonResponse = {{"configFilePath", m_huenicornCore->configFilePath()}};
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -145,11 +145,11 @@ namespace Huenicorn
   void SetupBackend::_validateBridgeAddress(const crow::request& req, crow::response& res)
   {
     const std::string& data = req.body;
-    nlohmann::json jsonBridgeAddressData = nlohmann::json::parse(data);
+    Serialization::Json jsonBridgeAddressData = Serialization::Json::parse(data);
 
     std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
 
-    nlohmann::json jsonResponse = {{"succeeded", m_huenicornCore->validateBridgeAddress(bridgeAddress)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_huenicornCore->validateBridgeAddress(bridgeAddress)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -161,11 +161,11 @@ namespace Huenicorn
   void SetupBackend::_validateCredentials(const crow::request& req, crow::response& res)
   {
     const std::string& data = req.body;
-    nlohmann::json jsonCredentials = nlohmann::json::parse(data);
+    Serialization::Json jsonCredentials = Serialization::Json::parse(data);
 
     Credentials credentials(jsonCredentials.at("username"), jsonCredentials.at("clientkey"));
 
-    nlohmann::json jsonResponse = {{"succeeded", m_huenicornCore->validateCredentials(credentials)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_huenicornCore->validateCredentials(credentials)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -176,7 +176,7 @@ namespace Huenicorn
 
   void SetupBackend::_registerNewUser(crow::response& res)
   {
-    nlohmann::json jsonResponse = m_huenicornCore->registerNewUser();
+    Serialization::Json jsonResponse = m_huenicornCore->registerNewUser();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);

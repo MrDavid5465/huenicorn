@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <functional>
 
-#include <nlohmann/json.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
 
 
 namespace Huenicorn
@@ -18,7 +18,7 @@ namespace Huenicorn
    */
   class SetupBackend : public IRestServer
   {
-    using Callback = std::function<void(const nlohmann::json& data, crow::response& res)>;
+    using Callback = std::function<void(const Serialization::Json& data, crow::response& res)>;
 
   public:
     // Constructor / destructor

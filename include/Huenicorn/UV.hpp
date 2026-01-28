@@ -2,7 +2,6 @@
 
 #include <glm/vec2.hpp>
 
-#include <nlohmann/json.hpp>
 
 namespace Huenicorn
 {
@@ -30,9 +29,4 @@ namespace Huenicorn
     BottomLeft = 2,
     BottomRight = 3
   };
-
-
-  // Serialization
-  void to_json(nlohmann::json& jsonUv, const UV& uv);
-  void to_json(nlohmann::json& jsonUvs, const UVs& uvs);
 }

@@ -23,7 +23,7 @@ namespace Huenicorn
       throw std::runtime_error("CURL initialization failed");
     }
 
-    nlohmann::json jsonBody = nlohmann::json::object();
+    Serialization::Json jsonBody = Serialization::Json::object();
 
     curl_easy_setopt(handle.get(), CURLOPT_URL, url.c_str());
     curl_easy_setopt(handle.get(), CURLOPT_CUSTOMREQUEST, method.c_str());

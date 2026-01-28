@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <Huenicorn/Serialization/JsonSerializer.hpp>
 
 namespace Huenicorn
 {
@@ -65,18 +65,12 @@ namespace Huenicorn
      */
     std::vector<unsigned char> clientkeyBytes() const;
 
-    friend void from_json(const nlohmann::json& jsonCredentials, Credentials& credentials);
-
   private:
     // Attributes
     std::string m_username;
     std::string m_clientkey;
+
+    template<typename T>
+    friend struct Huenicorn::Serialization::JsonSerializer;
   };
-
-
-  // Deserialization
-  void from_json(const nlohmann::json& jsonCredentials, Credentials& credentials);
-
-  // Serialization
-  void to_json(nlohmann::json& jsonCredentials, const Credentials& credentials);
 }

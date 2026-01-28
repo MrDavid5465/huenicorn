@@ -84,10 +84,8 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/CurlHttpClient.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DtlsClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfiguration.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
@@ -98,8 +96,13 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Streamer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/UV.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp

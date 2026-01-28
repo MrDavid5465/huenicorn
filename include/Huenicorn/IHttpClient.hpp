@@ -4,7 +4,8 @@
 #include <map>
 #include <optional>
 
-#include <nlohmann/json.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
+
 
 namespace Huenicorn
 {
@@ -29,9 +30,9 @@ namespace Huenicorn
         return m_response;
       }
 
-      const nlohmann::json asJson() const
+      const Serialization::Json asJson() const
       {
-        return nlohmann::json::parse(m_response);
+        return Serialization::Json::parse(m_response);
       }
 
     private:
@@ -47,7 +48,7 @@ namespace Huenicorn
      * @param method HTTP method
      * @param body HTTP request body
      * @param headers HTTP request headers
-     * @return nlohmann::json JSON response
+     * @return Serialization::Json JSON response
      */
     virtual std::optional<Response> sendRequest(const std::string& url, const std::string& method, const std::string& body = "", const Headers& headers = {}) = 0;
   };

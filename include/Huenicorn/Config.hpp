@@ -3,8 +3,6 @@
 #include <filesystem>
 #include <optional>
 
-#include <nlohmann/json.hpp>
-
 #include <Huenicorn/Interpolation.hpp>
 #include <Huenicorn/Credentials.hpp>
 
@@ -18,6 +16,21 @@ namespace Huenicorn
   class Config
   {
   public:
+    struct Data
+    {
+      std::optional<unsigned> restServerPort;
+      std::optional<std::string> boundBackendIP;
+
+      std::optional<std::string> bridgeAddress;
+      std::optional<Credentials> credentials;
+      std::optional<std::string> profileName;
+
+      std::optional<unsigned> refreshRate{0};
+      std::optional<unsigned> subsampleWidth{0};
+      std::optional<Interpolation::Type> interpolation{Interpolation::Type::Area};
+    };
+    
+
     // Constructor
     /**
      * @brief Config constructor
@@ -67,22 +80,6 @@ namespace Huenicorn
      * @return const std::optional<std::string>& Registered address of the Hue bridge
      */
     const std::optional<std::string>& bridgeAddress() const;
-
-
-    /**
-     * @brief Returns the registered username from credentials
-     * 
-     * @return const std::string& Registered username
-     */
-    const std::string& username() const;
-
-
-    /**
-     * @brief Returns the registered clientkey from credentials
-     * 
-     * @return const std::string& Registered clientkey
-     */
-    const std::string& clientkey() const;
 
 
     /**
@@ -193,15 +190,9 @@ namespace Huenicorn
 
     // Attributes
     std::filesystem::path m_configFilePath;
-    int m_restServerPort{8215};
-    std::string m_boundBackendIP{"0.0.0.0"};
-    std::optional<std::string> m_bridgeAddress;
-    std::optional<Credentials> m_credentials;
-    std::optional<std::string> m_profileName;
-    unsigned m_refreshRate{0};
-    unsigned m_subsampleWidth{0};
-    Interpolation::Type m_interpolation{Interpolation::Type::Area};
-  };
+    std::optional<Data> m_configData;
 
-  void to_json(nlohmann::json& jsonConfig, const Config& config);
+    template<typename T>
+    friend struct Huenicorn::Serialization::JsonSerializer;
+  };
 }

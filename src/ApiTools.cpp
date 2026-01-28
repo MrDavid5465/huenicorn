@@ -1,8 +1,8 @@
 #include <Huenicorn/ApiTools.hpp>
 
-#include <nlohmann/json.hpp>
-
 #include <Huenicorn/HttpRequestUtils.hpp>
+#include <Huenicorn/Serialization/Device.hpp>
+#include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
 
 namespace Huenicorn
@@ -25,8 +25,7 @@ namespace Huenicorn
 
         auto jsonEntConfs = entConfResponse.value().asJson();
 
-        for(const nlohmann::json& jsonEntConf : jsonEntConfs.at("data")){
-
+        for(const auto& jsonEntConf : jsonEntConfs.at("data")){
           EntertainmentConfiguration entConf = jsonEntConf.get<EntertainmentConfiguration>();
 
           for(auto& [lightId, device] : entConf.devices){
@@ -124,7 +123,7 @@ namespace Huenicorn
 
     void setStreamingState(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress, bool active)
     {
-      nlohmann::json jsonBody = {
+      Serialization::Json jsonBody = {
         {"action", active ? "start" : "stop"},
         {"metadata", {{"name", entertainmentConfigurationEntry.second.name}}}
       };

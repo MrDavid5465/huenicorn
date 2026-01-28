@@ -3,14 +3,17 @@
 #include <fstream>
 #include <chrono>
 
+#include <Huenicorn/DummyGrabber.hpp>
+#include <Huenicorn/HttpRequestUtils.hpp>
 #include <Huenicorn/ImageProcessing.hpp>
 #include <Huenicorn/Interpolation.hpp>
 #include <Huenicorn/Logger.hpp>
-#include <Huenicorn/HttpRequestUtils.hpp>
+#include <Huenicorn/PlatformSelector.hpp>
 #include <Huenicorn/SetupBackend.hpp>
 #include <Huenicorn/WebUIBackend.hpp>
-#include <Huenicorn/DummyGrabber.hpp>
-#include <Huenicorn/PlatformSelector.hpp>
+
+#include <Huenicorn/Serialization/Channel.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
 
 
 using namespace std::chrono_literals;
@@ -103,7 +106,7 @@ namespace Huenicorn
   }
 
 
-  nlohmann::json HuenicornCore::autodetectedBridge() const
+  Serialization::Json HuenicornCore::autodetectedBridge() const
   {
     auto detectedBridgeResponse = HttpRequestUtils::sendRequest("https://discovery.meethue.com/", "GET");
 
@@ -117,12 +120,12 @@ namespace Huenicorn
   }
 
 
-  nlohmann::json HuenicornCore::registerNewUser()
+  Serialization::Json HuenicornCore::registerNewUser()
   {
     std::string sessionUsername = platformAdapter.getUsername();
     std::string deviceType = "huenicorn#" + sessionUsername;
 
-    nlohmann::json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
+    Serialization::Json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
     auto response = HttpRequestUtils::sendRequest(m_config.bridgeAddress().value() + "/api", "POST", request.dump());
 
     if(!response.has_value()){
@@ -301,11 +304,11 @@ namespace Huenicorn
       return;
     }
 
-    nlohmann::json profile;
+    Serialization::Json profile;
     if(m_selector->validSelection()){
-      profile = nlohmann::json{
+      profile = Serialization::Json{
         {"entertainmentConfigurationId", m_selector->currentEntertainmentConfigurationId().value()},
-        {"channels", nlohmann::json(m_channels)}
+        {"channels", m_channels}
       };
     }
 
@@ -329,14 +332,14 @@ namespace Huenicorn
   }
 
 
-  std::optional<nlohmann::json> HuenicornCore::_getProfile()
+  std::optional<Serialization::Json> HuenicornCore::_getProfile()
   {
     std::filesystem::path profilePath = _profilePath();
-    nlohmann::json jsonProfile = nlohmann::json::object();
+    Serialization::Json jsonProfile = Serialization::Json::object();
 
     if(!profilePath.empty() && std::filesystem::exists(profilePath) && std::filesystem::is_regular_file(profilePath)){
       std::ifstream profileFile(profilePath);
-      return nlohmann::json::parse(profileFile);
+      return Serialization::Json::parse(profileFile);
     }
 
     return std::nullopt;
@@ -442,7 +445,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_initChannels(const nlohmann::json& jsonChannels)
+  void HuenicornCore::_initChannels(const Serialization::Json& jsonChannels)
   {
     const std::string& username = m_config.credentials().value().username();
     const std::string& bridgeAddress =  m_config.bridgeAddress().value();
@@ -457,7 +460,7 @@ namespace Huenicorn
       for(const auto& jsonProfileChannel : jsonChannels){
         if(jsonProfileChannel.at("channelId") == id){
           bool active = jsonProfileChannel.at("active");
-          nlohmann::json jsonUVs = jsonProfileChannel.at("uvs");
+          Serialization::Json jsonUVs = jsonProfileChannel.at("uvs");
           float uvAx = jsonUVs.at("uvA").at("x");
           float uvAy = jsonUVs.at("uvA").at("y");
           float uvBx = jsonUVs.at("uvB").at("x");
@@ -512,10 +515,10 @@ namespace Huenicorn
     }
 
     auto profilePath = _profilePath();
-    nlohmann::json jsonChannels = nlohmann::json::object();
+    Serialization::Json jsonChannels = Serialization::Json::object();
 
     if(std::filesystem::is_regular_file(profilePath)){
-      nlohmann::json jsonProfile = nlohmann::json::parse(std::ifstream(_profilePath()));
+      Serialization::Json jsonProfile = Serialization::Json::parse(std::ifstream(_profilePath()));
       if(jsonProfile.contains("channels")){
         jsonChannels = jsonProfile.at("channels");
       }

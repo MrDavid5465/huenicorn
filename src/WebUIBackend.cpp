@@ -3,14 +3,16 @@
 #include <fstream>
 #include <sstream>
 
-#include <nlohmann/json.hpp>
-
 #include <Huenicorn/HuenicornCore.hpp>
 #include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Serialization/Channel.hpp>
+#include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
 
 namespace Huenicorn
 {
+  using namespace Serialization;
+
   WebUIBackend::WebUIBackend(HuenicornCore* huenicornCore):
   IRestServer("index.html"),
   m_huenicornCore(huenicornCore)
@@ -108,7 +110,7 @@ namespace Huenicorn
 
   void WebUIBackend::_getVersion(crow::response& res) const
   {
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       {"version", m_huenicornCore->version()},
     };
 
@@ -121,7 +123,7 @@ namespace Huenicorn
 
   void WebUIBackend::_getWebUIStatus(crow::response& res) const
   {
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       {"ready", true},
     };
 
@@ -134,10 +136,10 @@ namespace Huenicorn
 
   void WebUIBackend::_getEntertainmentConfigurations(crow::response& res) const
   {
-    auto entertainmentConfigurations = nlohmann::json(m_huenicornCore->entertainmentConfigurations());
+    const auto& entertainmentConfigurations = m_huenicornCore->entertainmentConfigurations();
     std::string currentEntertainmentConfigurationId = m_huenicornCore->currentEntertainmentConfigurationId().value();
 
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       {"entertainmentConfigurations", entertainmentConfigurations},
       {"currentEntertainmentConfigurationId", currentEntertainmentConfigurationId}
     };
@@ -151,7 +153,7 @@ namespace Huenicorn
 
   void WebUIBackend::_getChannel(crow::response& res, uint8_t channelId) const
   {
-    std::string response = nlohmann::json(m_huenicornCore->channels().at(channelId)).dump();
+    std::string response = Json(m_huenicornCore->channels().at(channelId)).dump();
 
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -161,7 +163,8 @@ namespace Huenicorn
 
   void WebUIBackend::_getChannels(crow::response& res) const
   {
-    std::string response = nlohmann::json(m_huenicornCore->channels()).dump();
+    std::string response = Json(m_huenicornCore->channels()).dump();
+
     res.set_header("Content-Type", "application/json");
     res.write(response);
     res.end();
@@ -172,7 +175,7 @@ namespace Huenicorn
   {
     auto displayResolution = m_huenicornCore->displayResolution();
 
-    nlohmann::json jsonSubsampleCandidates = nlohmann::json::array();
+    Json jsonSubsampleCandidates = Json::array();
     for(const auto& candidate : m_huenicornCore->subsampleResolutionCandidates()){
       jsonSubsampleCandidates.push_back({
         {"x", candidate.x},
@@ -180,7 +183,7 @@ namespace Huenicorn
       });
     }
 
-    nlohmann::json jsonDisplayInfo{
+    Json jsonDisplayInfo{
       {"x", displayResolution.x},
       {"y", displayResolution.y},
       {"subsampleWidth", m_huenicornCore->subsampleWidth()},
@@ -198,14 +201,14 @@ namespace Huenicorn
 
   void WebUIBackend::_getInterpolationInfo(crow::response& res) const
   {
-    nlohmann::json jsonAvailableInterpolations = nlohmann::json::array();
+    Json jsonAvailableInterpolations = Json::array();
     for(const auto& [key, value] : m_huenicornCore->availableInterpolations()){
       jsonAvailableInterpolations.push_back({
         {key, value},
       });
     }
 
-    nlohmann::json jsonInterpolationInfo = {
+    Json jsonInterpolationInfo = {
       {"available", jsonAvailableInterpolations},
       {"current", m_huenicornCore->interpolation()}
     };
@@ -220,14 +223,14 @@ namespace Huenicorn
   void WebUIBackend::_setEntertainmentConfiguration(const crow::request& req, crow::response& res) const
   {
     const std::string& data = req.body;
-    std::string entertainmentConfigurationId = nlohmann::json::parse(data);
+    std::string entertainmentConfigurationId = Json::parse(data);
 
     bool succeeded = m_huenicornCore->setEntertainmentConfiguration(entertainmentConfigurationId);
 
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       {"succeeded", succeeded},
       {"entertainmentConfigurationId", entertainmentConfigurationId},
-      {"channels", nlohmann::json(m_huenicornCore->channels())}
+      {"channels", Json(m_huenicornCore->channels())}
     };
 
     std::string response = jsonResponse.dump();
@@ -240,7 +243,7 @@ namespace Huenicorn
   void WebUIBackend::_setChannelUV(const crow::request& req, crow::response& res, uint8_t channelId) const
   {
     const std::string& data = req.body;
-    nlohmann::json jsonUV = nlohmann::json::parse(data);
+    Json jsonUV = Json::parse(data);
 
     float x = jsonUV.at("x");
     float y = jsonUV.at("y");
@@ -249,7 +252,7 @@ namespace Huenicorn
     const auto& clampedUVs = m_huenicornCore->setChannelUV(channelId, {x, y}, uvCorner);
 
     // TODO : Serialize from JsonSerializer
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       {"uvA", {{"x", clampedUVs.min.x}, {"y", clampedUVs.min.y}}},
       {"uvB", {{"x", clampedUVs.max.x}, {"y", clampedUVs.max.y}}}
     };
@@ -264,11 +267,11 @@ namespace Huenicorn
   void WebUIBackend::_setChannelGammaFactor(const crow::request& req, crow::response& res, uint8_t channelId) const
   {
     const std::string& data = req.body;
-    nlohmann::json jsonGammaFactorData = nlohmann::json::parse(data);
+    Json jsonGammaFactorData = Json::parse(data);
     float gammaFactor = jsonGammaFactorData.at("gammaFactor");
 
     if(!m_huenicornCore->setChannelGammaFactor(channelId, gammaFactor)){
-      std::string response = nlohmann::json{
+      std::string response = Json{
         {"succeeded", false},
         {"error", "invalid channel id"}
       }.dump();
@@ -279,7 +282,7 @@ namespace Huenicorn
       return;
     }
 
-    nlohmann::json jsonResponse = nlohmann::json{
+    Json jsonResponse = Json{
       {"succeeded", true},
       {"gammaFactor", gammaFactor}
     };
@@ -294,11 +297,11 @@ namespace Huenicorn
   void WebUIBackend::_setSubsampleWidth(const crow::request& req, crow::response& res) const
   {
     const std::string& data = req.body;
-    int subsampleWidth = nlohmann::json::parse(data).get<int>();
+    int subsampleWidth = Json::parse(data).get<int>();
     m_huenicornCore->setSubsampleWidth(subsampleWidth);
 
     glm::ivec2 displayResolution = m_huenicornCore->displayResolution();
-    nlohmann::json jsonDisplay{
+    Json jsonDisplay{
       {"x", displayResolution.x},
       {"y", displayResolution.y},
       {"subsampleWidth", m_huenicornCore->subsampleWidth()}
@@ -314,10 +317,10 @@ namespace Huenicorn
   void WebUIBackend::_setRefreshRate(const crow::request& req, crow::response& res) const
   {
     const std::string& data = req.body;
-    unsigned refreshRate = nlohmann::json::parse(data).get<unsigned>();
+    unsigned refreshRate = Json::parse(data).get<unsigned>();
     m_huenicornCore->setRefreshRate(refreshRate);
 
-    nlohmann::json jsonRefreshRate{
+    Json jsonRefreshRate{
       {"refreshRate", m_huenicornCore->refreshRate()}
     };
 
@@ -331,11 +334,11 @@ namespace Huenicorn
   void WebUIBackend::_setInterpolation(const crow::request& req, crow::response& res) const
   {
     const std::string& data = req.body;
-    unsigned interpolation = nlohmann::json::parse(data).get<unsigned>();
+    unsigned interpolation = Json::parse(data).get<unsigned>();
 
     m_huenicornCore->setInterpolation(interpolation);
 
-    nlohmann::json jsonInterpolation{
+    Json jsonInterpolation{
       {"interpolation", m_huenicornCore->interpolation()}
     };
 
@@ -349,11 +352,11 @@ namespace Huenicorn
   void WebUIBackend::_setChannelActivity(const crow::request& req, crow::response& res, uint8_t channelId) const
   {
     const std::string& data = req.body;
-    nlohmann::json jsonChannelData = nlohmann::json::parse(data);
+    Json jsonChannelData = Json::parse(data);
     bool active = jsonChannelData.at("active");
 
     if(!m_huenicornCore->setChannelActivity(channelId, active)){
-      std::string response = nlohmann::json{
+      std::string response = Json{
         {"succeeded", false},
         {"error", "invalid channel id"}
       }.dump();
@@ -364,9 +367,9 @@ namespace Huenicorn
       return;
     }
 
-    nlohmann::json jsonResponse = nlohmann::json{
+    Json jsonResponse = Json{
       {"succeeded", true},
-      {"channels", nlohmann::json(m_huenicornCore->channels())},
+      {"channels", Json(m_huenicornCore->channels())},
     };
     
     if(active){
@@ -384,7 +387,7 @@ namespace Huenicorn
   {
     m_huenicornCore->saveProfile();
 
-    nlohmann::json jsonResponse = {
+    Json jsonResponse = {
       "succeeded", true
     };
 
@@ -397,7 +400,7 @@ namespace Huenicorn
 
   void WebUIBackend::_stop(crow::response& res) const
   {
-    nlohmann::json jsonResponse = {{
+    Json jsonResponse = {{
       "succeeded", true
     }};
 

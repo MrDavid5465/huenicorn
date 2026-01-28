@@ -4,8 +4,6 @@
 #include <optional>
 #include <thread>
 
-#include <nlohmann/json.hpp>
-
 #include <Huenicorn/ApiTools.hpp>
 #include <Huenicorn/Channel.hpp>
 #include <Huenicorn/Config.hpp>
@@ -17,6 +15,7 @@
 #include <Huenicorn/TickSynchronizer.hpp>
 #include <Huenicorn/UV.hpp>
 #include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
 
 
 namespace Huenicorn
@@ -153,17 +152,17 @@ namespace Huenicorn
     /**
      * @brief Returns the resolved Hue bridge IP address
      * 
-     * @return nlohmann::json Object containing Hue bridge address and request status
+     * @return Serialization::Json Object containing Hue bridge address and request status
      */
-    nlohmann::json autodetectedBridge() const;
+    Serialization::Json autodetectedBridge() const;
 
 
     /**
      * @brief Requests the addition of a new user on the Hue bridge
      * 
-     * @return nlohmann::json Newly created user's credentials
+     * @return Serialization::Json Newly created user's credentials
      */
-    nlohmann::json registerNewUser();
+    Serialization::Json registerNewUser();
 
 
     // Setters
@@ -291,7 +290,7 @@ namespace Huenicorn
      * 
      * @return Loaded profile. Empty if not found
      */
-    std::optional<nlohmann::json> _getProfile();
+    std::optional<Serialization::Json> _getProfile();
 
 
     // Private methods
@@ -334,7 +333,7 @@ namespace Huenicorn
      * 
      * @param jsonProfile Data from the user-defined profile
      */
-    void _initChannels(const nlohmann::json& jsonProfile);
+    void _initChannels(const Serialization::Json& jsonProfile);
 
 
     /**
