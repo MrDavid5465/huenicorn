@@ -49,11 +49,11 @@ namespace Huenicorn
       cv::Range cols(std::max(0, a.x), std::min(b.x, inputImageData.width()));
       cv::Range rows(std::max(0, a.y), std::min(b.y, inputImageData.height()));
 
-      outputImageData.imageMatrix = inputImageData.imageMatrix(rows, cols);
+      outputImageData.imageMatrix = inputImageData.imageMatrix(rows, cols).clone();
     }
 
 
-    Color getDominantColor(ImageData& inputImageData)
+    Color getDominantColor(const ImageData& inputImageData)
     {
       if(inputImageData.width() < 1 || inputImageData.height() < 1){
         return {Color(0, 0, 0)};

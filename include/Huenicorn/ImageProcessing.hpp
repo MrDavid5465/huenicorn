@@ -46,7 +46,7 @@ namespace Huenicorn
      * @param image Input image
      * @return Color Dominant color
      */
-    Color getDominantColor(ImageData& imageData);
+    Color getDominantColor(const ImageData& imageData);
 
 
     namespace Algorithms
