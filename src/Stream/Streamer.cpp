@@ -1,17 +1,18 @@
-#include <Huenicorn/Streamer.hpp>
+#include <Huenicorn/Stream/Streamer.hpp>
 
+#include <Huenicorn/Stream/MbedTlsClient.hpp>
 #include <Huenicorn/Logger.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Stream
 {
   const std::string Streamer::Port = "2100";
 
-  Streamer::Streamer(const Credentials& credentials, const std::string& bridgeAddress):
-    m_dtlsClient(credentials, bridgeAddress, Port)
+  Streamer::Streamer(const Credentials& credentials, const std::string& bridgeAddress)
   {
+    m_dtlsClient = std::make_unique<MbedTlsClient>(DtlsConfig{credentials, bridgeAddress, Port});
     try{
-      m_dtlsClient.init();
+      m_dtlsClient->init();
     }
     catch(const std::exception& e){
       Logger::error(e.what());
@@ -27,8 +28,8 @@ namespace Huenicorn
 
   void Streamer::streamChannels(const ChannelStreams& channels)
   {
-    std::vector<char> requestBuffer;
-    requestBuffer.insert(requestBuffer.end(), reinterpret_cast<char*>(&m_header), reinterpret_cast<char*>(&m_header) + sizeof(HuestreamHeader));
+    std::vector<std::byte> requestBuffer;
+    requestBuffer.insert(requestBuffer.end(), reinterpret_cast<std::byte*>(&m_header), reinterpret_cast<std::byte*>(&m_header) + sizeof(HuestreamHeader));
 
     for(const auto channel : channels){
       HuestreamPayload payload;
@@ -37,10 +38,10 @@ namespace Huenicorn
       payload.setG(static_cast<uint16_t>(0xffff * channel.g));
       payload.setB(static_cast<uint16_t>(0xffff * channel.b));
 
-      requestBuffer.insert(requestBuffer.end(), reinterpret_cast<char*>(&payload), reinterpret_cast<char*>(&payload) + sizeof(HuestreamPayload));
+      requestBuffer.insert(requestBuffer.end(), reinterpret_cast<std::byte*>(&payload), reinterpret_cast<std::byte*>(&payload) + sizeof(HuestreamPayload));
     }
 
-    m_dtlsClient.send(requestBuffer);
+    m_dtlsClient->send(requestBuffer);
     m_header.sequenceId++;
   }
 }

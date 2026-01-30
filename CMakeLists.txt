@@ -84,7 +84,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/CurlHttpClient.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/DtlsClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
@@ -94,14 +93,23 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PlatformSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Streamer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/MbedTlsClient.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/MbedTlsClient.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/IDtlsClient.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Streamer.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
@@ -110,7 +118,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Credentials.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/CurlHttpClient.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DtlsClient.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfigurationSelector.hpp
@@ -126,7 +133,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Streamer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/UV.hpp

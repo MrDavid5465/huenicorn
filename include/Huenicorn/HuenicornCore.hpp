@@ -11,7 +11,7 @@
 #include <Huenicorn/EntertainmentConfigurationSelector.hpp>
 #include <Huenicorn/IGrabber.hpp>
 #include <Huenicorn/IRestServer.hpp>
-#include <Huenicorn/Streamer.hpp>
+#include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/TickSynchronizer.hpp>
 #include <Huenicorn/UV.hpp>
 #include <Huenicorn/Interpolation.hpp>
@@ -395,7 +395,7 @@ namespace Huenicorn
 
     // Streamer
     std::mutex m_streamerMutex;
-    std::unique_ptr<Streamer> m_streamer;
+    std::unique_ptr<Stream::Streamer> m_streamer;
 
     // Service and flags
     ThreadedRestService m_webUIService;

@@ -510,7 +510,7 @@ namespace Huenicorn
 
     {
       std::lock_guard lock(m_streamerMutex);
-      m_streamer = std::make_unique<Streamer>(credentials, m_config.bridgeAddress().value());
+      m_streamer = std::make_unique<Stream::Streamer>(credentials, m_config.bridgeAddress().value());
       m_streamer->setEntertainmentConfigurationId(m_selector->currentEntertainmentConfigurationId().value());
     }
 

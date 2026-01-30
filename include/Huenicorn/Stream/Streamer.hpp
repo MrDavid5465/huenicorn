@@ -4,10 +4,11 @@
 #include <vector>
 
 #include <Huenicorn/Channel.hpp>
-#include <Huenicorn/DtlsClient.hpp>
+#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Stream/IDtlsClient.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Stream
 {
   /**
    * @brief Wrapper around UDP requests to submit color data to the bridge
@@ -146,7 +147,7 @@ namespace Huenicorn
 
   private:
     // Attributes
-    DtlsClient m_dtlsClient;
+    std::unique_ptr<Stream::IDtlsClient> m_dtlsClient;
     HuestreamHeader m_header;
   };
 }
