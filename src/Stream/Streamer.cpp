@@ -1,6 +1,6 @@
 #include <Huenicorn/Stream/Streamer.hpp>
 
-#include <Huenicorn/Stream/MbedTlsClient.hpp>
+#include <Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp>
 #include <Huenicorn/Logger.hpp>
 
 

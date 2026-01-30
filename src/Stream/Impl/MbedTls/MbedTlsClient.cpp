@@ -1,4 +1,4 @@
-#include <Huenicorn/Stream/MbedTlsClient.hpp>
+#include <Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp>
 
 #include <stdexcept>
 

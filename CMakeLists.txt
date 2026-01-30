@@ -76,6 +76,32 @@ configure_file(
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
+
+set(STREAM_SOURCE
+  # MbedTls Impl
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Impl/MbedTls/MbedTlsClient.cpp
+
+  # Common
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/HuestreamHeader.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/HuestreamPayload.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/IDtlsClient.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Streamer.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/HuestreamHeader.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
+)
+
+set(SERIALIZATION_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
+)
+
 # Declare executable
 add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
@@ -96,20 +122,8 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/MbedTlsClient.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/MbedTlsClient.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/IDtlsClient.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Streamer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
-
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
+  ${STREAM_SOURCE}
+  ${SERIALIZATION_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
