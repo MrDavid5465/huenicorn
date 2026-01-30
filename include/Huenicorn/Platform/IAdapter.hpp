@@ -7,7 +7,14 @@
 #include <Huenicorn/DummyGrabber.hpp>
 #include <Huenicorn/Logger.hpp>
 
+
 namespace Huenicorn
+{
+  class Config;
+}
+
+
+namespace Huenicorn::Platform
 {
   using UniqueGrabber = std::unique_ptr<IGrabber>;
 
@@ -15,14 +22,14 @@ namespace Huenicorn
    * @brief Wrapper interface for platform-specific functions and grabber selection
    * 
    */
-  class IPlatformAdapter
+  class IAdapter
   {
   public:
     /**
      * @brief Constructor
      * 
      */
-    IPlatformAdapter(const std::string& platformName):
+    IAdapter(const std::string& platformName):
     m_platformName(platformName)
     {}
 
@@ -31,7 +38,7 @@ namespace Huenicorn
      * @brief Destructor
      * 
      */
-    virtual ~IPlatformAdapter(){}
+    virtual ~IAdapter(){}
 
 
     /**

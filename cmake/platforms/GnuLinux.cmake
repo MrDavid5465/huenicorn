@@ -1,9 +1,8 @@
 # Adapter
 target_sources(${BINARY_NAME} PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Adapters/GnuLinux/GnuLinuxAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Adapters/GnuLinux/GnuLinuxAdapter.cpp
 )
-
 
 # Check grabber-related libraries
 # Begin X11-related

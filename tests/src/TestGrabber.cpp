@@ -16,7 +16,7 @@ void testGrabber(const std::filesystem::path& frameDirRoot)
 {
   Config config("/tmp");
   config.setSubsampleWidth(20);
-  auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
+  auto grabber = Huenicorn::adapter.getGrabber(&config);
   Logger::log("Started ", grabber->name());
 
   {
@@ -93,7 +93,7 @@ void testMonitorEvents()
 {
   Config config("/tmp");
   config.setSubsampleWidth(20);
-  auto grabber = Huenicorn::platformAdapter.getGrabber(&config);
+  auto grabber = Huenicorn::adapter.getGrabber(&config);
   Logger::log("Started ", grabber->name());
   std::this_thread::sleep_for(20s);
 }

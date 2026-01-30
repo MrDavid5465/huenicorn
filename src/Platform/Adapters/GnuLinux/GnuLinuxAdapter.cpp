@@ -1,4 +1,4 @@
-#include <Adapters/GnuLinux/GnuLinuxAdapter.hpp>
+#include <Huenicorn/Platform/Adapters/GnuLinux/GnuLinuxAdapter.hpp>
 
 #include <pwd.h>
 #include <unistd.h>
@@ -13,7 +13,7 @@
 #endif
 
 
-namespace Huenicorn
+namespace Huenicorn::Platform
 {
   std::filesystem::path GnuLinuxAdapter::getConfigFilePath() const
   {

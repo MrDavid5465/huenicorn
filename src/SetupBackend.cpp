@@ -3,8 +3,9 @@
 #include <chrono>
 
 #include <Huenicorn/HuenicornCore.hpp>
-#include <Huenicorn/PlatformSelector.hpp>
+#include <Huenicorn/Platform/Selector.hpp>
 #include <Huenicorn/Logger.hpp>
+
 
 using namespace std::chrono_literals;
 
@@ -81,7 +82,7 @@ namespace Huenicorn
     std::string serviceURL = serviceUrlStream.str();
     Logger::log("Setup WebUI is ready and available at ", serviceURL);
 
-    platformAdapter.openWebBrowser(serviceURL);
+    Platform::adapter.openWebBrowser(serviceURL);
   }
 
 

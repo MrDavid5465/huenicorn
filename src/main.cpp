@@ -5,7 +5,7 @@
 #include <Huenicorn/Version.hpp>
 #include <Huenicorn/HuenicornCore.hpp>
 #include <Huenicorn/Logger.hpp>
-#include <Huenicorn/PlatformSelector.hpp>
+#include <Huenicorn/Platform/Selector.hpp>
 
 
 /**
@@ -17,7 +17,7 @@ class Application
 public:
   void start()
   {
-    m_core = std::make_unique<Huenicorn::HuenicornCore>(Huenicorn::Version, Huenicorn::platformAdapter.getConfigFilePath());
+    m_core = std::make_unique<Huenicorn::HuenicornCore>(Huenicorn::Version, Huenicorn::Platform::adapter.getConfigFilePath());
     m_applicationThread.emplace([&](){
       m_core->start();
     });
@@ -58,7 +58,7 @@ void signalHandler(int signal)
 
 int main()
 {
-  Huenicorn::Logger::log("Starting Huenicorn version ", Huenicorn::Version, " for ", Huenicorn::platformAdapter.getPlatformName());
+  Huenicorn::Logger::log("Starting Huenicorn version ", Huenicorn::Version, " for ", Huenicorn::Platform::adapter.getPlatformName());
 
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);

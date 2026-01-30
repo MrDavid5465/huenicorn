@@ -1,15 +1,14 @@
 #pragma once
 
-#include <Huenicorn/IPlatformAdapter.hpp>
+#include <Huenicorn/Platform/IAdapter.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Platform
 {
-  class Config;
-
-  class GnuLinuxAdapter : public IPlatformAdapter
+  class GnuLinuxAdapter : public IAdapter
   {
   public:
-    GnuLinuxAdapter():IPlatformAdapter{"Gnu/Linux"}{}
+    GnuLinuxAdapter():IAdapter{"Gnu/Linux"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;

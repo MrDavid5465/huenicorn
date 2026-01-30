@@ -1,13 +1,14 @@
 #pragma once
 
-#include <Huenicorn/IPlatformAdapter.hpp>
+#include <Huenicorn/Platform/IAdapter.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Platform
 {
-  class WindowsAdapter : public IPlatformAdapter
+  class WindowsAdapter : public IAdapter
   {
   public:
-    WindowsAdapter():IPlatformAdapter{"Windows"}{}
+    WindowsAdapter():IAdapter{"Windows"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;

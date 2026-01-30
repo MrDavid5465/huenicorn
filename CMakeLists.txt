@@ -102,6 +102,12 @@ set(SERIALIZATION_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
 )
 
+set(PLATFORM_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/IAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Selector.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Selector.cpp
+)
+
 set(IMAGING_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageProcessing.hpp
@@ -123,7 +129,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/PlatformSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
@@ -131,6 +136,7 @@ add_executable(${BINARY_NAME}
   ${STREAM_SOURCE}
   ${SERIALIZATION_SOURCE}
   ${IMAGING_SOURCE}
+  ${PLATFORM_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
@@ -145,11 +151,9 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HttpRequestUtils.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IPlatformAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp

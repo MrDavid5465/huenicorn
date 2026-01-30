@@ -1,13 +1,14 @@
 #pragma once
 
-#include <Huenicorn/IPlatformAdapter.hpp>
+#include <Huenicorn/Platform/IAdapter.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Platform
 {
-  class MacOSAdapter : public IPlatformAdapter
+  class MacOSAdapter : public IAdapter
   {
   public:
-    MacOSAdapter():IPlatformAdapter{"macOS"}{}
+    MacOSAdapter():IAdapter{"macOS"}{}
     virtual std::filesystem::path getConfigFilePath() const override;
     virtual std::string getUsername() const override;
     virtual void openWebBrowser(const std::string& url) const override;

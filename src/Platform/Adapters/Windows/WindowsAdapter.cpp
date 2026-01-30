@@ -1,4 +1,4 @@
-#include <Adapters/Windows/WindowsAdapter.hpp>
+#include <Huenicorn/Platform/Adapters/Windows/WindowsAdapter.hpp>
 
 #include <memory>
 
@@ -7,7 +7,8 @@
 
 #include <Huenicorn/Logger.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Platform
 {
   std::filesystem::path WindowsAdapter::getConfigFilePath() const
   {

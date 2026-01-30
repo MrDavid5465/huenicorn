@@ -8,7 +8,7 @@
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Logger.hpp>
-#include <Huenicorn/PlatformSelector.hpp>
+#include <Huenicorn/Platform/Selector.hpp>
 #include <Huenicorn/SetupBackend.hpp>
 #include <Huenicorn/WebUIBackend.hpp>
 
@@ -122,7 +122,7 @@ namespace Huenicorn
 
   Serialization::Json HuenicornCore::registerNewUser()
   {
-    std::string sessionUsername = platformAdapter.getUsername();
+    std::string sessionUsername = Platform::adapter.getUsername();
     std::string deviceType = "huenicorn#" + sessionUsername;
 
     Serialization::Json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
@@ -424,7 +424,7 @@ namespace Huenicorn
 
   bool HuenicornCore::_initGrabber()
   {
-    m_grabber = platformAdapter.getGrabber(&m_config);
+    m_grabber = Platform::adapter.getGrabber(&m_config);
     return true;
   }
 
@@ -496,7 +496,7 @@ namespace Huenicorn
     std::string serviceURL = serviceUrlStream.str();
     Logger::log("Management WebUI is ready and available at ", serviceURL);
 
-    platformAdapter.openWebBrowser(serviceURL);
+    Platform::adapter.openWebBrowser(serviceURL);
   }
 
 

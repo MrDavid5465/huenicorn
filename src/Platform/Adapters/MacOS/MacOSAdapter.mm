@@ -1,4 +1,4 @@
-#include <Adapters/MacOS/MacOSAdapter.hpp>
+#include <Huenicorn/Platform/Adapters/MacOS/MacOSAdapter.hpp>
 
 #include <memory>
 
@@ -7,7 +7,8 @@
 
 #include <Huenicorn/Logger.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Platform
 {
   std::filesystem::path MacOSAdapter::getConfigFilePath() const
   {
