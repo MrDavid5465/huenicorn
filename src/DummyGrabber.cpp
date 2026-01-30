@@ -32,7 +32,7 @@ namespace Huenicorn
   }
 
 
-  void DummyGrabber::grabFrameSubsample(ImageData& imageData)
+  void DummyGrabber::grabFrameSubsample(Imaging::ImageData& imageData)
   {
     Timing::TimePoint now = Timing::ClockType::now();
     Timing::Duration duration = now - m_startTime;

@@ -1,7 +1,7 @@
-#include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Imaging/Interpolation.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   namespace Interpolation
   {

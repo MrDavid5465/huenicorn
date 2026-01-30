@@ -7,7 +7,7 @@
 
 #include <glm/vec2.hpp>
 
-#include <Huenicorn/ImageData.hpp>
+#include <Huenicorn/Imaging/ImageData.hpp>
 #include <Huenicorn/MonitorData.hpp>
 #include <Huenicorn/Logger.hpp>
 
@@ -130,7 +130,7 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(ImageData& imageData) = 0;
+    virtual void grabFrameSubsample(Imaging::ImageData& imageData) = 0;
 
 
     inline Monitors monitors() const

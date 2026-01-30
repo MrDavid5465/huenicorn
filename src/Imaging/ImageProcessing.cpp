@@ -1,7 +1,7 @@
-#include <Huenicorn/ImageProcessing.hpp>
+#include <Huenicorn/Imaging/ImageProcessing.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   namespace ImageProcessing
   {

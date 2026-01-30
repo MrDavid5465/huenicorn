@@ -2,7 +2,7 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   struct ImageData
   {

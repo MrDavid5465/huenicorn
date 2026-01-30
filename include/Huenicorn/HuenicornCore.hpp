@@ -14,7 +14,7 @@
 #include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/TickSynchronizer.hpp>
 #include <Huenicorn/UV.hpp>
-#include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Serialization/Json.hpp>
 
 
@@ -106,7 +106,7 @@ namespace Huenicorn
      * 
      * @return const Interpolation::Interpolations& available interpolations
      */
-    const Interpolation::Interpolations& availableInterpolations() const;
+    const Imaging::Interpolation::Interpolations& availableInterpolations() const;
 
 
     /**
@@ -146,7 +146,7 @@ namespace Huenicorn
      * 
      * @return Interpolation::Type Subsample interpolation type
      */
-    Interpolation::Type interpolation() const;
+    Imaging::Interpolation::Type interpolation() const;
 
 
     /**
@@ -402,6 +402,6 @@ namespace Huenicorn
 
     //  Image Processing
     IGrabber* m_grabber;
-    ImageData m_frameData;
+    Imaging::ImageData m_frameData;
   };
 }

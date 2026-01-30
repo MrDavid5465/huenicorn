@@ -7,7 +7,7 @@
 #include <X11/extensions/Xrandr.h>
 
 #include <Huenicorn/Config.hpp>
-#include <Huenicorn/ImageProcessing.hpp>
+#include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Logger.hpp>
 
 
@@ -195,7 +195,7 @@ namespace Huenicorn
 
 
 
-  void X11Grabber::grabFrameSubsample(ImageData& imageData)
+  void X11Grabber::grabFrameSubsample(Imaging::ImageData& imageData)
   {
     /*
     if(
@@ -220,15 +220,15 @@ namespace Huenicorn
 
     XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, selectedMonitor->xPos, selectedMonitor->yPos, AllPlanes);
 
-    ImageData grabbedImageData;
+    Imaging::ImageData grabbedImageData;
     if(ximage->bits_per_pixel > 24){
       grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC4, ximage->data);
-      ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
-      ImageProcessing::rgbaToRgb(grabbedImageData, grabbedImageData);
+      Imaging::ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
+      Imaging::ImageProcessing::rgbaToRgb(grabbedImageData, grabbedImageData);
     }
     else{
       grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC3, ximage->data);
-      ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
+      Imaging::ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
     }
 
     imageData = std::move(grabbedImageData);

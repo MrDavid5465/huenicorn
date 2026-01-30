@@ -2,12 +2,12 @@
 
 #include <vector>
 
-#include <Huenicorn/ImageData.hpp>
-#include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Imaging/ImageData.hpp>
+#include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Color.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   using Colors = std::vector<Color>;
 

@@ -159,7 +159,7 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(ImageData& imageData) override;
+    virtual void grabFrameSubsample(Imaging::ImageData& imageData) override;
 
   protected:
     virtual void _initMonitorsList() override;

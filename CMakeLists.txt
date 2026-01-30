@@ -102,6 +102,14 @@ set(SERIALIZATION_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
 )
 
+set(IMAGING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageData.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageProcessing.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Interpolation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/ImageProcessing.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/Interpolation.cpp
+)
+
 # Declare executable
 add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
@@ -114,8 +122,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ImageProcessing.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Interpolation.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/PlatformSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
@@ -124,6 +130,7 @@ add_executable(${BINARY_NAME}
 
   ${STREAM_SOURCE}
   ${SERIALIZATION_SOURCE}
+  ${IMAGING_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
@@ -138,9 +145,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HttpRequestUtils.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageData.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IPlatformAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp

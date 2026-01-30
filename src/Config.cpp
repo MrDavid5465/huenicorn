@@ -65,7 +65,7 @@ namespace Huenicorn
   }
 
 
-  Interpolation::Type Config::interpolation() const
+  Imaging::Interpolation::Type Config::interpolation() const
   {
     return m_configData.value().interpolation.value();
   }
@@ -128,7 +128,7 @@ namespace Huenicorn
   }
 
 
-  void Config::setInterpolation(Interpolation::Type interpolation)
+  void Config::setInterpolation(Imaging::Interpolation::Type interpolation)
   {
     m_configData.value().interpolation = interpolation;
     _save();
@@ -145,7 +145,7 @@ namespace Huenicorn
       .profileName = {},
       .refreshRate = 0,
       .subsampleWidth = 0,
-      .interpolation = Interpolation::Type::Area
+      .interpolation = Imaging::Interpolation::Type::Area
     };
 
     Json jsonConfig = Json::object();

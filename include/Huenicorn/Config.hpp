@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <optional>
 
-#include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Credentials.hpp>
 
 
@@ -27,7 +27,7 @@ namespace Huenicorn
 
       std::optional<unsigned> refreshRate{0};
       std::optional<unsigned> subsampleWidth{0};
-      std::optional<Interpolation::Type> interpolation{Interpolation::Type::Area};
+      std::optional<Imaging::Interpolation::Type> interpolation{Imaging::Interpolation::Type::Area};
     };
     
 
@@ -119,7 +119,7 @@ namespace Huenicorn
      * 
      * @return Type of current subsample interpolation
     */
-    Interpolation::Type interpolation() const;
+    Imaging::Interpolation::Type interpolation() const;
 
 
     // Setters
@@ -168,7 +168,7 @@ namespace Huenicorn
      * 
      * @param interpolation Type of interpolation
     */
-    void setInterpolation(Interpolation::Type interpolation);
+    void setInterpolation(Imaging::Interpolation::Type interpolation);
 
   private:
     // Private methods

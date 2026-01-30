@@ -4,7 +4,7 @@
 #include <string>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   namespace Interpolation
   {

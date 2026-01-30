@@ -5,8 +5,8 @@
 
 #include <Huenicorn/DummyGrabber.hpp>
 #include <Huenicorn/HttpRequestUtils.hpp>
-#include <Huenicorn/ImageProcessing.hpp>
-#include <Huenicorn/Interpolation.hpp>
+#include <Huenicorn/Imaging/ImageProcessing.hpp>
+#include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Logger.hpp>
 #include <Huenicorn/PlatformSelector.hpp>
 #include <Huenicorn/SetupBackend.hpp>
@@ -94,15 +94,15 @@ namespace Huenicorn
   }
 
 
-  Interpolation::Type HuenicornCore::interpolation() const
+  Imaging::Interpolation::Type HuenicornCore::interpolation() const
   {
     return m_config.interpolation();
   }
 
 
-  const Interpolation::Interpolations& HuenicornCore::availableInterpolations() const
+  const Imaging::Interpolation::Interpolations& HuenicornCore::availableInterpolations() const
   {
-    return Interpolation::availableInterpolations;
+    return Imaging::Interpolation::availableInterpolations;
   }
 
 
@@ -192,7 +192,7 @@ namespace Huenicorn
 
   void HuenicornCore::setInterpolation(unsigned interpolation)
   {
-    m_config.setInterpolation(static_cast<Interpolation::Type>(interpolation));
+    m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
   }
 
 
@@ -560,7 +560,7 @@ namespace Huenicorn
       return;
     }
 
-    ImageData subframeImageData;
+    Imaging::ImageData subframeImageData;
 
     for(auto& [channelId, channel] : m_channels){
       if(channel.state() == Channel::State::Inactive){
@@ -582,8 +582,8 @@ namespace Huenicorn
         glm::ivec2 a{uvs.min.x * m_frameData.width(), uvs.min.y * m_frameData.height()};
         glm::ivec2 b{uvs.max.x * m_frameData.width(), uvs.max.y * m_frameData.height()};
 
-        ImageProcessing::getSubImage(m_frameData, subframeImageData, a, b);
-        Color color = ImageProcessing::getDominantColor(subframeImageData);
+        Imaging::ImageProcessing::getSubImage(m_frameData, subframeImageData, a, b);
+        Color color = Imaging::ImageProcessing::getDominantColor(subframeImageData);
 
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));

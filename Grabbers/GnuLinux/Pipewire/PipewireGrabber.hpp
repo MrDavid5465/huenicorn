@@ -29,7 +29,7 @@ namespace Huenicorn
     */
     struct SafeDoubleBuffer
     {
-      std::array<ImageData, 2> frame;
+      std::array<Imaging::ImageData, 2> frame;
       std::mutex mutex;
     };
 
@@ -89,7 +89,7 @@ namespace Huenicorn
      * 
      * @param imageData Subsample of the last captured frame
      */
-    virtual void grabFrameSubsample(ImageData& imageData) override;
+    virtual void grabFrameSubsample(Imaging::ImageData& imageData) override;
 
 
   private:

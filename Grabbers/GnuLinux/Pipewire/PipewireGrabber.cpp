@@ -5,7 +5,7 @@
 #include <fcntl.h>
 
 #include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
-#include <Huenicorn/ImageProcessing.hpp>
+#include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Config.hpp>
 #include <Huenicorn/Logger.hpp>
 
@@ -68,7 +68,7 @@ namespace Huenicorn
   }
 
 
-  void PipewireGrabber::grabFrameSubsample(ImageData& imageData)
+  void PipewireGrabber::grabFrameSubsample(Imaging::ImageData& imageData)
   {
     auto lock = std::lock_guard(m_pwData.frameDoubleBuffer.mutex);
     imageData = m_pwData.frameDoubleBuffer.frame.at(0);
@@ -126,12 +126,12 @@ namespace Huenicorn
       return;
     }
 
-    ImageData capturedFrame{
+    Imaging::ImageData capturedFrame{
       .imageMatrix = cv::Mat(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data)
     };
 
-    ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
-    ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
+    Imaging::ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
+    Imaging::ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
 
     {
       auto lock = std::lock_guard(pw->frameDoubleBuffer.mutex);
