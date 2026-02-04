@@ -76,6 +76,10 @@ configure_file(
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
+set(HUE_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Auth/Credentials.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Auth/Credentials.hpp
+)
 
 set(NETWORK_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
@@ -128,7 +132,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ApiTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
@@ -142,12 +145,12 @@ add_executable(${BINARY_NAME}
   ${IMAGING_SOURCE}
   ${PLATFORM_SOURCE}
   ${NETWORK_SOURCE}
+  ${HUE_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Credentials.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp

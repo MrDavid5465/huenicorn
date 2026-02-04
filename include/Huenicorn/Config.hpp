@@ -4,7 +4,7 @@
 #include <optional>
 
 #include <Huenicorn/Imaging/Interpolation.hpp>
-#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
 
 
 namespace Huenicorn
@@ -22,7 +22,7 @@ namespace Huenicorn
       std::optional<std::string> boundBackendIP;
 
       std::optional<std::string> bridgeAddress;
-      std::optional<Credentials> credentials;
+      std::optional<Hue::Auth::Credentials> credentials;
       std::optional<std::string> profileName;
 
       std::optional<unsigned> refreshRate{0};
@@ -87,7 +87,7 @@ namespace Huenicorn
      * 
      * @return const std::optional<Credentials>& Registered credentials
      */
-    const std::optional<Credentials>& credentials() const;
+    const std::optional<Hue::Auth::Credentials>& credentials() const;
 
 
     /**
@@ -136,7 +136,7 @@ namespace Huenicorn
      * 
      * @param credentials User credentials for the Hue bridge
      */
-    void setCredentials(const Credentials& credentials);
+    void setCredentials(const Hue::Auth::Credentials& credentials);
 
 
     /**

@@ -3,14 +3,14 @@
 #include <span>
 #include <string>
 
-#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
 
 
 namespace Huenicorn::Stream
 {
   struct DtlsConfig
   {
-    Credentials credentials;
+    Hue::Auth::Credentials credentials;
     std::string address;
     std::string port;
   };

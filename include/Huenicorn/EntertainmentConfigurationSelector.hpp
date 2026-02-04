@@ -3,7 +3,7 @@
 #include <optional>
 #include <string>
 
-#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
 #include <Huenicorn/EntertainmentConfiguration.hpp>
 
 
@@ -23,7 +23,7 @@ namespace Huenicorn
      * @param credentials Hue bridge credentials
      * @param bridgeAddress Hue bridge address
      */
-    EntertainmentConfigurationSelector(const Credentials& credentials, const std::string& bridgeAddress);
+    EntertainmentConfigurationSelector(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress);
 
 
     // Getters
@@ -80,7 +80,7 @@ namespace Huenicorn
 
   private:
     // Attributes
-    const Credentials m_credentials;
+    const Hue::Auth::Credentials m_credentials;
     const std::string m_bridgeAddress;
 
     EntertainmentConfigurations m_entertainmentConfigurations;

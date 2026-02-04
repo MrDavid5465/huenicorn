@@ -49,8 +49,7 @@ namespace Huenicorn::Serialization
       }
 
       if(jsonConfigData.contains("credentials")){
-        const auto& jsonCredentials = jsonConfigData.at("credentials");
-        configData.credentials.emplace(jsonCredentials.get<Credentials>());
+        configData.credentials.emplace(jsonConfigData.at("credentials").get<Hue::Auth::Credentials>());
       }
 
       if(jsonConfigData.contains("profileName")){

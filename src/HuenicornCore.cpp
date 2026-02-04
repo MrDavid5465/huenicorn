@@ -138,7 +138,7 @@ namespace Huenicorn
       return {{"succeeded", false}, {"error", jsonResponse.at(0).at("error").at("description")}};
     }
 
-    auto credentials = jsonResponse.at(0).at("success").get<Credentials>();
+    auto credentials = jsonResponse.at(0).at("success").get<Hue::Auth::Credentials>();
     m_config.setCredentials(credentials);
 
     return {{"succeeded", true}, {"username", credentials.username()}, {"clientkey", credentials.clientkey()}};
@@ -258,7 +258,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::validateCredentials(const Credentials& credentials)
+  bool HuenicornCore::validateCredentials(const Hue::Auth::Credentials& credentials)
   {
     auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
     if(!response.has_value()){
@@ -380,7 +380,7 @@ namespace Huenicorn
 
     Logger::log("Configuration is ready. Feel free to modify it manually by editing ", std::quoted(m_config.configFilePath().string()));
 
-    const Credentials& credentials = m_config.credentials().value();
+    const auto& credentials = m_config.credentials().value();
     const std::string& bridgeAddress =  m_config.bridgeAddress().value();
 
     m_selector = std::make_unique<EntertainmentConfigurationSelector>(credentials, bridgeAddress);
@@ -506,7 +506,7 @@ namespace Huenicorn
       return;
     }
 
-    const Credentials& credentials = m_config.credentials().value();
+    const auto& credentials = m_config.credentials().value();
 
     {
       std::lock_guard lock(m_streamerMutex);

@@ -1,9 +1,9 @@
-#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Auth
 {
-  std::vector<unsigned char> hexStringToBytes(const std::string& hexString)
+  inline std::vector<unsigned char> hexStringToBytes(const std::string& hexString)
   {
     if(hexString.size() % 2 != 0){
       throw std::runtime_error("Wrong hex string length");
@@ -26,7 +26,7 @@ namespace Huenicorn
   }
 
 
-  std::vector<unsigned char> stringToBytes(const std::string& string)
+  inline std::vector<unsigned char> stringToBytes(const std::string& string)
   {
     std::vector<unsigned char> bytes;
     for(unsigned char c : string){
@@ -36,7 +36,7 @@ namespace Huenicorn
     return bytes;
   }
 
-  
+
   Credentials::Credentials(const std::string& username, const std::string& clientkey):
   m_username(username),
   m_clientkey(clientkey)

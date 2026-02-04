@@ -7,11 +7,8 @@
 
 #include <Huenicorn/Serialization/JsonSerializer.hpp>
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Auth
 {
-  std::vector<unsigned char> hexStringToBytes(const std::string& hexString);
-  std::vector<unsigned char> stringToBytes(const std::string& string);
-
   /**
    * @brief Wrapper around Hue bridge user authentication data
    * 

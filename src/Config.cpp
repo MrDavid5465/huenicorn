@@ -83,7 +83,7 @@ namespace Huenicorn
   }
 
 
-  const std::optional<Credentials>& Config::credentials() const
+  const std::optional<Hue::Auth::Credentials>& Config::credentials() const
   {
     return m_configData.value().credentials;
   }
@@ -96,7 +96,7 @@ namespace Huenicorn
   }
 
 
-  void Config::setCredentials(const Credentials& credentials)
+  void Config::setCredentials(const Hue::Auth::Credentials& credentials)
   {
     m_configData.value().credentials.emplace(credentials);
     _save();

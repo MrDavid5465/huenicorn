@@ -254,7 +254,7 @@ namespace Huenicorn
      * @return true Hue bridge credentials are valid and were registered
      * @return false Hue bridge credentials are invalid and were discarded
      */
-    bool validateCredentials(const Credentials& credentials);
+    bool validateCredentials(const Hue::Auth::Credentials& credentials);
 
 
     /**

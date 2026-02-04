@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <Huenicorn/Channel.hpp>
-#include <Huenicorn/Credentials.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
 #include <Huenicorn/Stream/IDtlsClient.hpp>
 #include <Huenicorn/Stream/HuestreamHeader.hpp>
 #include <Huenicorn/Stream/HuestreamPayload.hpp>
@@ -29,7 +29,7 @@ namespace Huenicorn::Stream
      * @param credentials Hue bridge credentials
      * @param bridgeAddress Hue bridge address
      */
-    Streamer(const Credentials& credentials, const std::string& bridgeAddress);
+    Streamer(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress);
 
 
     // Setters

@@ -8,7 +8,7 @@ namespace Huenicorn::Stream
 {
   const std::string Streamer::Port = "2100";
 
-  Streamer::Streamer(const Credentials& credentials, const std::string& bridgeAddress)
+  Streamer::Streamer(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress)
   {
     m_dtlsClient = std::make_unique<MbedTlsClient>(DtlsConfig{credentials, bridgeAddress, Port});
     try{

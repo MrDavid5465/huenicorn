@@ -4,6 +4,7 @@
 
 #include <Huenicorn/HuenicornCore.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
 #include <Huenicorn/Logger.hpp>
 
 
@@ -164,7 +165,7 @@ namespace Huenicorn
     const std::string& data = req.body;
     Serialization::Json jsonCredentials = Serialization::Json::parse(data);
 
-    Credentials credentials(jsonCredentials.at("username"), jsonCredentials.at("clientkey"));
+    auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
 
     Serialization::Json jsonResponse = {{"succeeded", m_huenicornCore->validateCredentials(credentials)}};
 

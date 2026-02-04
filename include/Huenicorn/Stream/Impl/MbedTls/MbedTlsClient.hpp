@@ -11,8 +11,6 @@
 #include <mbedtls/ssl.h>
 #include <mbedtls/timing.h>
 
-#include <Huenicorn/Credentials.hpp>
-
 
 namespace Huenicorn::Stream
 {
@@ -54,9 +52,7 @@ namespace Huenicorn::Stream
     /**
      * @brief MbedTlsClient constructor
      * 
-     * @param credentials PSK credentials
-     * @param address Address of the DTLS server
-     * @param port Port of the DTLS server
+     * @param dtlsConfig DTLS configuration
      */
     explicit MbedTlsClient(const DtlsConfig& dtlsConfig);
 

@@ -6,7 +6,7 @@
 
 namespace Huenicorn
 {
-  EntertainmentConfigurationSelector::EntertainmentConfigurationSelector(const Credentials& credentials, const std::string& bridgeAddress):
+  EntertainmentConfigurationSelector::EntertainmentConfigurationSelector(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress):
   m_credentials(credentials),
   m_bridgeAddress(bridgeAddress)
   {
