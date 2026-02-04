@@ -77,6 +77,12 @@ configure_file(
 )
 
 
+set(NETWORK_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Client/Client.hpp
+)
+
+
 set(STREAM_SOURCE
   # MbedTls Impl
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp
@@ -123,10 +129,8 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/CurlHttpClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
@@ -137,18 +141,17 @@ add_executable(${BINARY_NAME}
   ${SERIALIZATION_SOURCE}
   ${IMAGING_SOURCE}
   ${PLATFORM_SOURCE}
+  ${NETWORK_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Credentials.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/CurlHttpClient.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfigurationSelector.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HttpRequestUtils.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp

@@ -1,21 +1,44 @@
-#include <Huenicorn/CurlHttpClient.hpp>
+#include <Huenicorn/Network/Http/Client/Client.hpp>
 
+#include <memory>
+#include <optional>
 #include <stdexcept>
 
+#include <curl/curl.h>
 #include <curl/easy.h>
 
 #include <Huenicorn/Logger.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Network::Http::Client
 {
+  class CurlDeleter
+  {
+  public:
+    void operator()(CURL* curl) const
+    {
+      curl_easy_cleanup(curl);
+    }
+  };
+
+  struct CurlSlistDeleter
+  {
+    void operator()(curl_slist* slist) const
+    {
+      curl_slist_free_all(slist);
+    }
+  };
+
+  using UniqueCurlSlist = std::unique_ptr<curl_slist, CurlSlistDeleter>;
+
+
   size_t writeCallback(char* ptr, size_t size, size_t nmemb, std::string* data) {
     data->append(ptr, size * nmemb);
     return size * nmemb;
   }
 
 
-  std::optional<IHttpClient::Response> CurlHttpClient::sendRequest(const std::string& url, const std::string& method, const std::string& body, const Headers& headers)
+  std::optional<Response> sendRequest(const std::string& url, const std::string& method, const std::string& body, const Headers& headers)
   {
     auto handle = std::unique_ptr<CURL, CurlDeleter>(curl_easy_init());
     if(!handle){

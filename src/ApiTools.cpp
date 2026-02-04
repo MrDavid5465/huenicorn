@@ -1,6 +1,6 @@
 #include <Huenicorn/ApiTools.hpp>
 
-#include <Huenicorn/HttpRequestUtils.hpp>
+#include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Serialization/Device.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
@@ -16,9 +16,9 @@ namespace Huenicorn
       // (If someones has such a display, please tell me about Huenicorn's performance)
       EntertainmentConfigurations entConfs;
 
-      HttpRequestUtils::Headers headers = {{"hue-application-key", username}};
+      Network::Http::Client::Headers headers = {{"hue-application-key", username}};
       std::string entConfUrl = "https://" + bridgeAddress + "/clip/v2/resource/entertainment_configuration";
-      auto entConfResponse = HttpRequestUtils::sendRequest(entConfUrl, "GET", "", headers);
+      auto entConfResponse = Network::Http::Client::sendRequest(entConfUrl, "GET", "", headers);
 
       if(entConfResponse.has_value()){
         // Listing entertainment configurations
@@ -31,7 +31,7 @@ namespace Huenicorn
           for(auto& [lightId, device] : entConf.devices){
             std::string lightUrl = "https://" + bridgeAddress + "/clip/v2/resource/light/" + lightId;
 
-            auto jsonLightData = HttpRequestUtils::sendRequest(lightUrl, "GET", "", headers).value().asJson();
+            auto jsonLightData = Network::Http::Client::sendRequest(lightUrl, "GET", "", headers).value().asJson();
             auto deviceId = device.id;
             device = jsonLightData.at("data").at(0).at("metadata").get<Device>();
             device.id = deviceId;
@@ -53,9 +53,11 @@ namespace Huenicorn
 
     Devices loadDevices(const std::string& username, const std::string& bridgeAddress)
     {
-      HttpRequestUtils::Headers headers = {{"hue-application-key", username}};
+      using namespace Network::Http::Client;
+
+      Network::Http::Client::Headers headers = {{"hue-application-key", username}};
       std::string resourceUrl = "https://" + bridgeAddress + "/clip/v2/resource";
-      auto resourceResponse = HttpRequestUtils::sendRequest(resourceUrl, "GET", "", headers);
+      auto resourceResponse = Network::Http::Client::sendRequest(resourceUrl, "GET", "", headers);
 
       Devices devices;
 
@@ -84,10 +86,12 @@ namespace Huenicorn
 
     EntertainmentConfigurationsChannels loadEntertainmentConfigurationsChannels(const std::string& username, const std::string& bridgeAddress)
     {
-      HttpRequestUtils::Headers headers = {{"hue-application-key", username}};
+      using namespace Network::Http::Client;
+
+      Network::Http::Client::Headers headers = {{"hue-application-key", username}};
       std::string resourceUrl = "https://" + bridgeAddress + "/clip/v2/resource/entertainment_configuration";
 
-      auto entertainmentConfigurationsResponse = HttpRequestUtils::sendRequest(resourceUrl, "GET", "", headers);
+      auto entertainmentConfigurationsResponse = Network::Http::Client::sendRequest(resourceUrl, "GET", "", headers);
 
       EntertainmentConfigurationsChannels entConfsChannels;
 
@@ -128,21 +132,23 @@ namespace Huenicorn
         {"metadata", {{"name", entertainmentConfigurationEntry.second.name}}}
       };
 
-      HttpRequestUtils::Headers headers = {{"hue-application-key", username}};
+      Network::Http::Client::Headers headers = {{"hue-application-key", username}};
 
       std::string url = "https://" + bridgeAddress + "/clip/v2/resource/entertainment_configuration/" + entertainmentConfigurationEntry.first;
 
-      HttpRequestUtils::sendRequest(url, "PUT", jsonBody.dump(), headers);
+      Network::Http::Client::sendRequest(url, "PUT", jsonBody.dump(), headers);
     }
 
 
     bool streamingActive(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress)
     {
+      using namespace Network::Http::Client;
+
       std::string status;
 
-      HttpRequestUtils::Headers headers = {{"hue-application-key", username}};
+      Network::Http::Client::Headers headers = {{"hue-application-key", username}};
       std::string url = "https://" + bridgeAddress + "/clip/v2/resource/entertainment_configuration/" + entertainmentConfigurationEntry.first;
-      auto entConfResponse = HttpRequestUtils::sendRequest(url, "GET", "", headers);
+      auto entConfResponse = Network::Http::Client::sendRequest(url, "GET", "", headers);
       if(entConfResponse.has_value()){
         status = entConfResponse.value().asJson().at("data").front().at("status");
       }

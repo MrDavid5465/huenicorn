@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include <Huenicorn/DummyGrabber.hpp>
-#include <Huenicorn/HttpRequestUtils.hpp>
+#include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Logger.hpp>
@@ -108,7 +108,7 @@ namespace Huenicorn
 
   Serialization::Json HuenicornCore::autodetectedBridge() const
   {
-    auto detectedBridgeResponse = HttpRequestUtils::sendRequest("https://discovery.meethue.com/", "GET");
+    auto detectedBridgeResponse = Network::Http::Client::sendRequest("https://discovery.meethue.com/", "GET");
 
     if(!detectedBridgeResponse.has_value()){
       return {{"succeeded", false}, {"error", "Could not reach discovery service. Please check your internet connection."}};
@@ -126,7 +126,7 @@ namespace Huenicorn
     std::string deviceType = "huenicorn#" + sessionUsername;
 
     Serialization::Json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
-    auto response = HttpRequestUtils::sendRequest(m_config.bridgeAddress().value() + "/api", "POST", request.dump());
+    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api", "POST", request.dump());
 
     if(!response.has_value()){
       return {{"succeeded", false}, {"error", "unreachable bridge"}};
@@ -247,7 +247,7 @@ namespace Huenicorn
       sanitizedAddress.pop_back();
     }
 
-    auto response = HttpRequestUtils::sendRequest(sanitizedAddress + "/api", "GET", "");
+    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api", "GET", "");
     if(!response.has_value()){
       return false;
     }
@@ -260,7 +260,7 @@ namespace Huenicorn
 
   bool HuenicornCore::validateCredentials(const Credentials& credentials)
   {
-    auto response = HttpRequestUtils::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
+    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
     if(!response.has_value()){
       return false;
     }
