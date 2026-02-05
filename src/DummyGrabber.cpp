@@ -2,12 +2,12 @@
 
 #include <glm/trigonometric.hpp>
 
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 
 
 namespace Huenicorn
 {
-  DummyGrabber::DummyGrabber(Config* config):
+  DummyGrabber::DummyGrabber(Core::Config* config):
   IGrabber(config)
   {
     m_startTime = Timing::ClockType::now();

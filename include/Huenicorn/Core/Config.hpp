@@ -7,7 +7,7 @@
 #include <Huenicorn/Hue/Auth/Credentials.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
   /**
    * @brief Main configuration parameters to be stored and loaded in a persistent way

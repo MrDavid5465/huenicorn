@@ -1,4 +1,4 @@
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -7,7 +7,7 @@
 #include <Huenicorn/Serialization/Config.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
   using namespace Serialization;
 

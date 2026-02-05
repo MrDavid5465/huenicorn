@@ -19,7 +19,7 @@ namespace Huenicorn
      * 
      * @param config Huenicorn configuration
      */
-    DummyGrabber(Config* config);
+    DummyGrabber(Core::Config* config);
 
 
     /**

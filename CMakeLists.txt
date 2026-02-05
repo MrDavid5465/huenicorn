@@ -101,6 +101,12 @@ set(STREAM_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
 )
 
+
+set(CORE_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
+)
+
 set(SERIALIZATION_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
@@ -131,7 +137,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ApiTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
@@ -140,17 +145,17 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
 
-  ${STREAM_SOURCE}
-  ${SERIALIZATION_SOURCE}
-  ${IMAGING_SOURCE}
-  ${PLATFORM_SOURCE}
-  ${NETWORK_SOURCE}
+  ${CORE_SOURCE}
   ${HUE_SOURCE}
+  ${IMAGING_SOURCE}
+  ${NETWORK_SOURCE}
+  ${PLATFORM_SOURCE}
+  ${SERIALIZATION_SOURCE}
+  ${STREAM_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp

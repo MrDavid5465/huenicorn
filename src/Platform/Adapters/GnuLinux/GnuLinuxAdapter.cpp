@@ -44,7 +44,7 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber GnuLinuxAdapter::_createGrabber(Config* config)
+  UniqueGrabber GnuLinuxAdapter::_createGrabber(Core::Config* config)
   {
     std::string sessionType = std::getenv("XDG_SESSION_TYPE");
 

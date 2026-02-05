@@ -6,7 +6,7 @@
 
 #include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Logger.hpp>
 
 #pragma GCC diagnostic push
@@ -20,7 +20,7 @@ using namespace std::chrono_literals;
 
 namespace Huenicorn
 {
-  PipewireGrabber::PipewireGrabber(Config* config):
+  PipewireGrabber::PipewireGrabber(Core::Config* config):
   IGrabber(config)
   {
     m_pwData.config = config;

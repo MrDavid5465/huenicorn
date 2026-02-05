@@ -8,7 +8,7 @@
 #include <Huenicorn/Logger.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
   class Config;
 }
@@ -80,7 +80,7 @@ namespace Huenicorn::Platform
      * @param config Huenicorn current configuration
      * @return UniqueGrabber Grabber instance
      */
-    inline IGrabber* getGrabber(Config* config)
+    inline IGrabber* getGrabber(Core::Config* config)
     {
       if(!m_grabber){
         try{
@@ -107,7 +107,7 @@ namespace Huenicorn::Platform
      * @param config Huenicorn current configuration
      * @return UniqueGrabber New grabber
      */
-    virtual UniqueGrabber _createGrabber(Config* config) = 0;
+    virtual UniqueGrabber _createGrabber(Core::Config* config) = 0;
 
     // Attributes
     const std::string m_platformName;

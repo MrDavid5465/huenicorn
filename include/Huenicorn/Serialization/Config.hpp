@@ -2,15 +2,15 @@
 
 #include <Huenicorn/Serialization/JsonSerializer.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 
 
 namespace Huenicorn::Serialization
 {
   template<>
-  struct JsonSerializer<Huenicorn::Config::Data>
+  struct JsonSerializer<Huenicorn::Core::Config::Data>
   {
-    static void to_json(Json& jsonConfigData, const Huenicorn::Config::Data& configData)
+    static void to_json(Json& jsonConfigData, const Huenicorn::Core::Config::Data& configData)
     {
       jsonConfigData = {
         {"subsampleWidth", configData.subsampleWidth},
@@ -34,7 +34,7 @@ namespace Huenicorn::Serialization
     }
 
 
-    static void from_json(const Json& jsonConfigData, Huenicorn::Config::Data& configData)
+    static void from_json(const Json& jsonConfigData, Huenicorn::Core::Config::Data& configData)
     {
       if(jsonConfigData.contains("restServerPort")){
         configData.restServerPort = jsonConfigData.at("restServerPort");

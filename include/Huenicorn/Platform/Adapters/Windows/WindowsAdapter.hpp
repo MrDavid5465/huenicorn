@@ -14,6 +14,6 @@ namespace Huenicorn::Platform
     virtual void openWebBrowser(const std::string& url) const override;
 
   protected:
-    virtual UniqueGrabber _createGrabber(Config* config) override;
+    virtual UniqueGrabber _createGrabber(Core::Config* config) override;
   };
 }

@@ -13,7 +13,10 @@
 
 namespace Huenicorn
 {
-  class Config;
+  namespace Core
+  {
+    class Config;
+  }
 
   using UniqueMonitor = std::shared_ptr<MonitorData>;
   using Monitors = std::vector<UniqueMonitor>;
@@ -68,7 +71,7 @@ namespace Huenicorn
      * 
      * @param config Huenicorn configuration
      */
-    IGrabber(Config* config):
+    IGrabber(Core::Config* config):
     m_config(config)
     {}
 
@@ -212,7 +215,7 @@ namespace Huenicorn
 
 
     //Attributes
-    Config* m_config;
+    Core::Config* m_config;
     MonitorSelectionData m_monitorSelectionData;
   };
 }

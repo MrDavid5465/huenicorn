@@ -47,7 +47,7 @@ namespace Huenicorn
       SafeDoubleBuffer frameDoubleBuffer;
       std::promise<bool> screenDataReadyPromise;
       bool promiseSetAlready{false};
-      Config* config;
+      Core::Config* config;
     };
 
 
@@ -56,7 +56,7 @@ namespace Huenicorn
     /**
      * PipewireGrabber constructor
     */
-    PipewireGrabber(Config* config);
+    PipewireGrabber(Core::Config* config);
 
 
     /**

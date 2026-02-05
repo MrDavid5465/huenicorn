@@ -34,7 +34,7 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber WindowsAdapter::_createGrabber(Config* config)
+  UniqueGrabber WindowsAdapter::_createGrabber(Core::Config* config)
   {
     (void)config;
     return nullptr;

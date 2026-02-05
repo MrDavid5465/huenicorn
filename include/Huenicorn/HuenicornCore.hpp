@@ -6,7 +6,7 @@
 
 #include <Huenicorn/ApiTools.hpp>
 #include <Huenicorn/Channel.hpp>
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/EntertainmentConfiguration.hpp>
 #include <Huenicorn/EntertainmentConfigurationSelector.hpp>
 #include <Huenicorn/IGrabber.hpp>
@@ -382,7 +382,7 @@ namespace Huenicorn
     // Attributes
     const std::string& m_version;
     std::filesystem::path m_configRoot;
-    Config m_config;
+    Core::Config m_config;
 
     bool m_keepLooping;
     bool m_openedSetup{false};

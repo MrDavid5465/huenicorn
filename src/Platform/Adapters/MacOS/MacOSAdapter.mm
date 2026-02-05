@@ -28,7 +28,7 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber MacOSAdapter::_createGrabber(Config* config)
+  UniqueGrabber MacOSAdapter::_createGrabber(Core::Config* config)
   {
     (void)config;
     return nullptr;

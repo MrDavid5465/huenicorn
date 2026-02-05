@@ -6,7 +6,7 @@
 
 #include <X11/extensions/Xrandr.h>
 
-#include <Huenicorn/Config.hpp>
+#include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Logger.hpp>
 
@@ -95,7 +95,14 @@ namespace Huenicorn
 
     m_shmInfo->shmid = shmget(IPC_PRIVATE, size, IPC_CREAT | 0777);
     m_shmInfo->readOnly = False;
+
+    /*/ // Hum...
     m_shmInfo->shmaddr = m_ximage->data = reinterpret_cast<char*>(shmat(m_shmInfo->shmid, nullptr, 0));
+    /*/ // Maybe better
+    char* addr = reinterpret_cast<char*>(shmat(m_shmInfo->shmid, nullptr, 0));
+    m_shmInfo->shmaddr = addr;
+    m_ximage->data = addr;
+    //*/
 
     XShmAttach(m_display, m_shmInfo.get());
   }
@@ -131,7 +138,7 @@ namespace Huenicorn
 
 
   // X11 Grabber
-  X11Grabber::X11Grabber(Config* config):
+  X11Grabber::X11Grabber(Core::Config* config):
   IGrabber(config)
   {
     _ensureXThreadsInit();

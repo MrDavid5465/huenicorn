@@ -91,13 +91,6 @@ namespace Huenicorn
     class XShmData
     {
     public:
-
-      struct XImageDeleter
-      {
-        void operator()(XImage* ptr);
-      };
-
-
       XShmData(Display* display, int screenId, int width, int height);
       ~XShmData();
 
@@ -116,7 +109,7 @@ namespace Huenicorn
      * 
      * @param config Huenicorn configuration
      */
-    X11Grabber(Config* config);
+    X11Grabber(Core::Config* config);
 
 
     /**
@@ -168,12 +161,12 @@ namespace Huenicorn
 
     void _ensureXThreadsInit();
     //void _initDisplayEvents();
-    bool _ensureMonitorSelection();
+    //bool _ensureMonitorSelection();
     bool _ensureXShmData();
 
     // Attributes
     int m_screenId; // Once and for all
-    UniqueDisplay m_display;
+    UniqueDisplay m_display; // MUST be destroyed AFTER m_xshmData
     //std::unique_ptr<X11MonitorCache> m_x11MonitorCache;
 
     std::unique_ptr<XShmData> m_xshmData;
