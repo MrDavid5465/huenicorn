@@ -4,7 +4,7 @@
 
 #include <Huenicorn/Imaging/ImageData.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
-#include <Huenicorn/Color.hpp>
+#include <Huenicorn/Imaging/Color.hpp>
 
 
 namespace Huenicorn::Imaging

@@ -80,7 +80,6 @@ set(HUE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Auth/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Auth/Credentials.hpp
 
-
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/ApiTools.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/Device.hpp
@@ -144,6 +143,7 @@ set(PLATFORM_SOURCE
 )
 
 set(IMAGING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Color.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageProcessing.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Interpolation.hpp
@@ -169,7 +169,6 @@ add_executable(${BINARY_NAME}
   ${SERIALIZATION_SOURCE}
   ${STREAM_SOURCE}
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp

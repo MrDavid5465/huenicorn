@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   /**
    * @brief Color data structure providing conversion and manipulation methods

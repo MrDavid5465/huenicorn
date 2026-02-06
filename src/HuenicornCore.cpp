@@ -583,7 +583,7 @@ namespace Huenicorn
         glm::ivec2 b{uvs.max.x * m_frameData.width(), uvs.max.y * m_frameData.height()};
 
         Imaging::ImageProcessing::getSubImage(m_frameData, subframeImageData, a, b);
-        Color color = Imaging::ImageProcessing::getDominantColor(subframeImageData);
+        auto color = Imaging::ImageProcessing::getDominantColor(subframeImageData);
 
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));
