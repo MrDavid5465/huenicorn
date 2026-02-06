@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <memory>
 
-#include <Huenicorn/IGrabber.hpp>
-#include <Huenicorn/DummyGrabber.hpp>
+#include <Huenicorn/Grabber/IGrabber.hpp>
+#include <Huenicorn/Grabber/DummyGrabber.hpp>
 #include <Huenicorn/Logger.hpp>
 
 
@@ -16,7 +16,7 @@ namespace Huenicorn::Core
 
 namespace Huenicorn::Platform
 {
-  using UniqueGrabber = std::unique_ptr<IGrabber>;
+  using UniqueGrabber = std::unique_ptr<Grabber::IGrabber>;
 
   /**
    * @brief Wrapper interface for platform-specific functions and grabber selection
@@ -80,7 +80,7 @@ namespace Huenicorn::Platform
      * @param config Huenicorn current configuration
      * @return UniqueGrabber Grabber instance
      */
-    inline IGrabber* getGrabber(Core::Config* config)
+    inline Grabber::IGrabber* getGrabber(Core::Config* config)
     {
       if(!m_grabber){
         try{
@@ -92,7 +92,7 @@ namespace Huenicorn::Platform
           Logger::warn(e.what());
           Logger::warn("Could not start propper grabber. Now falling back to DummyGrabber.");
 
-          m_grabber = std::make_unique<DummyGrabber>(config);
+          m_grabber = std::make_unique<Grabber::DummyGrabber>(config);
         }
       }
 

@@ -102,6 +102,13 @@ set(STREAM_SOURCE
 )
 
 
+set(GRABBER_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/IGrabber.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/DummyGrabber.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/DummyGrabber.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/MonitorData.hpp
+)
+
 set(CORE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
@@ -137,7 +144,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ApiTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
@@ -146,6 +152,7 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
 
   ${CORE_SOURCE}
+  ${GRABBER_SOURCE}
   ${HUE_SOURCE}
   ${IMAGING_SOURCE}
   ${NETWORK_SOURCE}
@@ -157,14 +164,11 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfigurationSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp

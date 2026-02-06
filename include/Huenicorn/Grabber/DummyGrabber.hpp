@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/Grabber/IGrabber.hpp>
 
 #include <Huenicorn/TimingDefinitions.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Grabber
 {
   /**
    * @brief Dummy grabber returning a color shift based on time

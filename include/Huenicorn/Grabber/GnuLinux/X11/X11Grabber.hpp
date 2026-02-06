@@ -3,15 +3,15 @@
 #include <memory>
 #include <optional>
 
-#include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/Grabber/IGrabber.hpp>
 
 #include <X11/extensions/Xrandr.h>
 #include <X11/extensions/XShm.h>
 
-#include <Huenicorn/MonitorData.hpp>
+#include <Huenicorn/Grabber/MonitorData.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Grabber
 {
   /**
    * @brief X11 implementation of screen grabber

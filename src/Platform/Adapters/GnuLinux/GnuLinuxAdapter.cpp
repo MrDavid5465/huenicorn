@@ -6,10 +6,10 @@
 #include <Huenicorn/Logger.hpp>
 
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
-#include <Grabbers/GnuLinux/Pipewire/PipewireGrabber.hpp>
+#include <Huenicorn/Grabber/GnuLinux/Pipewire/PipewireGrabber.hpp>
 #endif
 #ifdef X11_GRABBER_AVAILABLE
-#include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
+#include <Huenicorn/Grabber/GnuLinux/X11/X11Grabber.hpp>
 #endif
 
 
@@ -50,13 +50,13 @@ namespace Huenicorn::Platform
 
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
     if(sessionType == "wayland"){
-      return std::make_unique<PipewireGrabber>(config);
+      return std::make_unique<Grabber::PipewireGrabber>(config);
     }
 #endif
 
 #ifdef X11_GRABBER_AVAILABLE
     if(sessionType == "x11"){
-      return std::make_unique<X11Grabber>(config);
+      return std::make_unique<Grabber::X11Grabber>(config);
     }
 #endif
 

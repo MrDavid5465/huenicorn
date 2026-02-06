@@ -1,10 +1,10 @@
-#include <Grabbers/GnuLinux/Pipewire/PipewireGrabber.hpp>
+#include <Huenicorn/Grabber/GnuLinux/Pipewire/PipewireGrabber.hpp>
 
 #include <sstream>
 #include <future>
 #include <fcntl.h>
 
-#include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
+#include <Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Logger.hpp>
@@ -18,7 +18,8 @@
 
 using namespace std::chrono_literals;
 
-namespace Huenicorn
+
+namespace Huenicorn::Grabber
 {
   PipewireGrabber::PipewireGrabber(Core::Config* config):
   IGrabber(config)

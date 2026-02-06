@@ -1,11 +1,11 @@
-#include <Huenicorn/DummyGrabber.hpp>
+#include <Huenicorn/Grabber/DummyGrabber.hpp>
 
 #include <glm/trigonometric.hpp>
 
 #include <Huenicorn/Core/Config.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Grabber
 {
   DummyGrabber::DummyGrabber(Core::Config* config):
   IGrabber(config)

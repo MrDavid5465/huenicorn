@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/Grabber/IGrabber.hpp>
 
 #include <mutex>
 #include <optional>
@@ -13,10 +13,10 @@
 #include <spa/param/video/format-utils.h>
 #pragma GCC diagnostic pop
 
-#include <Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
+#include <Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Grabber
 {
   /**
    * Pipewire implementation of screen grabber instanciated for Wayland support

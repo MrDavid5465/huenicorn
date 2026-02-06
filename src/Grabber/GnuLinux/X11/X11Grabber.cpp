@@ -1,4 +1,4 @@
-#include <Grabbers/GnuLinux/X11/X11Grabber.hpp>
+#include <Huenicorn/Grabber/GnuLinux/X11/X11Grabber.hpp>
 
 
 #include <X11/Xutil.h>
@@ -11,7 +11,7 @@
 #include <Huenicorn/Logger.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Grabber
 {
   /*
   const std::vector<int> X11Grabber::s_xRandrEventFlags = {

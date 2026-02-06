@@ -9,7 +9,7 @@
 #include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/EntertainmentConfiguration.hpp>
 #include <Huenicorn/EntertainmentConfigurationSelector.hpp>
-#include <Huenicorn/IGrabber.hpp>
+#include <Huenicorn/Grabber/IGrabber.hpp>
 #include <Huenicorn/IRestServer.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/TickSynchronizer.hpp>
@@ -401,7 +401,7 @@ namespace Huenicorn
     ThreadedRestService m_webUIService;
 
     //  Image Processing
-    IGrabber* m_grabber;
+    Grabber::IGrabber* m_grabber;
     Imaging::ImageData m_frameData;
   };
 }

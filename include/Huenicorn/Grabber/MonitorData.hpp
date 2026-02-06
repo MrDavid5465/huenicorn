@@ -2,7 +2,8 @@
 
 #include <string>
 
-namespace Huenicorn
+
+namespace Huenicorn::Grabber
 {
   struct MonitorData
   {

@@ -12,7 +12,7 @@
 #include <gio/gunixfdlist.h>
 
 
-namespace Huenicorn
+namespace Huenicorn::Grabber
 {
   namespace XdgDesktopPortal
   {

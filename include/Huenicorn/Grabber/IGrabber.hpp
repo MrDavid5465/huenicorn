@@ -8,15 +8,17 @@
 #include <glm/vec2.hpp>
 
 #include <Huenicorn/Imaging/ImageData.hpp>
-#include <Huenicorn/MonitorData.hpp>
+#include <Huenicorn/Grabber/MonitorData.hpp>
 #include <Huenicorn/Logger.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Core
 {
-  namespace Core
-  {
-    class Config;
-  }
+  class Config;
+}
+
+namespace Huenicorn::Grabber
+{
 
   using UniqueMonitor = std::shared_ptr<MonitorData>;
   using Monitors = std::vector<UniqueMonitor>;

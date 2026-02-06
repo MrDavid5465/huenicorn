@@ -3,7 +3,7 @@
 #include <fstream>
 #include <chrono>
 
-#include <Huenicorn/DummyGrabber.hpp>
+#include <Huenicorn/Grabber/DummyGrabber.hpp>
 #include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
