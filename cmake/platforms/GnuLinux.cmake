@@ -22,8 +22,8 @@ if(${X11_FOUND})
   message("Able to build X11 Grabber !")
 
   set(X11_GRABBER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/X11/X11Grabber.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/X11/X11Grabber.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/X11/X11Grabber.hpp
   )
 endif()
 
@@ -32,10 +32,10 @@ if(LIB_PIPEWIRE_FOUND AND GIO_FOUND AND LIBGLIB_FOUND)
   message("Able to build Pipewire Grabber !")
 
   set(PIPEWIRE_GRABBER_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/Pipewire/PipewireGrabber.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/Pipewire/PipewireGrabber.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Grabbers/GnuLinux/Pipewire/XdgDesktopPortal.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/Pipewire/PipewireGrabber.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/Pipewire/PipewireGrabber.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp
   )
 endif()
 
