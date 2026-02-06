@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   /**
    * @brief Device data structure

@@ -1,11 +1,11 @@
-#include <Huenicorn/ApiTools.hpp>
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
 
 #include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Serialization/Device.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   namespace ApiTools
   {

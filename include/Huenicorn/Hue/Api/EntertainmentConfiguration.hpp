@@ -2,11 +2,11 @@
 
 #include <unordered_map>
 
-#include <Huenicorn/Channel.hpp>
-#include <Huenicorn/Device.hpp>
+#include <Huenicorn/Hue/Api/Channel.hpp>
+#include <Huenicorn/Hue/Api/Device.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   // Type definitions
   struct EntertainmentConfiguration;

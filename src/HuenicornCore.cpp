@@ -40,19 +40,19 @@ namespace Huenicorn
   }
 
 
-  const Channels& HuenicornCore::channels() const
+  const Hue::Api::Channels& HuenicornCore::channels() const
   {
     return m_channels;
   }
 
 
-  const EntertainmentConfigurations& HuenicornCore::entertainmentConfigurations() const
+  const Hue::Api::EntertainmentConfigurations& HuenicornCore::entertainmentConfigurations() const
   {
     return m_selector->entertainmentConfigurations();
   }
 
 
-  const EntertainmentConfiguration& HuenicornCore::currentEntertainmentConfiguration() const
+  const Hue::Api::EntertainmentConfiguration& HuenicornCore::currentEntertainmentConfiguration() const
   {
     return m_selector->currentEntertainmentConfiguration();
   }
@@ -383,7 +383,7 @@ namespace Huenicorn
     const auto& credentials = m_config.credentials().value();
     const std::string& bridgeAddress =  m_config.bridgeAddress().value();
 
-    m_selector = std::make_unique<EntertainmentConfigurationSelector>(credentials, bridgeAddress);
+    m_selector = std::make_unique<Hue::Api::EntertainmentConfigurationSelector>(credentials, bridgeAddress);
 
     std::string entertainmentConfigurationId = {};
     auto optJsonProfile = _getProfile();
@@ -447,16 +447,16 @@ namespace Huenicorn
 
   void HuenicornCore::_initChannels(const Serialization::Json& jsonChannels)
   {
-    const std::string& username = m_config.credentials().value().username();
-    const std::string& bridgeAddress =  m_config.bridgeAddress().value();
-    Devices devices = ApiTools::loadDevices(username, bridgeAddress);
-    EntertainmentConfigurationsChannels entertainmentConfigurationsChannels = ApiTools::loadEntertainmentConfigurationsChannels(username, bridgeAddress);
+    const auto& username = m_config.credentials().value().username();
+    const auto& bridgeAddress =  m_config.bridgeAddress().value();
+    auto devices = Hue::Api::ApiTools::loadDevices(username, bridgeAddress);
+    auto entertainmentConfigurationsChannels = Hue::Api::ApiTools::loadEntertainmentConfigurationsChannels(username, bridgeAddress);
 
-    Channels channels;
+    Hue::Api::Channels channels;
 
     for(const auto& [id, channel] : m_selector->currentEntertainmentConfiguration().channels){
       bool found = false;
-      const auto& members = ApiTools::matchDevices(entertainmentConfigurationsChannels.at(m_selector->currentEntertainmentConfigurationId().value()).at(id), devices);
+      const auto& members = Hue::Api::ApiTools::matchDevices(entertainmentConfigurationsChannels.at(m_selector->currentEntertainmentConfigurationId().value()).at(id), devices);
       for(const auto& jsonProfileChannel : jsonChannels){
         if(jsonProfileChannel.at("channelId") == id){
           bool active = jsonProfileChannel.at("active");
@@ -468,7 +468,7 @@ namespace Huenicorn
 
           UVs uvs = {{uvAx, uvAy}, {uvBx, uvBy}};
           float gammaFactor = jsonProfileChannel.at("gammaFactor");
-          channels.emplace(id, Channel{active, members, gammaFactor, uvs});
+          channels.emplace(id, Hue::Api::Channel{active, members, gammaFactor, uvs});
 
           found = true;
           break;
@@ -476,7 +476,7 @@ namespace Huenicorn
       }
 
       if(!found){
-        channels.emplace(id, Channel{false, members, 0.0f});
+        channels.emplace(id, Hue::Api::Channel{false, members, 0.0f});
       }
     }
 
@@ -563,13 +563,13 @@ namespace Huenicorn
     Imaging::ImageData subframeImageData;
 
     for(auto& [channelId, channel] : m_channels){
-      if(channel.state() == Channel::State::Inactive){
+      if(channel.state() == Hue::Api::Channel::State::Inactive){
         continue;
       }
 
       auto& channelStream = m_channelStreams.at(channelId);
 
-      if(channel.state() == Channel::State::PendingShutdown){
+      if(channel.state() == Hue::Api::Channel::State::PendingShutdown){
         channelStream.id = channelId;
         channelStream.r = 0;
         channelStream.g = 0;

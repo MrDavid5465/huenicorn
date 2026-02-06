@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <Huenicorn/Channel.hpp>
+#include <Huenicorn/Hue/Api/Channel.hpp>
 #include <Huenicorn/Hue/Auth/Credentials.hpp>
 #include <Huenicorn/Stream/IDtlsClient.hpp>
 #include <Huenicorn/Stream/HuestreamHeader.hpp>
@@ -47,7 +47,7 @@ namespace Huenicorn::Stream
      * 
      * @param channels 
      */
-    void streamChannels(const ChannelStreams& channels);
+    void streamChannels(const Hue::Api::ChannelStreams& channels);
 
 
   private:

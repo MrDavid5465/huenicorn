@@ -26,7 +26,7 @@ namespace Huenicorn::Stream
   }
 
 
-  void Streamer::streamChannels(const ChannelStreams& channels)
+  void Streamer::streamChannels(const Hue::Api::ChannelStreams& channels)
   {
     std::vector<std::byte> requestBuffer;
     requestBuffer.insert(requestBuffer.end(), reinterpret_cast<std::byte*>(&m_header), reinterpret_cast<std::byte*>(&m_header) + sizeof(HuestreamHeader));

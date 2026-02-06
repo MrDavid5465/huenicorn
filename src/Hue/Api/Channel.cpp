@@ -1,11 +1,11 @@
-#include <Huenicorn/Channel.hpp>
+#include <Huenicorn/Hue/Api/Channel.hpp>
 
 #include <glm/common.hpp>
 
 #include <Huenicorn/Serialization/Channel.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   Channel::Channel(bool active, const std::vector<Device>& devices, float gammaFactor, const UVs& uvs):
   m_state(active ? State::Active : State::Inactive),

@@ -79,6 +79,18 @@ configure_file(
 set(HUE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Auth/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Auth/Credentials.hpp
+
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/ApiTools.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/Channel.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/Device.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/EntertainmentConfiguration.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/ApiTools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/Channel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/EntertainmentConfigurationSelector.cpp
+
 )
 
 set(NETWORK_SOURCE
@@ -142,9 +154,6 @@ set(IMAGING_SOURCE
 # Declare executable
 add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ApiTools.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
@@ -160,12 +169,7 @@ add_executable(${BINARY_NAME}
   ${SERIALIZATION_SOURCE}
   ${STREAM_SOURCE}
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfigurationSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp

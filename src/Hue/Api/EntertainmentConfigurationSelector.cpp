@@ -1,10 +1,10 @@
-#include <Huenicorn/EntertainmentConfigurationSelector.hpp>
+#include <Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp>
 
-#include <Huenicorn/ApiTools.hpp>
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
 #include <Huenicorn/Logger.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   EntertainmentConfigurationSelector::EntertainmentConfigurationSelector(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress):
   m_credentials(credentials),

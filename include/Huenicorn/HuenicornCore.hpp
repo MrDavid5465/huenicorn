@@ -4,11 +4,11 @@
 #include <optional>
 #include <thread>
 
-#include <Huenicorn/ApiTools.hpp>
-#include <Huenicorn/Channel.hpp>
 #include <Huenicorn/Core/Config.hpp>
-#include <Huenicorn/EntertainmentConfiguration.hpp>
-#include <Huenicorn/EntertainmentConfigurationSelector.hpp>
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
+#include <Huenicorn/Hue/Api/Channel.hpp>
+#include <Huenicorn/Hue/Api/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp>
 #include <Huenicorn/Grabber/IGrabber.hpp>
 #include <Huenicorn/IRestServer.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
@@ -66,7 +66,7 @@ namespace Huenicorn
      * 
      * @return const Channels&  Channels list
      */
-    const Channels& channels() const;
+    const Hue::Api::Channels& channels() const;
 
 
     /**
@@ -74,7 +74,7 @@ namespace Huenicorn
      * 
      * @return const EntertainmentConfigurations& Available entertainment configurations
      */
-    const EntertainmentConfigurations& entertainmentConfigurations() const;
+    const Hue::Api::EntertainmentConfigurations& entertainmentConfigurations() const;
 
 
     /**
@@ -82,7 +82,7 @@ namespace Huenicorn
      * 
      * @return const EntertainmentConfiguration& Current entertainment configuration
      */
-    const EntertainmentConfiguration& currentEntertainmentConfiguration() const;
+    const Hue::Api::EntertainmentConfiguration& currentEntertainmentConfiguration() const;
 
 
     /**
@@ -389,9 +389,9 @@ namespace Huenicorn
     std::unique_ptr<TickSynchronizer> m_tickSynchronizer;
 
     //  API structure wrapper
-    std::unique_ptr<EntertainmentConfigurationSelector> m_selector;
-    Channels m_channels;
-    ChannelStreams m_channelStreams;
+    std::unique_ptr<Hue::Api::EntertainmentConfigurationSelector> m_selector;
+    Hue::Api::Channels m_channels;
+    Hue::Api::ChannelStreams m_channelStreams;
 
     // Streamer
     std::mutex m_streamerMutex;

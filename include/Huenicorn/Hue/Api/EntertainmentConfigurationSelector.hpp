@@ -4,10 +4,10 @@
 #include <string>
 
 #include <Huenicorn/Hue/Auth/Credentials.hpp>
-#include <Huenicorn/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Hue/Api/EntertainmentConfiguration.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   /**
    * @brief Selector tool for Entertainment Configurations

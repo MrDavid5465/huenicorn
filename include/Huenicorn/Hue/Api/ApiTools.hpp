@@ -4,11 +4,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include <Huenicorn/Device.hpp>
-#include <Huenicorn/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Hue/Api/Device.hpp>
+#include <Huenicorn/Hue/Api/EntertainmentConfiguration.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   using MembersIds = std::vector<std::string>;
   using ChannelsMembersIds = std::unordered_map<uint8_t, MembersIds>;

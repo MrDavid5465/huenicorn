@@ -5,11 +5,11 @@
 
 #include <glm/exponential.hpp>
 
-#include <Huenicorn/Device.hpp>
+#include <Huenicorn/Hue/Api/Device.hpp>
 #include <Huenicorn/UV.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Hue::Api
 {
   // Type definitions
   class Channel;
