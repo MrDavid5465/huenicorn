@@ -16,7 +16,8 @@
 
 #include <Huenicorn/EmbeddedWebrootFiles.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Network::Http::Server
 {
   /**
    * @brief Abstract class to implement for REST service

@@ -10,7 +10,7 @@
 #include <Huenicorn/Hue/Api/EntertainmentConfiguration.hpp>
 #include <Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp>
 #include <Huenicorn/Grabber/IGrabber.hpp>
-#include <Huenicorn/IRestServer.hpp>
+#include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/TickSynchronizer.hpp>
 #include <Huenicorn/UV.hpp>
@@ -29,7 +29,7 @@ namespace Huenicorn
     // Type definitions
     struct ThreadedRestService
     {
-      std::unique_ptr<IRestServer> server;
+      std::unique_ptr<Network::Http::Server::IRestServer> server;
       std::optional<std::thread> thread;
     };
 

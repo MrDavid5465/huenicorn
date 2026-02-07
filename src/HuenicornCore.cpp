@@ -9,8 +9,8 @@
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
-#include <Huenicorn/SetupBackend.hpp>
-#include <Huenicorn/WebUIBackend.hpp>
+#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
+#include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 
 #include <Huenicorn/Serialization/Channel.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
@@ -407,7 +407,7 @@ namespace Huenicorn
     unsigned port = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
 
-    SetupBackend sb(this);
+    Network::Http::Server::SetupBackend sb(this);
     sb.start(port, boundBackendIP);
 
     if(sb.aborted()){
@@ -436,7 +436,7 @@ namespace Huenicorn
 
     unsigned restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
-    m_webUIService.server = std::make_unique<WebUIBackend>(this);
+    m_webUIService.server = std::make_unique<Network::Http::Server::WebUIBackend>(this);
     m_webUIService.thread.emplace([&](){
       m_webUIService.server->start(restServerPort, boundBackendIP, std::move(readyWebUIPromise));
     });

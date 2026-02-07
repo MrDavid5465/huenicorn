@@ -95,6 +95,12 @@ set(HUE_SOURCE
 set(NETWORK_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Client/Client.hpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/IRestServer.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/WebUIBackend.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/SetupBackend.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/SetupBackend.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/WebUIBackend.cpp
 )
 
 
@@ -156,9 +162,7 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
 
   ${CORE_SOURCE}
   ${GRABBER_SOURCE}
@@ -170,13 +174,10 @@ add_executable(${BINARY_NAME}
   ${STREAM_SOURCE}
 
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/UV.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/WebUIBackend.hpp
 
   ${VERSION_HEADER}
   ${EMBEDDED_WEBROOT_HEADER}

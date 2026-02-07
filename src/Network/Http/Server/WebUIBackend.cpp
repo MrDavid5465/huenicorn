@@ -1,4 +1,4 @@
-#include <Huenicorn/WebUIBackend.hpp>
+#include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -9,11 +9,11 @@
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Network::Http::Server
 {
   using namespace Serialization;
 
-  WebUIBackend::WebUIBackend(HuenicornCore* huenicornCore):
+  WebUIBackend::WebUIBackend(Huenicorn::HuenicornCore* huenicornCore):
   IRestServer("index.html"),
   m_huenicornCore(huenicornCore)
   {

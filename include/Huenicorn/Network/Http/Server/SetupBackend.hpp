@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Huenicorn/IRestServer.hpp>
+#include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 
 #include <filesystem>
 #include <functional>
@@ -9,6 +9,11 @@
 
 
 namespace Huenicorn
+{
+  class HuenicornCore;
+}
+
+namespace Huenicorn::Network::Http::Server
 {
   class HuenicornCore;
 
@@ -27,7 +32,7 @@ namespace Huenicorn
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    SetupBackend(HuenicornCore* huenicornCore);
+    SetupBackend(Huenicorn::HuenicornCore* huenicornCore);
 
 
     /**
@@ -133,7 +138,7 @@ namespace Huenicorn
 
     // Attributes
     std::unordered_map<std::string, Callback> m_callbacks;
-    HuenicornCore* m_huenicornCore;
+    Huenicorn::HuenicornCore* m_huenicornCore;
     const std::filesystem::path m_webroot;
     std::unordered_map<std::string, std::string> m_contentTypes;
     bool m_aborted{false};

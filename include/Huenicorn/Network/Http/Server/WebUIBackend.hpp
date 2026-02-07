@@ -1,11 +1,16 @@
 #pragma once
 
-#include <Huenicorn/IRestServer.hpp>
+#include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 
 #include <filesystem>
 
 
 namespace Huenicorn
+{
+  class HuenicornCore;
+}
+
+namespace Huenicorn::Network::Http::Server
 {
   class HuenicornCore;
 
@@ -24,7 +29,7 @@ namespace Huenicorn
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    WebUIBackend(HuenicornCore* huenicornCore);
+    WebUIBackend(Huenicorn::HuenicornCore* huenicornCore);
 
 
   protected:
@@ -167,6 +172,6 @@ namespace Huenicorn
 
 
     // Attributes
-    HuenicornCore* m_huenicornCore;
+    Huenicorn::HuenicornCore* m_huenicornCore;
   };
 }

@@ -1,4 +1,4 @@
-#include <Huenicorn/SetupBackend.hpp>
+#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 
 #include <chrono>
 
@@ -10,9 +10,9 @@
 
 using namespace std::chrono_literals;
 
-namespace Huenicorn
+namespace Huenicorn::Network::Http::Server
 {
-  SetupBackend::SetupBackend(HuenicornCore* huenicornCore):
+  SetupBackend::SetupBackend(Huenicorn::HuenicornCore* huenicornCore):
   IRestServer("setup.html"),
   m_huenicornCore(huenicornCore)
   {
