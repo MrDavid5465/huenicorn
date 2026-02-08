@@ -1,5 +1,5 @@
 # Adapter
-target_sources(${BINARY_NAME} PRIVATE
+target_sources(huenicorn PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Adapters/GnuLinux/GnuLinuxAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Adapters/GnuLinux/GnuLinuxAdapter.cpp
 )
@@ -45,12 +45,12 @@ if(NOT (PIPEWIRER_GRABBER_AVAILABLE OR X11_GRABBER_AVAILABLE))
 endif()
 
 if(X11_GRABBER_AVAILABLE)
-  target_compile_definitions(${BINARY_NAME} PUBLIC X11_GRABBER_AVAILABLE=1)
-  target_sources(${BINARY_NAME} PRIVATE
+  target_compile_definitions(huenicorn PUBLIC X11_GRABBER_AVAILABLE=1)
+  target_sources(huenicorn PRIVATE
     ${X11_GRABBER_SOURCES}
   )
 
-  target_link_libraries(${BINARY_NAME} PUBLIC
+  target_link_libraries(huenicorn PUBLIC
     X11::X11
     X11::Xext
     X11::Xrandr
@@ -59,18 +59,18 @@ endif(X11_GRABBER_AVAILABLE)
 
 
 if(PIPEWIRE_GRABBER_AVAILABLE)
-  target_compile_definitions(${BINARY_NAME} PUBLIC PIPEWIRE_GRABBER_AVAILABLE=1)
-  target_sources(${BINARY_NAME} PRIVATE
+  target_compile_definitions(huenicorn PUBLIC PIPEWIRE_GRABBER_AVAILABLE=1)
+  target_sources(huenicorn PRIVATE
     ${PIPEWIRE_GRABBER_SOURCES}
   )
 
-  target_include_directories(${BINARY_NAME} PUBLIC
+  target_include_directories(huenicorn PUBLIC
     ${LIB_PIPEWIRE_INCLUDE_DIRS}
     ${GIO_INCLUDE_DIRS}
     ${GLIB_INCLUDE_DIRS}
   )
 
-  target_link_libraries(${BINARY_NAME} PUBLIC
+  target_link_libraries(huenicorn PUBLIC
     GIO::GIO
     ${LIB_PIPEWIRE_LIBRARIES}
     ${LIBGLIB_LIBRARIES}

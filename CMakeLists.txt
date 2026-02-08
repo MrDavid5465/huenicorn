@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-set(PROJECT_NAME huenicorn)
-set(BINARY_NAME huenicorn)
 
-project(${PROJECT_NAME} VERSION 1.0.11)
+project(Huenicorn VERSION 1.0.11)
 
 
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
@@ -172,7 +170,7 @@ set(TIMING_SOURCE
 
 
 # Declare executable
-add_executable(${BINARY_NAME}
+add_executable(huenicorn
   ${APP_SOURCE}
   ${CORE_SOURCE}
   ${GRABBER_SOURCE}
@@ -188,7 +186,7 @@ add_executable(${BINARY_NAME}
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
-add_dependencies(${PROJECT_NAME} generate_version_header generate_webroot_header)
+add_dependencies(huenicorn generate_version_header generate_webroot_header)
 
 if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
@@ -202,16 +200,16 @@ if(WIN32) #For Windows
   include(cmake/platforms/Windows.cmake)
 endif()
 
-set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)
+set_target_properties(huenicorn PROPERTIES CXX_STANDARD 20)
 
-target_include_directories(${BINARY_NAME} PUBLIC
+target_include_directories(huenicorn PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR} # For adapters and grabbers
   ${OpenCV_INCLUDE_DIRS}
   include
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
-target_link_libraries(${BINARY_NAME} PUBLIC
+target_link_libraries(huenicorn PUBLIC
   ${OpenCV_LIBS}
   ${CURL_LIBRARIES}
   ${MBEDTLS_LIBS}
@@ -221,7 +219,7 @@ target_link_libraries(${BINARY_NAME} PUBLIC
 )
 
 
-target_compile_options(${BINARY_NAME} PRIVATE
+target_compile_options(huenicorn PRIVATE
   -Werror
   -Wall
   -Wextra
@@ -267,25 +265,25 @@ endif(${BUILD_DOCUMENTATION})
 # Post build commands
 
 # Copy readme to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_CURRENT_SOURCE_DIR}/README.md $<TARGET_FILE_DIR:${PROJECT_NAME}>/README.md
+  ${CMAKE_CURRENT_SOURCE_DIR}/README.md $<TARGET_FILE_DIR:huenicorn>/README.md
 )
 
 # Copy screenshots to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}/screenshots $<TARGET_FILE_DIR:${PROJECT_NAME}>/screenshots
+  ${CMAKE_CURRENT_SOURCE_DIR}/screenshots $<TARGET_FILE_DIR:huenicorn>/screenshots
 )
 
 # Copy assets to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
+  ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:huenicorn>/assets
 )
 
 # Copy license to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt $<TARGET_FILE_DIR:${PROJECT_NAME}>/LICENSE.txt
+  ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt $<TARGET_FILE_DIR:huenicorn>/LICENSE.txt
 )
