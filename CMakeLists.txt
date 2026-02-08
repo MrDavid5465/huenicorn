@@ -76,6 +76,28 @@ configure_file(
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
+set(APP_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/App/main.cpp
+)
+
+set(CORE_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Runtime.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Runtime.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Logger.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Logger.hpp
+)
+
+set(GRABBER_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/IGrabber.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/DummyGrabber.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/DummyGrabber.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/MonitorData.hpp
+)
+
 set(HUE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Auth/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Hue/Auth/Credentials.hpp
@@ -91,6 +113,16 @@ set(HUE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/EntertainmentConfigurationSelector.cpp
 )
 
+set(IMAGING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Color.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageData.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageProcessing.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Interpolation.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/ImageProcessing.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/Interpolation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/UV.hpp
+)
+
 set(NETWORK_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Client/Client.hpp
@@ -102,6 +134,21 @@ set(NETWORK_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/WebUIBackend.cpp
 )
 
+set(PLATFORM_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/IAdapter.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Selector.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Selector.cpp
+)
+
+set(SERIALIZATION_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
+)
 
 set(STREAM_SOURCE
   # MbedTls Impl
@@ -117,61 +164,16 @@ set(STREAM_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
 )
 
-
-set(GRABBER_SOURCE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/IGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/DummyGrabber.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/DummyGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/MonitorData.hpp
-)
-
-set(CORE_SOURCE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
-
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Runtime.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Runtime.cpp
-
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Logger.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Logger.hpp
-)
-
-set(SERIALIZATION_SOURCE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Channel.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Credentials.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
-)
-
-set(PLATFORM_SOURCE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/IAdapter.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Selector.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Selector.cpp
-)
-
-set(IMAGING_SOURCE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Color.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageData.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/ImageProcessing.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Interpolation.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/ImageProcessing.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/Interpolation.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/UV.hpp
-)
-
 set(TIMING_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Timing/LoopRegulator.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Timing/Definitions.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Timing/LoopRegulator.cpp
 )
 
+
 # Declare executable
 add_executable(${BINARY_NAME}
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-
+  ${APP_SOURCE}
   ${CORE_SOURCE}
   ${GRABBER_SOURCE}
   ${HUE_SOURCE}
