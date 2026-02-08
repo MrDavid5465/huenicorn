@@ -31,10 +31,14 @@ namespace Huenicorn::Grabber
     class X11MonitorCache
     {
     public:
-      X11MonitorCache(Display* display);
+      X11MonitorCache(
+        Display* display
+      );
 
       bool updateRequired();
-      bool isConnected(RROutput output);
+      bool isConnected(
+        RROutput output
+      );
 
     private:
       void _refresh();
@@ -52,7 +56,9 @@ namespace Huenicorn::Grabber
     struct XDeleter
     {
       template <typename T>
-      void operator()(T* ptr) const noexcept
+      void operator()(
+        T* ptr
+      ) const noexcept
       {
         if(ptr){
           FreeFunc(ptr);
@@ -61,7 +67,9 @@ namespace Huenicorn::Grabber
       }
     };
 
-    static inline void destroyXImage(XImage* img)
+    static inline void destroyXImage(
+      XImage* img
+    )
     {
       if(img){
         XDestroyImage(img);
@@ -71,16 +79,25 @@ namespace Huenicorn::Grabber
     template <typename T, auto FreeFunc>
     using XUniquePtr = std::unique_ptr<T, XDeleter<FreeFunc>>;
 
-    using UniqueDisplay = XUniquePtr<Display,    XCloseDisplay>;
-    using UniqueOutputInfo = XUniquePtr<XRROutputInfo,    XRRFreeOutputInfo>;
-    using UniqueCrtcInfo   = XUniquePtr<XRRCrtcInfo,      XRRFreeCrtcInfo>;
-    using UniqueScreenResources  = XUniquePtr<XRRScreenResources, XRRFreeScreenResources>;
-    using UniqueXImage = XUniquePtr<XImage, X11Grabber::destroyXImage>;
+    using UniqueDisplay         = XUniquePtr<Display, XCloseDisplay>;
+    using UniqueOutputInfo      = XUniquePtr<XRROutputInfo, XRRFreeOutputInfo>;
+    using UniqueCrtcInfo        = XUniquePtr<XRRCrtcInfo, XRRFreeCrtcInfo>;
+    using UniqueScreenResources = XUniquePtr<XRRScreenResources, XRRFreeScreenResources>;
+    using UniqueXImage          = XUniquePtr<XImage, destroyXImage>;
 
 
     struct X11MonitorData : public MonitorData
     {
-      X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId);
+      X11MonitorData(
+        const std::string& name,
+        unsigned width,
+        unsigned height,
+        double refreshRate,
+        bool isPrimary,
+        int xPos,
+        int yPos,
+        RROutput outputId
+      );
 
       int xPos{0};
       int yPos{0};
@@ -91,7 +108,13 @@ namespace Huenicorn::Grabber
     class XShmData
     {
     public:
-      XShmData(Display* display, int screenId, int width, int height);
+      XShmData(
+        Display* display,
+        int screenId,
+        int width,
+        int height
+      );
+
       ~XShmData();
 
       XImage* ximage() const;
@@ -142,17 +165,23 @@ namespace Huenicorn::Grabber
      */
     virtual RefreshRate displayRefreshRate() const override;
 
-    bool isMonitorStillValid(X11MonitorData* monitor);
+    bool isMonitorStillValid(
+      X11MonitorData* monitor
+    );
 
     // Methods
-    virtual void selectMonitor(unsigned monitorId) override;
+    virtual void selectMonitor(
+      unsigned monitorId
+    ) override;
 
     /**
      * @brief Takes a screen capture and returns a subsample of it as bitmap
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(Imaging::ImageData& imageData) override;
+    virtual void grabFrameSubsample(
+      Imaging::ImageData& imageData
+    ) override;
 
   protected:
     virtual void _initMonitorsList() override;

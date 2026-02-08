@@ -72,7 +72,9 @@ namespace Huenicorn::Grabber
      * 
      * @param config Huenicorn configuration
      */
-    IGrabber(Core::Config* config):
+    IGrabber(
+      Core::Config* config
+    ):
     m_config(config)
     {}
 
@@ -121,7 +123,9 @@ namespace Huenicorn::Grabber
 
 
     // Methods
-    virtual void selectMonitor(unsigned /*monitorId*/)
+    virtual void selectMonitor(
+      unsigned /*monitorId*/
+    )
     {
       if(hasCustomScreenManagement()){
         throw std::runtime_error("Missing '_initMonitorsList' override for " + name());
@@ -134,7 +138,9 @@ namespace Huenicorn::Grabber
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(Imaging::ImageData& imageData) = 0;
+    virtual void grabFrameSubsample(
+      Imaging::ImageData& imageData
+    ) = 0;
 
 
     inline Monitors monitors() const
@@ -182,7 +188,9 @@ namespace Huenicorn::Grabber
      * @param number 
      * @return Divisors 
      */
-    inline static Divisors _divisors(int number)
+    inline static Divisors _divisors(
+      int number
+    )
     {
       Divisors divisors;
       for(int i = 1; i < number / 2; i++){
@@ -204,7 +212,10 @@ namespace Huenicorn::Grabber
      * @param heightDivisors List of height divisors
      * @return Divisors
      */
-    inline static Divisors _selectValidDivisors(const Divisors& widthDivisors, const Divisors& heightDivisors)
+    inline static Divisors _selectValidDivisors(
+      const Divisors& widthDivisors,
+      const Divisors& heightDivisors
+    )
     {
       Divisors validDivisors(std::max(widthDivisors.size(), heightDivisors.size()));
       auto validDivisorsIt = std::set_intersection(widthDivisors.begin(), widthDivisors.end(), heightDivisors.begin(), heightDivisors.end(), validDivisors.begin());

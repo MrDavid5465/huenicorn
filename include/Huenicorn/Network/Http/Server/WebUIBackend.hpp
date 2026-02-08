@@ -29,7 +29,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    WebUIBackend(Huenicorn::Core::Runtime* huenicornCore);
+    WebUIBackend(
+      Huenicorn::Core::Runtime* huenicornCore
+    );
 
 
   protected:
@@ -47,7 +49,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    virtual void _getVersion(crow::response& res) const override;
+    virtual void _getVersion(
+      crow::response& res
+    ) const override;
 
 
   private:
@@ -56,7 +60,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getWebUIStatus(crow::response& res) const;
+    void _getWebUIStatus(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -64,7 +70,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getEntertainmentConfigurations(crow::response& res) const;
+    void _getEntertainmentConfigurations(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -72,7 +80,10 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getChannel(crow::response& res, uint8_t channelId) const;
+    void _getChannel(
+      crow::response& res,
+      uint8_t channelId
+    ) const;
 
 
     /**
@@ -80,7 +91,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getChannels(crow::response& res) const;
+    void _getChannels(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -88,7 +101,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getDisplayInfo(crow::response& res) const;
+    void _getDisplayInfo(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -96,7 +111,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _getInterpolationInfo(crow::response& res) const;
+    void _getInterpolationInfo(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -104,7 +121,10 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setEntertainmentConfiguration(const crow::request& req, crow::response& res) const;
+    void _setEntertainmentConfiguration(
+      const crow::request& req,
+      crow::response& res
+    ) const;
 
 
     /**
@@ -112,7 +132,11 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setChannelUV(const crow::request& req, crow::response& res, uint8_t channelId) const;
+    void _setChannelUV(
+      const crow::request& req,
+      crow::response& res,
+      uint8_t channelId
+    ) const;
 
 
     /**
@@ -120,7 +144,11 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setChannelGammaFactor(const crow::request& req, crow::response& res, uint8_t channelId) const;
+    void _setChannelGammaFactor(
+      const crow::request& req,
+      crow::response& res,
+      uint8_t channelId
+    ) const;
 
 
     /**
@@ -128,7 +156,10 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setSubsampleWidth(const crow::request& req, crow::response& res) const;
+    void _setSubsampleWidth(
+      const crow::request& req,
+      crow::response& res
+    ) const;
 
 
     /**
@@ -136,7 +167,10 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setRefreshRate(const crow::request& req, crow::response& res) const;
+    void _setRefreshRate(
+      const crow::request& req,
+      crow::response& res
+    ) const;
 
 
     /**
@@ -144,7 +178,10 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setInterpolation(const crow::request& req, crow::response& res) const;
+    void _setInterpolation(
+      const crow::request& req,
+      crow::response& res
+    ) const;
 
 
     /**
@@ -152,7 +189,11 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _setChannelActivity(const crow::request& req, crow::response& res, uint8_t channelId) const;
+    void _setChannelActivity(
+      const crow::request& req,
+      crow::response& res,
+      uint8_t channelId
+    ) const;
 
 
     /**
@@ -160,7 +201,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _saveProfile(crow::response& res) const;
+    void _saveProfile(
+      crow::response& res
+    ) const;
 
 
     /**
@@ -168,7 +211,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _stop(crow::response& res) const;
+    void _stop(
+      crow::response& res
+    ) const;
 
 
     // Attributes

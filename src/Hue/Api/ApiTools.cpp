@@ -9,7 +9,10 @@ namespace Huenicorn::Hue::Api
 {
   namespace ApiTools
   {
-    EntertainmentConfigurations loadEntertainmentConfigurations(const std::string& username, const std::string& bridgeAddress)
+    EntertainmentConfigurations loadEntertainmentConfigurations(
+      const std::string& username,
+      const std::string& bridgeAddress
+    )
     {
       // I don't always abbreviate variable names
       // but when I do, it's because I don't have a 32:9 monitor
@@ -51,7 +54,10 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    Devices loadDevices(const std::string& username, const std::string& bridgeAddress)
+    Devices loadDevices(
+      const std::string& username,
+      const std::string& bridgeAddress
+    )
     {
       using namespace Network::Http::Client;
 
@@ -84,7 +90,10 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    EntertainmentConfigurationsChannels loadEntertainmentConfigurationsChannels(const std::string& username, const std::string& bridgeAddress)
+    EntertainmentConfigurationsChannels loadEntertainmentConfigurationsChannels(
+      const std::string& username,
+      const std::string& bridgeAddress
+    )
     {
       using namespace Network::Http::Client;
 
@@ -113,7 +122,10 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    std::vector<Device> matchDevices(const MembersIds& membersIds, const Devices& devices)
+    std::vector<Device> matchDevices(
+      const MembersIds& membersIds,
+      const Devices& devices
+    )
     {
       std::vector<Device> matchedDevices;
       for(const auto& memberId : membersIds){
@@ -125,7 +137,12 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    void setStreamingState(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress, bool active)
+    void setStreamingState(
+      const EntertainmentConfigurationEntry& entertainmentConfigurationEntry,
+      const std::string& username,
+      const std::string& bridgeAddress,
+      bool active
+    )
     {
       Serialization::Json jsonBody = {
         {"action", active ? "start" : "stop"},
@@ -140,7 +157,11 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    bool streamingActive(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress)
+    bool streamingActive(
+      const EntertainmentConfigurationEntry& entertainmentConfigurationEntry,
+      const std::string& username,
+      const std::string& bridgeAddress
+    )
     {
       using namespace Network::Http::Client;
 

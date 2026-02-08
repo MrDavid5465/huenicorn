@@ -80,7 +80,9 @@ namespace Huenicorn::Stream
      * @return true Sending was successful
      * @return false Sending failed
      */
-    virtual bool send(std::span<const std::byte> requestBuffer) override;
+    virtual bool send(
+      std::span<const std::byte> requestBuffer
+    ) override;
 
   private:
     // Private methods

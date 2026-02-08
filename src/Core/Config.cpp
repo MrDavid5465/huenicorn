@@ -11,7 +11,9 @@ namespace Huenicorn::Core
 {
   using namespace Serialization;
 
-  Config::Config(const std::filesystem::path& settingsRoot):
+  Config::Config(
+    const std::filesystem::path& settingsRoot
+  ):
   m_configFilePath(settingsRoot / "config.json")
   {
     _loadConfigFile();
@@ -89,35 +91,45 @@ namespace Huenicorn::Core
   }
 
 
-  void Config::setBridgeAddress(const std::string& bridgeAddress)
+  void Config::setBridgeAddress(
+    const std::string& bridgeAddress
+  )
   {
     m_configData.value().bridgeAddress.emplace(bridgeAddress);
     _save();
   }
 
 
-  void Config::setCredentials(const Hue::Auth::Credentials& credentials)
+  void Config::setCredentials(
+    const Hue::Auth::Credentials& credentials
+  )
   {
     m_configData.value().credentials.emplace(credentials);
     _save();
   }
 
 
-  void Config::setProfileName(const std::string& profileName)
+  void Config::setProfileName(
+    const std::string& profileName
+  )
   {
     m_configData.value().profileName.emplace(profileName);
     _save();
   }
 
 
-  void Config::setSubsampleWidth(unsigned subsampleWidth)
+  void Config::setSubsampleWidth(
+    unsigned subsampleWidth
+  )
   {
     m_configData.value().subsampleWidth = subsampleWidth;
     _save();
   }
 
 
-  void Config::setRefreshRate(unsigned refreshRate)
+  void Config::setRefreshRate(
+    unsigned refreshRate
+  )
   {
     if(refreshRate < 1){
       refreshRate = 1;
@@ -128,7 +140,9 @@ namespace Huenicorn::Core
   }
 
 
-  void Config::setInterpolation(Imaging::Interpolation::Type interpolation)
+  void Config::setInterpolation(
+    Imaging::Interpolation::Type interpolation
+  )
   {
     m_configData.value().interpolation = interpolation;
     _save();

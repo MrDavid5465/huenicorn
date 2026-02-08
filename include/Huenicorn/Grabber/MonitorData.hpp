@@ -7,7 +7,13 @@ namespace Huenicorn::Grabber
 {
   struct MonitorData
   {
-    MonitorData(const std::string name, unsigned width, unsigned height, double refreshRate, bool isPrimary):
+    MonitorData(
+      const std::string name,
+      unsigned width,
+      unsigned height,
+      double refreshRate,
+      bool isPrimary
+    ):
     name(name),
     width(width),
     height(height),

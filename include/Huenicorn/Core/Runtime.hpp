@@ -41,7 +41,10 @@ namespace Huenicorn::Core
      * @param version Current version of Huenicorn
      * @param configRoot Path to the configuration directory
      */
-    Runtime(const std::string& version, const std::filesystem::path& configRoot);
+    Runtime(
+      const std::string& version,
+      const std::filesystem::path& configRoot
+    );
 
 
     // Getters
@@ -173,7 +176,9 @@ namespace Huenicorn::Core
      * @return true Successfully selected entertainment configuration
      * @return false Failed to select entertainment configuration
      */
-    bool setEntertainmentConfiguration(const std::string& entertainmentConfigurationId);
+    bool setEntertainmentConfiguration(
+      const std::string& entertainmentConfigurationId
+    );
 
 
     /**
@@ -184,7 +189,11 @@ namespace Huenicorn::Core
      * @param uvCorner Corner to affect
      * @return const UVs& Clamped UV value
      */
-    const Imaging::UVs& setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner);
+    const Imaging::UVs& setChannelUV(
+      uint8_t channelId,
+      Imaging::UV&& uv,
+      Imaging::UVCorner uvCorner
+    );
 
 
     /**
@@ -195,7 +204,10 @@ namespace Huenicorn::Core
      * @return true Gamma factor was successuflly set
      * @return false Gamma factor could not be set
      */
-    bool setChannelGammaFactor(uint8_t channelId, float gammaFactor);
+    bool setChannelGammaFactor(
+      uint8_t channelId,
+      float gammaFactor
+    );
 
 
     /**
@@ -203,7 +215,9 @@ namespace Huenicorn::Core
      * 
      * @param subsampleWidth Desired width for the image subsample
      */
-    void setSubsampleWidth(unsigned subsampleWidth);
+    void setSubsampleWidth(
+      unsigned subsampleWidth
+    );
 
 
     /**
@@ -211,7 +225,9 @@ namespace Huenicorn::Core
      * 
      * @param refreshRate Desired refresh rate for color data streaming
      */
-    void setRefreshRate(unsigned refreshRate);
+    void setRefreshRate(
+      unsigned refreshRate
+    );
 
 
     /**
@@ -219,7 +235,9 @@ namespace Huenicorn::Core
      * 
      * @param interpolation Desired interpolation type
      */
-    void setInterpolation(unsigned interpolation);
+    void setInterpolation(
+      unsigned interpolation
+    );
 
 
     // Methods
@@ -244,7 +262,9 @@ namespace Huenicorn::Core
      * @return true Hue bridge address is valid and was registered
      * @return false Hue bridge address is invalid and was discarded
      */
-    bool validateBridgeAddress(const std::string& bridgeAddress);
+    bool validateBridgeAddress(
+      const std::string& bridgeAddress
+    );
 
 
     /**
@@ -254,7 +274,9 @@ namespace Huenicorn::Core
      * @return true Hue bridge credentials are valid and were registered
      * @return false Hue bridge credentials are invalid and were discarded
      */
-    bool validateCredentials(const Hue::Auth::Credentials& credentials);
+    bool validateCredentials(
+      const Hue::Auth::Credentials& credentials
+    );
 
 
     /**
@@ -265,7 +287,10 @@ namespace Huenicorn::Core
      * @return true Streaming state was successfully set
      * @return false Streaming state could not be set
      */
-    bool setChannelActivity(uint8_t channelId, bool active);
+    bool setChannelActivity(
+      uint8_t channelId,
+      bool active
+    );
 
 
     /**
@@ -333,7 +358,9 @@ namespace Huenicorn::Core
      * 
      * @param jsonProfile Data from the user-defined profile
      */
-    void _initChannels(const Serialization::Json& jsonProfile);
+    void _initChannels(
+      const Serialization::Json& jsonProfile
+    );
 
 
     /**
@@ -348,7 +375,9 @@ namespace Huenicorn::Core
      * 
      * @param entertainmentConfigurationId ID of the entertainment configuration to enable
      */
-    void _enableEntertainmentConfiguration(const std::string& entertainmentConfigurationId);
+    void _enableEntertainmentConfiguration(
+      const std::string& entertainmentConfigurationId
+    );
 
 
     /**

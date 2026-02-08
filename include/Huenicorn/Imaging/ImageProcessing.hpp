@@ -24,10 +24,18 @@ namespace Huenicorn::Imaging
      * @param targetWidth Target width of the output bitmap
      * @param interpolationType Subsampling interpolation type
      */
-    void rescale(const ImageData& inputImageData, ImageData& outputImageData, int outputWidth, Interpolation::Type interpolationType);
+    void rescale(
+      const ImageData& inputImageData,
+      ImageData& outputImageData,
+      int outputWidth,
+      Interpolation::Type interpolationType
+    );
 
 
-    void rgbaToRgb(const ImageData& inputImageData, ImageData& outputImageData);
+    void rgbaToRgb(
+      const ImageData& inputImageData,
+      ImageData& outputImageData
+    );
 
 
     /**
@@ -37,7 +45,12 @@ namespace Huenicorn::Imaging
      * @param a Top-left coordinates
      * @param b Bottom-right coordinates
      */
-    void getSubImage(const ImageData& sourceImageData, ImageData& destImage, const glm::ivec2& a, const glm::ivec2& b);
+    void getSubImage(
+      const ImageData& sourceImageData,
+      ImageData& destImage,
+      const glm::ivec2& a,
+      const glm::ivec2& b
+    );
 
 
     /**
@@ -46,12 +59,16 @@ namespace Huenicorn::Imaging
      * @param image Input image
      * @return Color Dominant color
      */
-    Color getDominantColor(const ImageData& imageData);
+    Color getDominantColor(
+      const ImageData& imageData
+    );
 
 
     namespace Algorithms
     {
-      Color mean(const ImageData& imageData);
+      Color mean(
+        const ImageData& imageData
+      );
     }
   };
 }

@@ -6,7 +6,10 @@
 
 namespace Huenicorn::Hue::Api
 {
-  EntertainmentConfigurationSelector::EntertainmentConfigurationSelector(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress):
+  EntertainmentConfigurationSelector::EntertainmentConfigurationSelector(
+    const Hue::Auth::Credentials& credentials,
+    const std::string& bridgeAddress
+  ):
   m_credentials(credentials),
   m_bridgeAddress(bridgeAddress)
   {
@@ -42,7 +45,9 @@ namespace Huenicorn::Hue::Api
   }
 
 
-  bool EntertainmentConfigurationSelector::selectEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
+  bool EntertainmentConfigurationSelector::selectEntertainmentConfiguration(
+    const std::string& entertainmentConfigurationId
+  )
   {
     if(m_entertainmentConfigurations.size() == 0){
       Core::Logger::error("No entertainment configuration could be found yet. Please register one through the official Philips Hue application in order to power it with Huenicorn");

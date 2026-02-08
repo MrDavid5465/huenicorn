@@ -7,7 +7,9 @@
 
 namespace Huenicorn::Grabber
 {
-  DummyGrabber::DummyGrabber(Core::Config* config):
+  DummyGrabber::DummyGrabber(
+    Core::Config* config
+  ):
   IGrabber(config)
   {
     m_startTime = Timing::ClockType::now();
@@ -32,7 +34,9 @@ namespace Huenicorn::Grabber
   }
 
 
-  void DummyGrabber::grabFrameSubsample(Imaging::ImageData& imageData)
+  void DummyGrabber::grabFrameSubsample(
+    Imaging::ImageData& imageData
+  )
   {
     Timing::TimePoint now = Timing::ClockType::now();
     Timing::Duration duration = now - m_startTime;

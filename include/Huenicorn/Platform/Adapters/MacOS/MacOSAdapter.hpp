@@ -9,11 +9,18 @@ namespace Huenicorn::Platform
   {
   public:
     MacOSAdapter():IAdapter{"macOS"}{}
+
     virtual std::filesystem::path getConfigFilePath() const override;
+
     virtual std::string getUsername() const override;
-    virtual void openWebBrowser(const std::string& url) const override;
+
+    virtual void openWebBrowser(
+      const std::string& url
+    ) const override;
 
   protected:
-    virtual UniqueGrabber _createGrabber(Core::Config* config) override;
+    virtual UniqueGrabber _createGrabber(
+      Core::Config* config
+    ) override;
   };
 }

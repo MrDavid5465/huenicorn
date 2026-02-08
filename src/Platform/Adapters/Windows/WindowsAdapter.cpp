@@ -34,14 +34,18 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber WindowsAdapter::_createGrabber(Core::Config* config)
+  UniqueGrabber WindowsAdapter::_createGrabber(
+    Core::Config* config
+  )
   {
     (void)config;
     return nullptr;
   }
 
 
-  void WindowsAdapter::openWebBrowser(const std::string& url) const
+  void WindowsAdapter::openWebBrowser(
+    const std::string& url
+  ) const
   {
     if((uintptr_t)ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL) <= 32){
       Logger::error("Failed to open browser");

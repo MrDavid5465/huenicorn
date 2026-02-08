@@ -56,7 +56,9 @@ namespace Huenicorn::Grabber
     /**
      * PipewireGrabber constructor
     */
-    PipewireGrabber(Core::Config* config);
+    PipewireGrabber(
+      Core::Config* config
+    );
 
 
     /**
@@ -89,31 +91,57 @@ namespace Huenicorn::Grabber
      * 
      * @param imageData Subsample of the last captured frame
      */
-    virtual void grabFrameSubsample(Imaging::ImageData& imageData) override;
+    virtual void grabFrameSubsample(
+      Imaging::ImageData& imageData
+    ) override;
 
 
   private:
     // Methods
-    static void _onCoreInfoCallback(void* userData, const pw_core_info* info);
+    static void _onCoreInfoCallback(
+      void* userData,
+      const pw_core_info* info
+    );
 
-    static void _onCoreDoneCallback(void* userData, uint32_t id, int seq);
+    static void _onCoreDoneCallback(
+      void* userData,
+      uint32_t id,
+      int seq
+    );
 
-    static void _onCoreErrorCallback(void* userData, uint32_t id, int seq, int res, const char* message);
+    static void _onCoreErrorCallback(
+      void* userData,
+      uint32_t id,
+      int seq,
+      int res,
+      const char* message
+    );
 
-    static void _onStreamProcess(void* userdata);
+    static void _onStreamProcess(
+      void* userdata
+    );
 
-    static void _onStreamParamChanged(void* userdata, uint32_t id, const struct spa_pod* param);
+    static void _onStreamParamChanged(
+      void* userdata,
+      uint32_t id,
+      const struct spa_pod* param
+    );
 
     /**
      * Screencast portal thread
     */
-    static void _initCapture(XdgDesktopPortal::Capture* capture);
+    static void _initCapture(
+      XdgDesktopPortal::Capture* capture
+    );
 
 
     /**
      * Pipewire thread
     */
-    static void _pipewireThread(XdgDesktopPortal::Capture* capture, PipewireData* pw);
+    static void _pipewireThread(
+      XdgDesktopPortal::Capture* capture,
+      PipewireData* pw
+    );
 
 
     /**

@@ -36,7 +36,9 @@ namespace Huenicorn::Platform
   }
 
 
-  void GnuLinuxAdapter::openWebBrowser(const std::string& url) const
+  void GnuLinuxAdapter::openWebBrowser(
+    const std::string& url
+  ) const
   {
     if(system(std::string("xdg-open " + url).c_str()) != 0){
       Core::Logger::error("Failed to open browser");
@@ -44,7 +46,9 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber GnuLinuxAdapter::_createGrabber(Core::Config* config)
+  UniqueGrabber GnuLinuxAdapter::_createGrabber(
+    Core::Config* config
+  )
   {
     std::string sessionType = std::getenv("XDG_SESSION_TYPE");
 

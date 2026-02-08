@@ -17,7 +17,7 @@ namespace Huenicorn::Imaging
     {
       return imageMatrix.rows;
     }
-  
+
     inline bool hasData() const
     {
       return imageMatrix.data != nullptr && width() > 0 && height() > 0;

@@ -47,7 +47,9 @@ private:
 Application app;
 
 
-void signalHandler(int signal)
+void signalHandler(
+  int signal
+)
 {
   if(signal == SIGTERM || signal == SIGINT){
     Huenicorn::Core::Logger::log("Closing application");

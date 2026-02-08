@@ -12,7 +12,10 @@ namespace Huenicorn::Serialization
   struct JsonSerializer<Hue::Api::EntertainmentConfiguration>
   {
     // Deserialization
-    static void from_json(const Json& jsonEntConf, Hue::Api::EntertainmentConfiguration& entConf)
+    static void from_json(
+      const Json& jsonEntConf,
+      Hue::Api::EntertainmentConfiguration& entConf
+    )
     {
       jsonEntConf.at("metadata").at("name").get_to(entConf.name);
 
@@ -27,7 +30,10 @@ namespace Huenicorn::Serialization
 
 
     // Serialization
-    static void to_json(Json& jsonEntConf, const Hue::Api::EntertainmentConfiguration& entConf)
+    static void to_json(
+      Json& jsonEntConf,
+      const Hue::Api::EntertainmentConfiguration& entConf
+    )
     {
       jsonEntConf = {
         {"name", entConf.name},
@@ -41,7 +47,10 @@ namespace Huenicorn::Serialization
   template<>
   struct JsonSerializer<Hue::Api::EntertainmentConfigurations>
   {
-    static void to_json(Json& jsonEntConfs, const Hue::Api::EntertainmentConfigurations& entConfs)
+    static void to_json(
+      Json& jsonEntConfs,
+      const Hue::Api::EntertainmentConfigurations& entConfs
+    )
     {
       jsonEntConfs = Json::array();
       for(const auto& entertainmentConfiguration : entConfs){

@@ -29,7 +29,7 @@ namespace Huenicorn::Core
       std::optional<unsigned> subsampleWidth{0};
       std::optional<Imaging::Interpolation::Type> interpolation{Imaging::Interpolation::Type::Area};
     };
-    
+
 
     // Constructor
     /**
@@ -37,7 +37,9 @@ namespace Huenicorn::Core
      * 
      * @param configRoot Path to the configuration directory
      */
-    Config(const std::filesystem::path& configRoot);
+    Config(
+      const std::filesystem::path& configRoot
+    );
 
 
     // Getters
@@ -128,7 +130,9 @@ namespace Huenicorn::Core
      * 
      * @param bridgeAddress Address of the Hue bridge
      */
-    void setBridgeAddress(const std::string& bridgeAddress);
+    void setBridgeAddress(
+      const std::string& bridgeAddress
+    );
 
 
     /**
@@ -136,7 +140,9 @@ namespace Huenicorn::Core
      * 
      * @param credentials User credentials for the Hue bridge
      */
-    void setCredentials(const Hue::Auth::Credentials& credentials);
+    void setCredentials(
+      const Hue::Auth::Credentials& credentials
+    );
 
 
     /**
@@ -144,7 +150,9 @@ namespace Huenicorn::Core
      * 
      * @param profileName Profile name to use
      */
-    void setProfileName(const std::string& profileName);
+    void setProfileName(
+      const std::string& profileName
+    );
 
 
     /**
@@ -152,7 +160,9 @@ namespace Huenicorn::Core
      * 
      * @param subsampleWidth Subsample width
      */
-    void setSubsampleWidth(unsigned subsampleWidth);
+    void setSubsampleWidth(
+      unsigned subsampleWidth
+    );
 
 
     /**
@@ -160,7 +170,9 @@ namespace Huenicorn::Core
      * 
      * @param refreshRate Refresh rate
      */
-    void setRefreshRate(unsigned refreshRate);
+    void setRefreshRate(
+      unsigned refreshRate
+    );
 
 
     /**
@@ -168,7 +180,9 @@ namespace Huenicorn::Core
      * 
      * @param interpolation Type of interpolation
     */
-    void setInterpolation(Imaging::Interpolation::Type interpolation);
+    void setInterpolation(
+      Imaging::Interpolation::Type interpolation
+    );
 
   private:
     // Private methods

@@ -18,7 +18,9 @@ namespace Huenicorn::Network::Http::Client
   class Response
   {
   public:
-    Response(const std::string& response):
+    Response(
+      const std::string& response
+    ):
     m_response(response)
     {}
 
@@ -46,6 +48,11 @@ namespace Huenicorn::Network::Http::Client
    * @param headers HTTP request headers
    * @return Serialization::Json JSON response
    */
-  std::optional<Response> sendRequest(const std::string& url, const std::string& method, const std::string& body = "", const Headers& headers = {});
+  std::optional<Response> sendRequest(
+    const std::string& url,
+    const std::string& method,
+    const std::string& body = "",
+    const Headers& headers = {}
+  );
 }
 

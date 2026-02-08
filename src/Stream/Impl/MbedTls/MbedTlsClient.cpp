@@ -17,7 +17,13 @@ namespace Huenicorn::Stream
   const std::string MbedTlsClient::Hostname = "Hue";
   const unsigned MbedTlsClient::HandshakeAttempts = 4;
 
-  static void debugCallback(void* ctx, int level, const char* file, int line, const char* str)
+  static void debugCallback(
+    void* ctx,
+    int level,
+    const char* file,
+    int line,
+    const char* str
+  )
   {
     const char* p, *basename;
     (void)ctx;
@@ -33,7 +39,9 @@ namespace Huenicorn::Stream
 
 
 
-  MbedTlsClient::MbedTlsClient(const DtlsConfig& dtlsConfig):
+  MbedTlsClient::MbedTlsClient(
+    const DtlsConfig& dtlsConfig
+  ):
   m_dtlsConfig(dtlsConfig)
   {}
 
@@ -69,7 +77,9 @@ namespace Huenicorn::Stream
   }
 
 
-  bool MbedTlsClient::send(std::span<const std::byte> requestBuffer)
+  bool MbedTlsClient::send(
+    std::span<const std::byte> requestBuffer
+  )
   {
     if(!m_isConnected){
       Core::Logger::error("Dtls client is not connected");

@@ -20,7 +20,9 @@ namespace Huenicorn::Grabber
      * 
      * @param config Huenicorn configuration
      */
-    DummyGrabber(Core::Config* config);
+    DummyGrabber(
+      Core::Config* config
+    );
 
 
     /**
@@ -55,7 +57,9 @@ namespace Huenicorn::Grabber
      * 
      * @param imageData Subsample of screen capture
      */
-    virtual void grabFrameSubsample(Imaging::ImageData& imageData) override;
+    virtual void grabFrameSubsample(
+      Imaging::ImageData& imageData
+    ) override;
 
 
   private:

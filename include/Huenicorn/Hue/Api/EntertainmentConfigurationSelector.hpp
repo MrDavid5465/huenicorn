@@ -23,7 +23,10 @@ namespace Huenicorn::Hue::Api
      * @param credentials Hue bridge credentials
      * @param bridgeAddress Hue bridge address
      */
-    EntertainmentConfigurationSelector(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress);
+    EntertainmentConfigurationSelector(
+      const Hue::Auth::Credentials& credentials,
+      const std::string& bridgeAddress
+    );
 
 
     // Getters
@@ -68,7 +71,9 @@ namespace Huenicorn::Hue::Api
      * @return true Entertainment configuration was selected successfully
      * @return false Entertainment configuration could not be selected
      */
-    bool selectEntertainmentConfiguration(const std::string& entertainmentConfigurationId);
+    bool selectEntertainmentConfiguration(
+      const std::string& entertainmentConfigurationId
+    );
 
 
     /**

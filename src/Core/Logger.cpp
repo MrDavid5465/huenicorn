@@ -7,7 +7,10 @@ namespace Huenicorn::Core
 {
   namespace Logger
   {
-    void write(LogLevel logLevel, const std::string& message)
+    void write(
+      LogLevel logLevel,
+      const std::string& message
+    )
     {
       switch(logLevel)
       {

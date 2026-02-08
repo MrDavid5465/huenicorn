@@ -18,7 +18,9 @@ namespace Huenicorn::Stream
      * 
      * @param _channelId ID of the channel
      */
-    inline void setChannelId(char _channelId)
+    inline void setChannelId(
+      char _channelId
+    )
     {
       channelId = _channelId;
     }
@@ -29,7 +31,9 @@ namespace Huenicorn::Stream
      * 
      * @param red Red value
      */
-    inline void setR(uint16_t red)
+    inline void setR(
+      uint16_t red
+    )
     {
       uint8_t a = static_cast<uint8_t>((red >> 8) & 0xff);
       uint8_t b = static_cast<uint8_t>(red & 0xff);
@@ -43,7 +47,9 @@ namespace Huenicorn::Stream
      * 
      * @param green Green value
      */
-    inline void setG(uint16_t green)
+    inline void setG(
+      uint16_t green
+    )
     {
       uint8_t a = static_cast<uint8_t>((green >> 8) & 0xff);
       uint8_t b = static_cast<uint8_t>(green & 0xff);
@@ -57,7 +63,9 @@ namespace Huenicorn::Stream
      * 
      * @param blue Blue value
      */
-    inline void setB(uint16_t blue)
+    inline void setB(
+      uint16_t blue
+    )
     {
       uint8_t a = static_cast<uint8_t>((blue >> 8) & 0xff);
       uint8_t b = static_cast<uint8_t>(blue & 0xff);

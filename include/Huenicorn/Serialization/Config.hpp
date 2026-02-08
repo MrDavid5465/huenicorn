@@ -10,7 +10,10 @@ namespace Huenicorn::Serialization
   template<>
   struct JsonSerializer<Huenicorn::Core::Config::Data>
   {
-    static void to_json(Json& jsonConfigData, const Huenicorn::Core::Config::Data& configData)
+    static void to_json(
+      Json& jsonConfigData,
+      const Huenicorn::Core::Config::Data& configData
+    )
     {
       jsonConfigData = {
         {"subsampleWidth", configData.subsampleWidth},
@@ -34,7 +37,10 @@ namespace Huenicorn::Serialization
     }
 
 
-    static void from_json(const Json& jsonConfigData, Huenicorn::Core::Config::Data& configData)
+    static void from_json(
+      const Json& jsonConfigData,
+      Huenicorn::Core::Config::Data& configData
+    )
     {
       if(jsonConfigData.contains("restServerPort")){
         configData.restServerPort = jsonConfigData.at("restServerPort");

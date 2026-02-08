@@ -5,7 +5,12 @@ namespace Huenicorn::Imaging
 {
   namespace ImageProcessing
   {
-    void rescale(const ImageData& inputImageData, ImageData& outputImageData, int outputWidth, Interpolation::Type interpolation)
+    void rescale(
+      const ImageData& inputImageData,
+      ImageData& outputImageData,
+      int outputWidth,
+      Interpolation::Type interpolation
+    )
     {
       int sourceHeight = inputImageData.height();
       int sourceWidth = inputImageData.width();
@@ -37,14 +42,21 @@ namespace Huenicorn::Imaging
       cv::resize(inputImageData.imageMatrix, outputImageData.imageMatrix, cv::Size(outputWidth, targetHeight), 0, 0, interpolationFlag);
     }
 
-  
-    void rgbaToRgb(const ImageData& inputImageData, ImageData& outputImageData)
+
+    void rgbaToRgb(
+      const ImageData& inputImageData,
+      ImageData& outputImageData
+    )
     {
       cv::cvtColor(inputImageData.imageMatrix, outputImageData.imageMatrix, cv::COLOR_RGBA2RGB);
     }
 
 
-    void getSubImage(const ImageData& inputImageData, ImageData& outputImageData, const glm::ivec2& a, const glm::ivec2& b)
+    void getSubImage(
+      const ImageData& inputImageData,
+      ImageData& outputImageData,
+      const glm::ivec2& a, const glm::ivec2& b
+    )
     {
       cv::Range cols(std::max(0, a.x), std::min(b.x, inputImageData.width()));
       cv::Range rows(std::max(0, a.y), std::min(b.y, inputImageData.height()));
@@ -53,7 +65,9 @@ namespace Huenicorn::Imaging
     }
 
 
-    Color getDominantColor(const ImageData& inputImageData)
+    Color getDominantColor(
+      const ImageData& inputImageData
+    )
     {
       if(inputImageData.width() < 1 || inputImageData.height() < 1){
         return {Color(0, 0, 0)};
@@ -65,7 +79,9 @@ namespace Huenicorn::Imaging
 
     namespace Algorithms
     {
-      Color mean(const ImageData& imageData)
+      Color mean(
+        const ImageData& imageData
+      )
       {
         const auto& imageMatrix = imageData.imageMatrix;
 

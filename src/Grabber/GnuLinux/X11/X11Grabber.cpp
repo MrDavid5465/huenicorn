@@ -23,7 +23,9 @@ namespace Huenicorn::Grabber
 
 
 
-  X11Grabber::X11MonitorCache::X11MonitorCache(Display* display):
+  X11Grabber::X11MonitorCache::X11MonitorCache(
+    Display* display
+  ):
   m_display(display),
   m_root(DefaultRootWindow(m_display))
   {
@@ -47,7 +49,9 @@ namespace Huenicorn::Grabber
   }
 
 
-  bool X11Grabber::X11MonitorCache::isConnected(RROutput output)
+  bool X11Grabber::X11MonitorCache::isConnected(
+    RROutput output
+  )
   {
     auto it = m_connectedOutputs.find(output);
     return it != m_connectedOutputs.end() && it->second;
@@ -67,7 +71,16 @@ namespace Huenicorn::Grabber
 
 
   // X11MonitorData
-  X11Grabber::X11MonitorData::X11MonitorData(const std::string& name, unsigned width, unsigned height, double refreshRate, bool isPrimary, int xPos, int yPos, RROutput outputId):
+  X11Grabber::X11MonitorData::X11MonitorData(
+    const std::string& name,
+    unsigned width,
+    unsigned height,
+    double refreshRate,
+    bool isPrimary,
+    int xPos,
+    int yPos,
+    RROutput outputId
+  ):
   MonitorData(name, width, height, refreshRate, isPrimary),
   xPos(xPos),
   yPos(yPos),
@@ -76,7 +89,12 @@ namespace Huenicorn::Grabber
 
 
   // XShmData
-  X11Grabber::XShmData::XShmData(Display* display, int screenId, int width, int height):
+  X11Grabber::XShmData::XShmData(
+    Display* display,
+    int screenId,
+    int width,
+    int height
+  ):
   m_display(display)
   {
     m_shmInfo = std::make_unique<XShmSegmentInfo>();
@@ -138,7 +156,9 @@ namespace Huenicorn::Grabber
 
 
   // X11 Grabber
-  X11Grabber::X11Grabber(Core::Config* config):
+  X11Grabber::X11Grabber(
+    Core::Config* config
+  ):
   IGrabber(config)
   {
     _ensureXThreadsInit();
@@ -193,7 +213,9 @@ namespace Huenicorn::Grabber
   }
 
 
-  void X11Grabber::selectMonitor(unsigned monitorId)
+  void X11Grabber::selectMonitor(
+    unsigned monitorId
+  )
   {
     m_xshmData.reset();
     m_monitorSelectionData.selectedMonitorId = monitorId;
@@ -202,7 +224,9 @@ namespace Huenicorn::Grabber
 
 
 
-  void X11Grabber::grabFrameSubsample(Imaging::ImageData& imageData)
+  void X11Grabber::grabFrameSubsample(
+    Imaging::ImageData& imageData
+  )
   {
     /*
     if(

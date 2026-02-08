@@ -61,7 +61,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    StringPair portalCreatePath(CreatePathTokenType createPathTokenType)
+    StringPair portalCreatePath(
+      CreatePathTokenType createPathTokenType
+    )
     {
       static uint32_t count[2] = {0, 0};
 
@@ -143,7 +145,10 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onCancelledCallback(GCancellable* cancellable, void* data)
+    void onCancelledCallback(
+      GCancellable* cancellable,
+      void* data
+    )
     {
       (void)cancellable;
 
@@ -159,7 +164,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    DbusCallData* subscribeToSignal(Capture* capture, const char* path, GDBusSignalCallback callback)
+    DbusCallData* subscribeToSignal(
+      Capture* capture,
+      const char* path,
+      GDBusSignalCallback callback
+    )
     {
       DbusCallData* call = new DbusCallData();
       call->capture = capture;
@@ -172,7 +181,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void dbusCallDataFree(DbusCallData* call)
+    void dbusCallDataFree(
+      DbusCallData* call
+    )
     {
       if(!call){
         return;
@@ -190,7 +201,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onPipewireRemoteOpenedCallback(GObject* source, GAsyncResult* res, void* userData)
+    void onPipewireRemoteOpenedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    )
     {
       Capture* capture = static_cast<Capture*>(userData);
       g_autoptr(GUnixFDList) fdList = NULL;
@@ -222,7 +237,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void openPipewireRemote(Capture* capture)
+    void openPipewireRemote(
+      Capture* capture
+    )
     {
       GVariantBuilder builder;
       g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -231,7 +248,15 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onStartResponseReceivedCallback(GDBusConnection* connection, const char* senderName, const char* objectPath, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData)
+    void onStartResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* senderName,
+      const char* objectPath,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    )
     {
       (void)connection;
       (void)senderName;
@@ -269,7 +294,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onStartedCallback(GObject* source, GAsyncResult* res, void* userData)
+    void onStartedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    )
     {
       DbusCallData* call = static_cast<DbusCallData*>(userData);
       Capture* capture = call->capture;
@@ -287,7 +316,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void start(Capture* capture)
+    void start(
+      Capture* capture
+    )
     {
       try{
         StringPair pathAndToken = portalCreatePath(CreatePathTokenType::Request);
@@ -305,7 +336,15 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onSelectSourceResponseReceivedCallback(GDBusConnection* connection, const char* senderName, const char* objectPath, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData)
+    void onSelectSourceResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* senderName,
+      const char* objectPath,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    )
     {
       (void)connection;
       (void)senderName;
@@ -331,7 +370,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onSourceSelectedCallback(GObject* source, GAsyncResult* res, void* userData)
+    void onSourceSelectedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    )
     {
       (void)userData;
 
@@ -348,7 +391,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void selectSource(Capture* capture)
+    void selectSource(
+      Capture* capture
+    )
     {
       StringPair pathAndToken = portalCreatePath(CreatePathTokenType::Request);
       DbusCallData* call = subscribeToSignal(capture, pathAndToken.first.c_str(), onSelectSourceResponseReceivedCallback);
@@ -378,7 +423,15 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onCreateSessionResponseReceivedCallback(GDBusConnection* connection, const char* senderName, const char* objectPath, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData)
+    void onCreateSessionResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* senderName,
+      const char* objectPath,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    )
     {
       (void)connection;
       (void)senderName;
@@ -405,7 +458,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    void onSessionCreatedCallback(GObject* source, GAsyncResult* res, void* userData)
+    void onSessionCreatedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    )
     {
       (void)userData;
 
@@ -423,7 +480,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void createSession(Capture* capture)
+    void createSession(
+      Capture* capture
+    )
     {
       StringPair requestPathAndToken = portalCreatePath(CreatePathTokenType::Request);
       StringPair sessionPathAndToken = portalCreatePath(CreatePathTokenType::Session);
@@ -439,7 +498,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    bool initScreencastCapture(Capture* capture)
+    bool initScreencastCapture(
+      Capture* capture
+    )
     {
       capture->cancellable = g_cancellable_new();
       GDBusConnection* connection = portalGetDbusConnection();
@@ -458,7 +519,11 @@ namespace Huenicorn::Grabber
     }
 
 
-    void screencastPortalDesktopCaptureCreate(Capture* capture, CaptureType captureType, bool cursorVisible)
+    void screencastPortalDesktopCaptureCreate(
+      Capture* capture,
+      CaptureType captureType,
+      bool cursorVisible
+    )
     {
       capture->captureType = captureType;
       capture->cursorVisible = cursorVisible;
@@ -467,7 +532,9 @@ namespace Huenicorn::Grabber
     }
 
 
-    void screencastPortalCaptureDestroy(Capture* capture)
+    void screencastPortalCaptureDestroy(
+      Capture* capture
+    )
     {
       if(!capture){
         return;

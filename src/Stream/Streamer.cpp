@@ -8,7 +8,10 @@ namespace Huenicorn::Stream
 {
   const std::string Streamer::Port = "2100";
 
-  Streamer::Streamer(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress)
+  Streamer::Streamer(
+    const Hue::Auth::Credentials& credentials,
+    const std::string& bridgeAddress
+  )
   {
     m_dtlsClient = std::make_unique<MbedTlsClient>(DtlsConfig{credentials, bridgeAddress, Port});
     try{
@@ -20,13 +23,17 @@ namespace Huenicorn::Stream
   }
 
 
-  void Streamer::setEntertainmentConfigurationId(const std::string& entertainmentConfigurationId)
+  void Streamer::setEntertainmentConfigurationId(
+    const std::string& entertainmentConfigurationId
+  )
   {
     m_header.setEntertainmentConfigurationId(entertainmentConfigurationId);
   }
 
 
-  void Streamer::streamChannels(const Hue::Api::ChannelStreams& channels)
+  void Streamer::streamChannels(
+    const Hue::Api::ChannelStreams& channels
+  )
   {
     std::vector<std::byte> requestBuffer;
     requestBuffer.insert(requestBuffer.end(), reinterpret_cast<std::byte*>(&m_header), reinterpret_cast<std::byte*>(&m_header) + sizeof(HuestreamHeader));

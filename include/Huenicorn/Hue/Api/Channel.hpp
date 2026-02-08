@@ -50,7 +50,12 @@ namespace Huenicorn::Hue::Api
      * @param gammaFactor Gamma factor of the light
      * @param uvs UVs of the screen portion
      */
-    Channel(bool active, const std::vector<Device> &devices, float gammaFactor, const Imaging::UVs &uvs = {{0, 0}, {1, 1}});
+    Channel(
+      bool active,
+      const std::vector<Device> &devices,
+      float gammaFactor,
+      const Imaging::UVs &uvs = {{0, 0}, {1, 1}}
+    );
 
     // Getters
     /**
@@ -108,14 +113,19 @@ namespace Huenicorn::Hue::Api
      * @param uvCorner Specified corner
      * @return UVs& Clamped UVs
      */
-    Imaging::UVs &setUV(Imaging::UV &&uv, Imaging::UVCorner uvCorner);
+    Imaging::UVs &setUV(
+      Imaging::UV &&uv,
+      Imaging::UVCorner uvCorner
+    );
 
     /**
      * @brief Set the gamma factor
      *
      * @param gammaFactor Gamma factor to affect
      */
-    void setGammaFactor(float gammaFactor);
+    void setGammaFactor(
+      float gammaFactor
+    );
 
     // Methods
     /**

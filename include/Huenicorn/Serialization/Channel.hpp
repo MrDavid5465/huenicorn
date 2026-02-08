@@ -14,7 +14,10 @@ namespace Huenicorn::Serialization
   struct JsonSerializer<Hue::Api::Channel>
   {
     // Serialization
-    static void to_json(Json& jsonChannel, const Hue::Api::Channel& channel)
+    static void to_json(
+      Json& jsonChannel,
+      const Hue::Api::Channel& channel
+    )
     {
       jsonChannel = {
         {"active", channel.state() == Hue::Api::Channel::State::Active},
@@ -29,7 +32,10 @@ namespace Huenicorn::Serialization
   template<>
   struct JsonSerializer<Hue::Api::Channels>
   {
-    static void to_json(Json& jsonChannels, const Hue::Api::Channels& channels)
+    static void to_json(
+      Json& jsonChannels,
+      const Hue::Api::Channels& channels
+    )
     {
       jsonChannels = Json::array();
       for(const auto& channel : channels){

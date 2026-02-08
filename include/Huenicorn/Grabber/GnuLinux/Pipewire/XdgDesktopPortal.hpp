@@ -68,29 +68,120 @@ namespace Huenicorn::Grabber
 
     // Functions
     void ensureConnection();
+
     std::string getSenderName();
+
     GDBusConnection* portalGetDbusConnection();
-    StringPair portalCreatePath(CreatePathTokenType createPathTokenType);
+
+    StringPair portalCreatePath(
+      CreatePathTokenType createPathTokenType
+    );
+
     void ensureScreencastPortalProxy();
+
     GDBusProxy* getScreencastPortalProxy();
+
     uint32_t getAvailableCursorModes();
+
     uint32_t getScreencastVersion();
-    void onCancelledCallback(GCancellable* cancellable, void* data);
-    DbusCallData* subscribeToSignal(Capture* capture, const char* path, GDBusSignalCallback callback);
-    void dbusCallDataFree(DbusCallData* call);
-    void onPipewireRemoteOpenedCallback(GObject* source, GAsyncResult* res, void* userData);
-    void openPipewireRemote(Capture* capture);
-    void onStartResponseReceivedCallback(GDBusConnection* connection, const char* sender_name, const char* object_path, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData);
-    void onStartedCallback(GObject* source, GAsyncResult* res, void* userData);
-    void start(Capture* capture);
-    void onSelectSourceResponseReceivedCallback(GDBusConnection* connection, const char* senderName, const char* objectPath, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData);
-    void onSourceSelectedCallback(GObject* source, GAsyncResult* res, void* userData);
-    void selectSource(Capture* capture);
-    void onCreateSessionResponseReceivedCallback(GDBusConnection* connection, const char* senderName, const char* objectPath, const char* interfaceName, const char* signalName, GVariant* parameters, void* userData);
-    void onSessionCreatedCallback(GObject* source, GAsyncResult* res, void* userData);
-    void createSession(Capture* capture);
-    bool initScreencastCapture(Capture* capture);
-    void screencastPortalDesktopCaptureCreate(Capture* capture, CaptureType captureType, bool cursorVisible);
-    void screencastPortalCaptureDestroy(Capture* capture);
+
+    void onCancelledCallback(
+      GCancellable* cancellable,
+      void* data
+    );
+
+    DbusCallData* subscribeToSignal(
+      Capture* capture,
+      const char* path,
+      GDBusSignalCallback callback
+    );
+
+    void dbusCallDataFree(
+      DbusCallData* call
+    );
+
+    void onPipewireRemoteOpenedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    );
+
+    void openPipewireRemote(
+      Capture* capture
+    );
+
+    void onStartResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* sender_name,
+      const char* object_path,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    );
+
+    void onStartedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    );
+
+    void start(
+      Capture* capture
+    );
+
+    void onSelectSourceResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* senderName,
+      const char* objectPath,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    );
+
+    void onSourceSelectedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    );
+
+    void selectSource(
+      Capture* capture
+    );
+
+    void onCreateSessionResponseReceivedCallback(
+      GDBusConnection* connection,
+      const char* senderName,
+      const char* objectPath,
+      const char* interfaceName,
+      const char* signalName,
+      GVariant* parameters,
+      void* userData
+    );
+
+    void onSessionCreatedCallback(
+      GObject* source,
+      GAsyncResult* res,
+      void* userData
+    );
+
+    void createSession(
+      Capture* capture
+    );
+
+    bool initScreencastCapture(
+      Capture* capture
+    );
+
+    void screencastPortalDesktopCaptureCreate(
+      Capture* capture,
+      CaptureType captureType,
+      bool cursorVisible
+    );
+
+    void screencastPortalCaptureDestroy(
+      Capture* capture
+    );
   }
 }

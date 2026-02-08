@@ -21,7 +21,9 @@ using namespace std::chrono_literals;
 
 namespace Huenicorn::Grabber
 {
-  PipewireGrabber::PipewireGrabber(Core::Config* config):
+  PipewireGrabber::PipewireGrabber(
+    Core::Config* config
+  ):
   IGrabber(config)
   {
     m_pwData.config = config;
@@ -69,14 +71,19 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::grabFrameSubsample(Imaging::ImageData& imageData)
+  void PipewireGrabber::grabFrameSubsample(
+    Imaging::ImageData& imageData
+  )
   {
     auto lock = std::lock_guard(m_pwData.frameDoubleBuffer.mutex);
     imageData = m_pwData.frameDoubleBuffer.frame.at(0);
   }
 
 
-  void PipewireGrabber::_onCoreInfoCallback(void* userData, const pw_core_info* info)
+  void PipewireGrabber::_onCoreInfoCallback(
+    void* userData,
+    const pw_core_info* info
+  )
   {
     (void)userData;
     (void)info;
@@ -86,7 +93,11 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_onCoreDoneCallback(void* userData, uint32_t id, int seq)
+  void PipewireGrabber::_onCoreDoneCallback(
+    void* userData,
+    uint32_t id,
+    int seq
+  )
   {
     (void)id;
     (void)seq;
@@ -99,7 +110,13 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_onCoreErrorCallback(void* userData, uint32_t id, int seq, int res, const char* message)
+  void PipewireGrabber::_onCoreErrorCallback(
+    void* userData,
+    uint32_t id,
+    int seq,
+    int res,
+    const char* message
+  )
   {
     (void)userData;
     //PipewireData* pw = static_cast<PipewireData*>(userData);
@@ -112,7 +129,9 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_onStreamProcess(void* userdata)
+  void PipewireGrabber::_onStreamProcess(
+    void* userdata
+  )
   {
     PipewireData* pw = static_cast<PipewireData*>(userdata);
     struct pw_buffer* pwBuffer;
@@ -143,7 +162,11 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_onStreamParamChanged(void* userdata, uint32_t id, const struct spa_pod* param)
+  void PipewireGrabber::_onStreamParamChanged(
+    void* userdata,
+    uint32_t id,
+    const struct spa_pod* param
+  )
   {
     //Logger::log("Params changed !");
     PipewireData* pw = static_cast<PipewireData*>(userdata);
@@ -189,7 +212,9 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_initCapture(XdgDesktopPortal::Capture* capture)
+  void PipewireGrabber::_initCapture(
+    XdgDesktopPortal::Capture* capture
+  )
   {
     screencastPortalDesktopCaptureCreate(capture, XdgDesktopPortal::CaptureType::Monitor, true);
 
@@ -203,7 +228,10 @@ namespace Huenicorn::Grabber
   }
 
 
-  void PipewireGrabber::_pipewireThread(XdgDesktopPortal::Capture* capture, PipewireData* pw)
+  void PipewireGrabber::_pipewireThread(
+    XdgDesktopPortal::Capture* capture,
+    PipewireData* pw
+  )
   {
     //capture->updateXdgContext = false;
 
@@ -296,7 +324,6 @@ namespace Huenicorn::Grabber
 #pragma GCC diagnostic pop
 
     pw_stream_connect(pw->stream, PW_DIRECTION_INPUT, capture->pwNode, static_cast<pw_stream_flags>(PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS), params, 1);
-  
 
     pw_main_loop_run(pw->loop);
 

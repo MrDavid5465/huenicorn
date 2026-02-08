@@ -7,12 +7,14 @@
 
 namespace Huenicorn::Timing
 {
-  inline Duration fromHertz(unsigned hertz)
+  inline Duration fromHertz(
+    unsigned hertz
+  )
   {
     if(hertz > 0){
       return Duration{1.0 / static_cast<double>(hertz)};
     }
-    
+
     return Duration{0};
   }
 
@@ -44,7 +46,9 @@ namespace Huenicorn::Timing
      * 
      * @param tickInterval The duration of the interval to sync on in defined \ref TimeScale
      */
-    LoopRegulator(Duration tickInterval);
+    LoopRegulator(
+      Duration tickInterval
+    );
 
 
   // Getters
@@ -61,7 +65,9 @@ namespace Huenicorn::Timing
      * 
      * @return float Proportion of average measured duration divided by the nominal time to wait
      */
-    float loadRate(bool asPercents = false) const;
+    float loadRate(
+      bool asPercents = false
+    ) const;
 
 
     /**
@@ -78,7 +84,9 @@ namespace Huenicorn::Timing
      * 
      * @param tickInterval Tick interval duration to set
      */
-    void setTickInterval(Duration tickInterval);
+    void setTickInterval(
+      Duration tickInterval
+    );
 
 
   // Methods
@@ -104,7 +112,9 @@ namespace Huenicorn::Timing
      * @param startTime Time point to compare
      * @return Duration The time exces factor to compute for the next interval
      */
-    Duration _syncWithTick(const TimePoint& startTime);
+    Duration _syncWithTick(
+      const TimePoint& startTime
+    );
 
 
     /**
@@ -114,7 +124,9 @@ namespace Huenicorn::Timing
      * @param now
      * @return float
      */
-    inline float _computeLoad(const TimePoint& startTime, const TimePoint& now)
+    inline float _computeLoad(
+      const TimePoint& startTime, const TimePoint& now
+    )
     {
       Duration duration = now - startTime;
       m_tickAverage = _approxRollingAverage<Duration>(m_tickAverage, duration);
@@ -132,7 +144,10 @@ namespace Huenicorn::Timing
      * @return T Output average after integration of input
      */
     template<class T>
-    inline T _approxRollingAverage(T average, T input)
+    inline T _approxRollingAverage(
+      T average,
+      T input
+    )
     {
       average -= m_loadRateHistory[m_loadRateHistoryCursorId];
       m_loadRateHistory[m_loadRateHistoryCursorId] = input / LoadRateHistorySize;

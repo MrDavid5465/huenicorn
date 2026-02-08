@@ -29,7 +29,9 @@ namespace Huenicorn::Platform
      * @brief Constructor
      * 
      */
-    IAdapter(const std::string& platformName):
+    IAdapter(
+      const std::string& platformName
+    ):
     m_platformName(platformName)
     {}
 
@@ -71,7 +73,9 @@ namespace Huenicorn::Platform
      * 
      * @param url Page to open in web browser
      */
-    virtual void openWebBrowser(const std::string& url) const = 0;
+    virtual void openWebBrowser(
+      const std::string& url
+    ) const = 0;
 
 
     /**
@@ -80,7 +84,9 @@ namespace Huenicorn::Platform
      * @param config Huenicorn current configuration
      * @return UniqueGrabber Grabber instance
      */
-    inline Grabber::IGrabber* getGrabber(Core::Config* config)
+    inline Grabber::IGrabber* getGrabber(
+      Core::Config* config
+    )
     {
       if(!m_grabber){
         try{
@@ -107,7 +113,9 @@ namespace Huenicorn::Platform
      * @param config Huenicorn current configuration
      * @return UniqueGrabber New grabber
      */
-    virtual UniqueGrabber _createGrabber(Core::Config* config) = 0;
+    virtual UniqueGrabber _createGrabber(
+      Core::Config* config
+    ) = 0;
 
     // Attributes
     const std::string m_platformName;

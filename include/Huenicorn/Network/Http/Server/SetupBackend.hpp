@@ -23,7 +23,10 @@ namespace Huenicorn::Network::Http::Server
    */
   class SetupBackend : public IRestServer
   {
-    using Callback = std::function<void(const Serialization::Json& data, crow::response& res)>;
+    using Callback = std::function<void(
+      const Serialization::Json& data,
+      crow::response& res
+    )>;
 
   public:
     // Constructor / destructor
@@ -32,7 +35,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    SetupBackend(Huenicorn::Core::Runtime* huenicornCore);
+    SetupBackend(
+      Huenicorn::Core::Runtime* huenicornCore
+    );
 
 
     /**
@@ -75,7 +80,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    virtual void _getVersion(crow::response& res) const override;
+    virtual void _getVersion(
+      crow::response& res
+    ) const override;
 
   private:
     /**
@@ -83,7 +90,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _finish(crow::response& res);
+    void _finish(
+      crow::response& res
+    );
 
 
     /**
@@ -91,7 +100,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _abort(crow::response& res);
+    void _abort(
+      crow::response& res
+    );
 
 
     /**
@@ -99,7 +110,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _autodetectBridge(crow::response& res);
+    void _autodetectBridge(
+      crow::response& res
+    );
 
 
     /**
@@ -107,7 +120,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _configFilePath(crow::response& res);
+    void _configFilePath(
+      crow::response& res
+    );
 
 
     /**
@@ -116,7 +131,10 @@ namespace Huenicorn::Network::Http::Server
      * @param req Pending HTTP request
      * @param res Pending HTTP response
      */
-    void _validateBridgeAddress(const crow::request& req, crow::response& res);
+    void _validateBridgeAddress(
+      const crow::request& req,
+      crow::response& res
+    );
 
 
     /**
@@ -125,7 +143,10 @@ namespace Huenicorn::Network::Http::Server
      * @param req Pending HTTP request
      * @param res Pending HTTP response
      */
-    void _validateCredentials(const crow::request& req, crow::response& res);
+    void _validateCredentials(
+      const crow::request& req,
+      crow::response& res
+    );
 
 
     /**
@@ -133,7 +154,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP response
      */
-    void _registerNewUser(crow::response& res);
+    void _registerNewUser(
+      crow::response& res
+    );
 
 
     // Attributes

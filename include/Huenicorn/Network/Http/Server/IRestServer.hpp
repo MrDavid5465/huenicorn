@@ -32,7 +32,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param indexFile Default file to show
      */
-    IRestServer(const std::string& indexFile = "index.html"):
+    IRestServer(
+      const std::string& indexFile = "index.html"
+    ):
     m_indexFile(indexFile)
     {
       m_contentTypes = {
@@ -90,7 +92,10 @@ namespace Huenicorn::Network::Http::Server
      * @return true REST server started successfully
      * @return false REST server is already running
      */
-    bool start(unsigned port, const std::string& boundBackendIP)
+    bool start(
+      unsigned port,
+      const std::string& boundBackendIP
+    )
     {
       if(running()){
         return false;
@@ -118,7 +123,11 @@ namespace Huenicorn::Network::Http::Server
      * @return true REST server started successfully
      * @return false REST server is already running
      */
-    bool start(unsigned port, const std::string& boundBackendIP, std::promise<bool>&& readyPromise)
+    bool start(
+      unsigned port,
+      const std::string& boundBackendIP,
+      std::promise<bool>&& readyPromise
+    )
     {
       m_readyWebUIPromise.emplace(std::move(readyPromise));
       return start(port, boundBackendIP);
@@ -137,8 +146,7 @@ namespace Huenicorn::Network::Http::Server
     }
 
   private:
-    // Private method
-
+    // Private methods
 
     /**
      * @brief Stops REST server and triggers _onStop event
@@ -182,7 +190,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP connection
      */
-    virtual void _getVersion(crow::response& res) const = 0;
+    virtual void _getVersion(
+      crow::response& res
+    ) const = 0;
 
 
     /**
@@ -190,7 +200,9 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param res Pending HTTP connection
      */
-    void _getWebFile(const std::string& filePath, crow::response& res) const
+    void _getWebFile(
+      const std::string& filePath, crow::response& res
+    ) const
     {
       std::filesystem::path webFilePath = filePath;
       if(webFilePath == ""){

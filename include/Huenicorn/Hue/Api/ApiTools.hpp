@@ -28,7 +28,10 @@ namespace Huenicorn::Hue::Api
      * @param bridgeAddress Address of the Hue bridge
      * @return EntertainmentConfigurations List of entertainment configurations
      */
-    EntertainmentConfigurations loadEntertainmentConfigurations(const std::string& username, const std::string& bridgeAddress);
+    EntertainmentConfigurations loadEntertainmentConfigurations(
+      const std::string& username,
+      const std::string& bridgeAddress
+    );
 
     /**
      * @brief Loads devices from all entertainment configurations
@@ -37,7 +40,10 @@ namespace Huenicorn::Hue::Api
      * @param bridgeAddress Address of the Hue bridge
      * @return Devices List of entertainment devices
      */
-    Devices loadDevices(const std::string& username, const std::string& bridgeAddress);
+    Devices loadDevices(
+      const std::string& username,
+      const std::string& bridgeAddress
+    );
 
     /**
      * @brief Loads entertainment configurations channels
@@ -46,7 +52,10 @@ namespace Huenicorn::Hue::Api
      * @param bridgeAddress Address of the Hue bridge
      * @return EntertainmentConfigurationsChannels Map of entertainment configurations channels
      */
-    EntertainmentConfigurationsChannels loadEntertainmentConfigurationsChannels(const std::string& username, const std::string& bridgeAddress);
+    EntertainmentConfigurationsChannels loadEntertainmentConfigurationsChannels(
+      const std::string& username,
+      const std::string& bridgeAddress
+    );
 
     /**
      * @brief Resolves members data from list of IDs
@@ -55,7 +64,10 @@ namespace Huenicorn::Hue::Api
      * @param devices Devices data
      * @return std::vector<Device> List of matched data for each device
      */
-    std::vector<Device> matchDevices(const MembersIds& membersIds, const Devices& devices);
+    std::vector<Device> matchDevices(
+      const MembersIds& membersIds,
+      const Devices& devices
+    );
 
     /**
      * @brief Set the streaming state of the entertainment configuration on the Hue bridge
@@ -65,7 +77,12 @@ namespace Huenicorn::Hue::Api
      * @param bridgeAddress Address of the Hue bridge
      * @param active True for active, false for inactive
      */
-    void setStreamingState(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress, bool active);
+    void setStreamingState(
+      const EntertainmentConfigurationEntry& entertainmentConfigurationEntry,
+      const std::string& username,
+      const std::string& bridgeAddress,
+      bool active
+    );
 
     /**
      * @brief Returns the streaming state of the entertainment configuration entry
@@ -76,6 +93,10 @@ namespace Huenicorn::Hue::Api
      * @return true Streaming is active
      * @return false Streaming is inactive
      */
-    bool streamingActive(const EntertainmentConfigurationEntry& entertainmentConfigurationEntry, const std::string& username, const std::string& bridgeAddress);
+    bool streamingActive(
+      const EntertainmentConfigurationEntry& entertainmentConfigurationEntry,
+      const std::string& username,
+      const std::string& bridgeAddress
+    );
   }
 }

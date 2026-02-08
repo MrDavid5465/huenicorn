@@ -16,10 +16,16 @@ namespace Huenicorn::Core
     };
 
 
-    void write(LogLevel level, const std::string& message);
+    void write(
+      LogLevel level,
+      const std::string& message
+    );
 
     template<typename... Args>
-    void log(LogLevel logLevel, Args&&... args)
+    void log(
+      LogLevel logLevel,
+      Args&&... args
+    )
     {
       std::ostringstream oss;
       (oss << ... << std::forward<Args>(args));
@@ -28,28 +34,36 @@ namespace Huenicorn::Core
 
 
     template<typename... Args>
-    void log(Args&&... args)
+    void log(
+      Args&&... args
+    )
     {
       log(LogLevel::Message, std::forward<Args>(args)...);
     }
 
 
     template<typename... Args>
-    void warn(Args&&... args)
+    void warn(
+      Args&&... args
+    )
     {
       log(LogLevel::Warning, std::forward<Args>(args)...);
     }
 
 
     template<typename... Args>
-    void error(Args&&... args)
+    void error(
+      Args&&... args
+    )
     {
       log(LogLevel::Error, std::forward<Args>(args)...);
     }
 
 
     template<typename... Args>
-    void debug(Args&&... args)
+    void debug(
+      Args&&... args
+    )
     {
       log(LogLevel::Debug, std::forward<Args>(args)...);
     }

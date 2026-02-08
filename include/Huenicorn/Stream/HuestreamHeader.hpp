@@ -22,7 +22,9 @@ namespace Huenicorn::Stream
      * 
      * @param _colorSpace 0 for RGB, 1 for XY
      */
-    void setColorSpace(char _colorSpace);
+    void setColorSpace(
+      char _colorSpace
+    );
 
 
     /**
@@ -30,6 +32,8 @@ namespace Huenicorn::Stream
      * 
      * @param _entertainmentConfigurationId Id of the entertainment configuration to set
      */
-    void setEntertainmentConfigurationId(const std::string& entertainmentConfigurationId);
+    void setEntertainmentConfigurationId(
+      const std::string& entertainmentConfigurationId
+    );
   };
 }

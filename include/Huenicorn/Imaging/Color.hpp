@@ -27,7 +27,11 @@ namespace Huenicorn::Imaging
      * @param g Green channel
      * @param b Blue channel
      */
-    Color(ChannelDepth r = 0, ChannelDepth g = 0,  ChannelDepth b = 0):
+    Color(
+      ChannelDepth r = 0,
+      ChannelDepth g = 0,
+      ChannelDepth b = 0
+    ):
     m_r(r),
     m_g(g),
     m_b(b)
@@ -81,7 +85,9 @@ namespace Huenicorn::Imaging
      * @param gamutCoordinates Boundaries of the gammut
      * @return glm::vec2 XY color coordinates
      */
-    glm::vec2 toXY(const GamutCoordinates& gamutCoordinates) const
+    glm::vec2 toXY(
+      const GamutCoordinates& gamutCoordinates
+    ) const
     {
       // Following https://gist.github.com/popcorn245/30afa0f98eea1c2fd34d
       glm::vec3 normalizedRgb = this->toNormalized();
@@ -102,7 +108,7 @@ namespace Huenicorn::Imaging
       float Z = r * 0.000000f + g * 0.053077f + b * 1.035763f;
 
       float sum = X + Y + Z;
-      
+
       // White coordinates to be neutral in case of black (skip dividing by zero)
       glm::vec2 xy = glm::vec2(0.315f, 0.3312f);
 
@@ -144,7 +150,11 @@ namespace Huenicorn::Imaging
      * @param c Gammut vertex c
      * @return float Signed value for boundary check
      */
-    static inline float _sign(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c)
+    static inline float _sign(
+      const glm::vec2& a,
+      const glm::vec2& b,
+      const glm::vec2& c
+    )
     {
       return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y);
     }
@@ -158,7 +168,10 @@ namespace Huenicorn::Imaging
      * @return true XY color fits in gammut boundaries
      * @return false XY color doesn't fit in gammut boundaries
      */
-    inline static bool _xyInGamut(const glm::vec2& xy, const GamutCoordinates& gamutCoordinates)
+    inline static bool _xyInGamut(
+      const glm::vec2& xy,
+      const GamutCoordinates& gamutCoordinates
+    )
     {
       bool has_neg, has_pos;
 

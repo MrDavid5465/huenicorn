@@ -7,7 +7,12 @@
 
 namespace Huenicorn::Hue::Api
 {
-  Channel::Channel(bool active, const std::vector<Device>& devices, float gammaFactor, const Imaging::UVs& uvs):
+  Channel::Channel(
+    bool active,
+    const std::vector<Device>& devices,
+    float gammaFactor,
+    const Imaging::UVs& uvs
+  ):
   m_state(active ? State::Active : State::Inactive),
   m_devices(devices),
   m_gammaFactor(gammaFactor),
@@ -25,8 +30,8 @@ namespace Huenicorn::Hue::Api
   {
     return m_uvs;
   }
-  
-  
+
+
   float Channel::gammaFactor() const
   {
     return m_gammaFactor;
@@ -50,7 +55,10 @@ namespace Huenicorn::Hue::Api
   }
 
 
-  Imaging::UVs& Channel::setUV(Imaging::UV&& uv, Imaging::UVCorner uvCorner)
+  Imaging::UVs& Channel::setUV(
+    Imaging::UV&& uv,
+    Imaging::UVCorner uvCorner
+  )
   {
     Imaging::UVs newUVs = m_uvs;
     uv.x = glm::clamp(uv.x, 0.f, 1.f);
@@ -104,7 +112,9 @@ namespace Huenicorn::Hue::Api
   }
 
 
-  void Channel::setGammaFactor(float gammaFactor)
+  void Channel::setGammaFactor(
+    float gammaFactor
+  )
   {
     m_gammaFactor = gammaFactor;
   }

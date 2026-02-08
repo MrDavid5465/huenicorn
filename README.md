@@ -93,7 +93,7 @@ sudo cp -r lib/* /usr/local/lib
 
 <summary>OpenSUSE Tumbleweed</summary>
 
-These dependencies needed to be installed on OpenSUSE Tumbleweed 20231011 to build and run Huenicorn:  
+These dependencies needed to be installed on OpenSUSE Tumbleweed 20231011 to build and run Huenicorn:
 
 ```bash
 sudo zypper install opencv-devel libopencv408 python311-jsonschema asio-devel glm-devel nlohmann_json-devel

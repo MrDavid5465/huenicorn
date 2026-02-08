@@ -5,7 +5,9 @@
 
 namespace Huenicorn::Timing
 {
-  LoopRegulator::LoopRegulator(Duration tickInterval):
+  LoopRegulator::LoopRegulator(
+    Duration tickInterval
+  ):
   m_tickInterval(tickInterval)
   {
     std::fill(m_loadRateHistory, m_loadRateHistory + LoadRateHistorySize, Duration{0.0});
@@ -24,13 +26,17 @@ namespace Huenicorn::Timing
   }
 
 
-  float LoopRegulator::loadRate(bool asPercents) const
+  float LoopRegulator::loadRate(
+    bool asPercents
+  ) const
   {
     return asPercents ? m_loadRate * 100 : m_loadRate;
   }
 
 
-  void LoopRegulator::setTickInterval(Duration tickInterval)
+  void LoopRegulator::setTickInterval(
+    Duration tickInterval
+  )
   {
     m_tickInterval = Duration{tickInterval};
   }
@@ -57,7 +63,9 @@ namespace Huenicorn::Timing
   }
 
 
-  Duration LoopRegulator::_syncWithTick(const TimePoint& startTime)
+  Duration LoopRegulator::_syncWithTick(
+    const TimePoint& startTime
+  )
   {
     // Measure
     TimePoint now = ClockType::now();

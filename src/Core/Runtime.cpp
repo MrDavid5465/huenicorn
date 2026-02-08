@@ -21,7 +21,10 @@ using namespace std::chrono_literals;
 
 namespace Huenicorn::Core
 {
-  Runtime::Runtime(const std::string& version, const std::filesystem::path& configRoot):
+  Runtime::Runtime(
+    const std::string& version,
+    const std::filesystem::path& configRoot
+  ):
   m_version(version),
   m_configRoot(configRoot),
   m_config(m_configRoot)
@@ -145,7 +148,9 @@ namespace Huenicorn::Core
   }
 
 
-  bool Runtime::setEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
+  bool Runtime::setEntertainmentConfiguration(
+    const std::string& entertainmentConfigurationId
+  )
   {
     if(!m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
       return false;
@@ -157,13 +162,20 @@ namespace Huenicorn::Core
   }
 
 
-  const Imaging::UVs& Runtime::setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner)
+  const Imaging::UVs& Runtime::setChannelUV(
+    uint8_t channelId,
+    Imaging::UV&& uv,
+    Imaging::UVCorner uvCorner
+  )
   {
     return m_channels.at(channelId).setUV(std::move(uv), uvCorner);
   }
 
 
-  bool Runtime::setChannelGammaFactor(uint8_t channelId, float gammaExponent)
+  bool Runtime::setChannelGammaFactor(
+    uint8_t channelId,
+    float gammaExponent
+  )
   {
     if(m_channels.find(channelId) == m_channels.end()){
       return false;
@@ -174,13 +186,17 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::setSubsampleWidth(unsigned subsampleWidth)
+  void Runtime::setSubsampleWidth(
+    unsigned subsampleWidth
+  )
   {
     m_config.setSubsampleWidth(subsampleWidth);
   }
 
 
-  void Runtime::setRefreshRate(unsigned refreshRate)
+  void Runtime::setRefreshRate(
+    unsigned refreshRate
+  )
   {
     refreshRate = std::min(refreshRate, m_grabber->displayRefreshRate());
 
@@ -191,7 +207,9 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::setInterpolation(unsigned interpolation)
+  void Runtime::setInterpolation(
+    unsigned interpolation
+  )
   {
     m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
   }
@@ -240,7 +258,9 @@ namespace Huenicorn::Core
   }
 
 
-  bool Runtime::validateBridgeAddress(const std::string& bridgeAddress)
+  bool Runtime::validateBridgeAddress(
+    const std::string& bridgeAddress
+  )
   {
     std::string sanitizedAddress = bridgeAddress;
 
@@ -259,7 +279,9 @@ namespace Huenicorn::Core
   }
 
 
-  bool Runtime::validateCredentials(const Hue::Auth::Credentials& credentials)
+  bool Runtime::validateCredentials(
+    const Hue::Auth::Credentials& credentials
+  )
   {
     auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
     if(!response.has_value()){
@@ -284,7 +306,10 @@ namespace Huenicorn::Core
   }
 
 
-  bool Runtime::setChannelActivity(uint8_t channelId, bool active)
+  bool Runtime::setChannelActivity(
+    uint8_t channelId,
+    bool active
+  )
   {
     if(m_channels.find(channelId) == m_channels.end()){
       return false;
@@ -446,7 +471,9 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::_initChannels(const Serialization::Json& jsonChannels)
+  void Runtime::_initChannels(
+    const Serialization::Json& jsonChannels
+  )
   {
     const auto& username = m_config.credentials().value().username();
     const auto& bridgeAddress =  m_config.bridgeAddress().value();
@@ -498,7 +525,9 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::_enableEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
+  void Runtime::_enableEntertainmentConfiguration(
+    const std::string& entertainmentConfigurationId
+  )
   {
     if(!m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
       return;

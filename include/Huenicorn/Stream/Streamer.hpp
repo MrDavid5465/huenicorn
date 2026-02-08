@@ -29,7 +29,10 @@ namespace Huenicorn::Stream
      * @param credentials Hue bridge credentials
      * @param bridgeAddress Hue bridge address
      */
-    Streamer(const Hue::Auth::Credentials& credentials, const std::string& bridgeAddress);
+    Streamer(
+      const Hue::Auth::Credentials& credentials,
+      const std::string& bridgeAddress
+    );
 
 
     // Setters
@@ -38,16 +41,20 @@ namespace Huenicorn::Stream
      * 
      * @param entertainmentConfigurationId ID of the entertainment configuration to set to the request header
      */
-    void setEntertainmentConfigurationId(const std::string& entertainmentConfigurationId);
+    void setEntertainmentConfigurationId(
+      const std::string& entertainmentConfigurationId
+    );
 
 
     // Methods
     /**
      * @brief Submit the channels data to the stream
      * 
-     * @param channels 
+     * @param channels
      */
-    void streamChannels(const Hue::Api::ChannelStreams& channels);
+    void streamChannels(
+      const Hue::Api::ChannelStreams& channels
+    );
 
 
   private:

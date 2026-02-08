@@ -27,6 +27,8 @@ namespace Huenicorn::Stream
     virtual void shutdown() = 0;
 
 
-    virtual bool send(std::span<const std::byte> data) = 0;
+    virtual bool send(
+      std::span<const std::byte> data
+    ) = 0;
   };
 }

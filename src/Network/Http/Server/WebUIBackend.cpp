@@ -13,7 +13,9 @@ namespace Huenicorn::Network::Http::Server
 {
   using namespace Serialization;
 
-  WebUIBackend::WebUIBackend(Huenicorn::Core::Runtime* huenicornCore):
+  WebUIBackend::WebUIBackend(
+    Huenicorn::Core::Runtime* huenicornCore
+  ):
   IRestServer("index.html"),
   m_huenicornCore(huenicornCore)
   {
@@ -108,7 +110,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getVersion(crow::response& res) const
+  void WebUIBackend::_getVersion(
+    crow::response& res
+  ) const
   {
     Json jsonResponse = {
       {"version", m_huenicornCore->version()},
@@ -121,7 +125,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getWebUIStatus(crow::response& res) const
+  void WebUIBackend::_getWebUIStatus(
+    crow::response& res
+  ) const
   {
     Json jsonResponse = {
       {"ready", true},
@@ -134,7 +140,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getEntertainmentConfigurations(crow::response& res) const
+  void WebUIBackend::_getEntertainmentConfigurations(
+    crow::response& res
+  ) const
   {
     const auto& entertainmentConfigurations = m_huenicornCore->entertainmentConfigurations();
     std::string currentEntertainmentConfigurationId = m_huenicornCore->currentEntertainmentConfigurationId().value();
@@ -151,7 +159,10 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getChannel(crow::response& res, uint8_t channelId) const
+  void WebUIBackend::_getChannel(
+    crow::response& res,
+    uint8_t channelId
+  ) const
   {
     std::string response = Json(m_huenicornCore->channels().at(channelId)).dump();
 
@@ -161,7 +172,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getChannels(crow::response& res) const
+  void WebUIBackend::_getChannels(
+    crow::response& res
+  ) const
   {
     std::string response = Json(m_huenicornCore->channels()).dump();
 
@@ -171,7 +184,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getDisplayInfo(crow::response& res) const
+  void WebUIBackend::_getDisplayInfo(
+    crow::response& res
+  ) const
   {
     auto displayResolution = m_huenicornCore->displayResolution();
 
@@ -199,7 +214,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_getInterpolationInfo(crow::response& res) const
+  void WebUIBackend::_getInterpolationInfo(
+    crow::response& res
+  ) const
   {
     Json jsonAvailableInterpolations = Json::array();
     for(const auto& [key, value] : m_huenicornCore->availableInterpolations()){
@@ -220,7 +237,10 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setEntertainmentConfiguration(const crow::request& req, crow::response& res) const
+  void WebUIBackend::_setEntertainmentConfiguration(
+    const crow::request& req,
+    crow::response& res
+  ) const
   {
     const std::string& data = req.body;
     std::string entertainmentConfigurationId = Json::parse(data);
@@ -240,7 +260,11 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setChannelUV(const crow::request& req, crow::response& res, uint8_t channelId) const
+  void WebUIBackend::_setChannelUV(
+    const crow::request& req,
+    crow::response& res,
+    uint8_t channelId
+  ) const
   {
     const std::string& data = req.body;
     Json jsonUV = Json::parse(data);
@@ -264,7 +288,11 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setChannelGammaFactor(const crow::request& req, crow::response& res, uint8_t channelId) const
+  void WebUIBackend::_setChannelGammaFactor(
+    const crow::request& req,
+    crow::response& res,
+    uint8_t channelId
+  ) const
   {
     const std::string& data = req.body;
     Json jsonGammaFactorData = Json::parse(data);
@@ -275,7 +303,7 @@ namespace Huenicorn::Network::Http::Server
         {"succeeded", false},
         {"error", "invalid channel id"}
       }.dump();
-      
+
       res.set_header("Content-Type", "application/json");
       res.write(response);
       res.end();
@@ -294,7 +322,10 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setSubsampleWidth(const crow::request& req, crow::response& res) const
+  void WebUIBackend::_setSubsampleWidth(
+    const crow::request& req,
+    crow::response& res
+  ) const
   {
     const std::string& data = req.body;
     int subsampleWidth = Json::parse(data).get<int>();
@@ -314,7 +345,10 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setRefreshRate(const crow::request& req, crow::response& res) const
+  void WebUIBackend::_setRefreshRate(
+    const crow::request& req,
+    crow::response& res
+  ) const
   {
     const std::string& data = req.body;
     unsigned refreshRate = Json::parse(data).get<unsigned>();
@@ -331,7 +365,10 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setInterpolation(const crow::request& req, crow::response& res) const
+  void WebUIBackend::_setInterpolation(
+    const crow::request& req,
+    crow::response& res
+  ) const
   {
     const std::string& data = req.body;
     unsigned interpolation = Json::parse(data).get<unsigned>();
@@ -349,7 +386,11 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_setChannelActivity(const crow::request& req, crow::response& res, uint8_t channelId) const
+  void WebUIBackend::_setChannelActivity(
+    const crow::request& req,
+    crow::response& res,
+    uint8_t channelId
+  ) const
   {
     const std::string& data = req.body;
     Json jsonChannelData = Json::parse(data);
@@ -360,7 +401,7 @@ namespace Huenicorn::Network::Http::Server
         {"succeeded", false},
         {"error", "invalid channel id"}
       }.dump();
-      
+
       res.set_header("Content-Type", "application/json");
       res.write(response);
       res.end();
@@ -371,7 +412,7 @@ namespace Huenicorn::Network::Http::Server
       {"succeeded", true},
       {"channels", Json(m_huenicornCore->channels())},
     };
-    
+
     if(active){
       jsonResponse["newActiveChannelId"] = channelId;
     }
@@ -383,7 +424,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_saveProfile(crow::response& res) const
+  void WebUIBackend::_saveProfile(
+    crow::response& res
+  ) const
   {
     m_huenicornCore->saveProfile();
 
@@ -398,7 +441,9 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  void WebUIBackend::_stop(crow::response& res) const
+  void WebUIBackend::_stop(
+    crow::response& res
+  ) const
   {
     Json jsonResponse = {{
       "succeeded", true

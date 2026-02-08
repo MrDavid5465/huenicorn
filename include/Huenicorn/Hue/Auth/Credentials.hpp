@@ -27,7 +27,10 @@ namespace Huenicorn::Hue::Auth
      * @param username Hue bridge username
      * @param clientkey Hue bridge clientkey
      */
-    Credentials(const std::string& username, const std::string& clientkey);
+    Credentials(
+      const std::string& username,
+      const std::string& clientkey
+    );
 
 
     // Getters

@@ -28,14 +28,18 @@ namespace Huenicorn::Platform
   }
 
 
-  UniqueGrabber MacOSAdapter::_createGrabber(Core::Config* config)
+  UniqueGrabber MacOSAdapter::_createGrabber(
+    Core::Config* config
+  )
   {
     (void)config;
     return nullptr;
   }
 
 
-  void MacOSAdapter::openWebBrowser(const std::string& url) const
+  void MacOSAdapter::openWebBrowser(
+    const std::string& url
+  ) const
   {
     if(system(std::string("open " + url).c_str())){
       Logger::error("Failed to open browser");
