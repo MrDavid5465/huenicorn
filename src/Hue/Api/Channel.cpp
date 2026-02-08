@@ -7,7 +7,7 @@
 
 namespace Huenicorn::Hue::Api
 {
-  Channel::Channel(bool active, const std::vector<Device>& devices, float gammaFactor, const UVs& uvs):
+  Channel::Channel(bool active, const std::vector<Device>& devices, float gammaFactor, const Imaging::UVs& uvs):
   m_state(active ? State::Active : State::Inactive),
   m_devices(devices),
   m_gammaFactor(gammaFactor),
@@ -21,7 +21,7 @@ namespace Huenicorn::Hue::Api
   }
 
 
-  const UVs& Channel::uvs() const
+  const Imaging::UVs& Channel::uvs() const
   {
     return m_uvs;
   }
@@ -50,15 +50,15 @@ namespace Huenicorn::Hue::Api
   }
 
 
-  UVs& Channel::setUV(UV&& uv, UVCorner uvCorner)
+  Imaging::UVs& Channel::setUV(Imaging::UV&& uv, Imaging::UVCorner uvCorner)
   {
-    UVs newUVs = m_uvs;
+    Imaging::UVs newUVs = m_uvs;
     uv.x = glm::clamp(uv.x, 0.f, 1.f);
     uv.y = glm::clamp(uv.y, 0.f, 1.f);
 
     switch (uvCorner)
     {
-      case UVCorner::TopLeft:
+      case Imaging::UVCorner::TopLeft:
       {
         newUVs.min.x = uv.x;
         newUVs.min.y = uv.y;
@@ -67,7 +67,7 @@ namespace Huenicorn::Hue::Api
         break;
       }
 
-      case UVCorner::TopRight:
+      case Imaging::UVCorner::TopRight:
       {
         newUVs.max.x = uv.x;
         newUVs.min.y = uv.y;
@@ -76,7 +76,7 @@ namespace Huenicorn::Hue::Api
         break;
       }
 
-      case UVCorner::BottomLeft:
+      case Imaging::UVCorner::BottomLeft:
       {
         newUVs.min.x = uv.x;
         newUVs.max.y = uv.y;
@@ -85,7 +85,7 @@ namespace Huenicorn::Hue::Api
         break;
       }
 
-      case UVCorner::BottomRight:
+      case Imaging::UVCorner::BottomRight:
       {
         newUVs.max.x = uv.x;
         newUVs.max.y = uv.y;

@@ -6,8 +6,7 @@
 #include <glm/exponential.hpp>
 
 #include <Huenicorn/Hue/Api/Device.hpp>
-#include <Huenicorn/UV.hpp>
-
+#include <Huenicorn/Imaging/UV.hpp>
 
 namespace Huenicorn::Hue::Api
 {
@@ -15,10 +14,9 @@ namespace Huenicorn::Hue::Api
   class Channel;
   using Channels = std::unordered_map<uint8_t, Channel>;
 
-
   /**
    * @brief Channel structure matching Hue streaming protocol
-   * 
+   *
    */
   struct ChannelStream
   {
@@ -29,10 +27,9 @@ namespace Huenicorn::Hue::Api
   };
   using ChannelStreams = std::vector<ChannelStream>;
 
-
   /**
    * @brief Wrapper around Hue Channel extended with UV and Gamma control
-   * 
+   *
    */
   class Channel
   {
@@ -47,47 +44,46 @@ namespace Huenicorn::Hue::Api
 
     /**
      * @brief Channel constructor
-     * 
+     *
      * @param active Whether the channel is active or not
      * @param devices List of devices driven by the channel
      * @param gammaFactor Gamma factor of the light
      * @param uvs UVs of the screen portion
      */
-    Channel(bool active, const std::vector<Device>& devices, float gammaFactor, const UVs& uvs = {{0, 0}, {1, 1}});
-
+    Channel(bool active, const std::vector<Device> &devices, float gammaFactor, const Imaging::UVs &uvs = {{0, 0}, {1, 1}});
 
     // Getters
     /**
      * @brief Returns the current state of the channel
-     * 
+     *
      * @return State Channel state
      */
     State state() const;
 
     /**
      * @brief Returns the UVs of the channel
-     * 
+     *
      * @return const UVs& Channel UVs
      */
-    const UVs& uvs() const;
+    const Imaging::UVs &uvs() const;
 
     /**
      * @brief Returns the gammaFactor of the channel
-     * 
+     *
      * @return float Channel gamma factor
      */
     float gammaFactor() const;
 
     /**
      * @brief Returns a list of member devices
-     * 
-     * @return const std::vector<Device>& 
+     *
+     * @return const std::vector<Device>&
      */
-    const std::vector<Device>& devices() const;
+    const std::vector<Device> &devices() const;
 
     /**
      * @brief Returns the exponent factor for gamma
-     * 
+     *
      * @return float Channel gamma factor
      */
     inline float gammaExponent() const
@@ -97,45 +93,42 @@ namespace Huenicorn::Hue::Api
       return exponent;
     }
 
-
     // Setters
     /**
      * @brief Set the channel activity
-     * 
+     *
      * @param active Whether the channel must be active or not
      */
     void setActive(bool active);
 
     /**
      * @brief Sets the UVs of the channel
-     * 
+     *
      * @param uv UV coordinate to set
      * @param uvCorner Specified corner
      * @return UVs& Clamped UVs
      */
-    UVs& setUV(UV&& uv, UVCorner uvCorner);
+    Imaging::UVs &setUV(Imaging::UV &&uv, Imaging::UVCorner uvCorner);
 
     /**
-     * @brief Set the gamma factor 
-     * 
+     * @brief Set the gamma factor
+     *
      * @param gammaFactor Gamma factor to affect
      */
     void setGammaFactor(float gammaFactor);
 
-
     // Methods
     /**
      * @brief Call to move from pending state to inactive
-     * 
+     *
      */
     void acknowledgeShutdown();
-
 
   private:
     // Attributes
     State m_state{State::Inactive};
     std::vector<Device> m_devices;
     float m_gammaFactor{0.0};
-    UVs m_uvs{};
+    Imaging::UVs m_uvs{};
   };
 }

@@ -89,7 +89,6 @@ set(HUE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/ApiTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/Channel.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/EntertainmentConfigurationSelector.cpp
-
 )
 
 set(NETWORK_SOURCE
@@ -139,7 +138,6 @@ set(SERIALIZATION_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/EntertainmentConfiguration.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/Json.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/JsonSerializer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Serialization/UV.hpp
 )
 
 set(PLATFORM_SOURCE
@@ -155,6 +153,7 @@ set(IMAGING_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/Interpolation.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/ImageProcessing.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/Interpolation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/UV.hpp
 )
 
 # Declare executable
@@ -177,7 +176,6 @@ add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/UV.hpp
 
   ${VERSION_HEADER}
   ${EMBEDDED_WEBROOT_HEADER}

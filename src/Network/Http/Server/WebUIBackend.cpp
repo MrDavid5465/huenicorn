@@ -247,7 +247,7 @@ namespace Huenicorn::Network::Http::Server
 
     float x = jsonUV.at("x");
     float y = jsonUV.at("y");
-    UVCorner uvCorner = static_cast<UVCorner>(jsonUV.at("type").get<int>());
+    Imaging::UVCorner uvCorner = static_cast<Imaging::UVCorner>(jsonUV.at("type").get<int>());
 
     const auto& clampedUVs = m_huenicornCore->setChannelUV(channelId, {x, y}, uvCorner);
 

@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Imaging
 {
   using UV = glm::vec2;
 

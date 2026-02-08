@@ -157,7 +157,7 @@ namespace Huenicorn
   }
 
 
-  const UVs& HuenicornCore::setChannelUV(uint8_t channelId, UV&& uv, UVCorner uvCorner)
+  const Imaging::UVs& HuenicornCore::setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner)
   {
     return m_channels.at(channelId).setUV(std::move(uv), uvCorner);
   }
@@ -461,12 +461,9 @@ namespace Huenicorn
         if(jsonProfileChannel.at("channelId") == id){
           bool active = jsonProfileChannel.at("active");
           Serialization::Json jsonUVs = jsonProfileChannel.at("uvs");
-          float uvAx = jsonUVs.at("uvA").at("x");
-          float uvAy = jsonUVs.at("uvA").at("y");
-          float uvBx = jsonUVs.at("uvB").at("x");
-          float uvBy = jsonUVs.at("uvB").at("y");
 
-          UVs uvs = {{uvAx, uvAy}, {uvBx, uvBy}};
+          Imaging::UVs uvs = jsonUVs.get<Imaging::UVs>();
+
           float gammaFactor = jsonProfileChannel.at("gammaFactor");
           channels.emplace(id, Hue::Api::Channel{active, members, gammaFactor, uvs});
 

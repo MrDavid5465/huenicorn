@@ -13,7 +13,7 @@
 #include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/TickSynchronizer.hpp>
-#include <Huenicorn/UV.hpp>
+#include <Huenicorn/Imaging/UV.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Serialization/Json.hpp>
 
@@ -184,7 +184,7 @@ namespace Huenicorn
      * @param uvCorner Corner to affect
      * @return const UVs& Clamped UV value
      */
-    const UVs& setChannelUV(uint8_t channelId, UV&& uv, UVCorner uvCorner);
+    const Imaging::UVs& setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner);
 
 
     /**
