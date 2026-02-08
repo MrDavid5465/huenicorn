@@ -2,15 +2,26 @@
 
 #include <chrono>
 
-#include <Huenicorn/TimingDefinitions.hpp>
+#include <Huenicorn/Timing/Definitions.hpp>
 
-namespace Huenicorn
+
+namespace Huenicorn::Timing
 {
+  inline Duration fromHertz(unsigned hertz)
+  {
+    if(hertz > 0){
+      return Duration{1.0 / static_cast<double>(hertz)};
+    }
+    
+    return Duration{0};
+  }
+
+
   /**
    * @brief Timing tool allowing to sync on a time inverval and compute stats
    * 
    */
-  class TickSynchronizer
+  class LoopRegulator
   {
     static constexpr size_t LoadRateHistorySize = 10;
 
@@ -22,18 +33,18 @@ namespace Huenicorn
      */
     struct Excess
     {
-      Timing::Duration extra;
+      Duration extra;
       float rate;
     };
 
 
   // Constructors / Destructor
     /**
-     * @brief TickSynchronizer constructor
+     * @brief LoopRegulator constructor
      * 
      * @param tickInterval The duration of the interval to sync on in defined \ref TimeScale
      */
-    TickSynchronizer(Timing::TimeUnitType tickInterval);
+    LoopRegulator(Duration tickInterval);
 
 
   // Getters
@@ -42,7 +53,7 @@ namespace Huenicorn
      * 
      * @return TimeUnitType
      */
-    Timing::TimeUnit tickInterval() const;
+    Duration tickInterval() const;
 
 
     /**
@@ -67,7 +78,7 @@ namespace Huenicorn
      * 
      * @param tickInterval Tick interval duration to set
      */
-    void setTickInterval(Timing::TimeUnitType tickInterval);
+    void setTickInterval(Duration tickInterval);
 
 
   // Methods
@@ -91,9 +102,9 @@ namespace Huenicorn
      * @brief Internal code to compute proper waiting duration
      * 
      * @param startTime Time point to compare
-     * @return int The time exces factor to compute for the next interval
+     * @return Duration The time exces factor to compute for the next interval
      */
-    Timing::TimeUnitType _syncWithTick(const Timing::TimePoint& startTime);
+    Duration _syncWithTick(const TimePoint& startTime);
 
 
     /**
@@ -103,12 +114,12 @@ namespace Huenicorn
      * @param now
      * @return float
      */
-    inline float _computeLoad(const Timing::TimePoint& startTime, const Timing::TimePoint& now)
+    inline float _computeLoad(const TimePoint& startTime, const TimePoint& now)
     {
-      Timing::Duration duration = now - startTime;
-      m_tickAverage = _approxRollingAverage<Timing::Duration>(m_tickAverage, duration);
+      Duration duration = now - startTime;
+      m_tickAverage = _approxRollingAverage<Duration>(m_tickAverage, duration);
 
-      return m_tickAverage / m_tickInterval;
+      return m_tickAverage.count() / m_tickInterval.count();
     }
 
 
@@ -132,14 +143,14 @@ namespace Huenicorn
     }
 
   // Attributes
-    Timing::TimeUnit m_tickInterval;
-    Timing::TimePoint m_timePoint;
-    Timing::Duration m_tickAverage{0};
+    Duration m_tickInterval;
+    TimePoint m_nextTickTime;
+    Duration m_tickAverage{0};
 
-    Timing::Duration m_loadRateHistory[LoadRateHistorySize];
+    Duration m_loadRateHistory[LoadRateHistorySize];
     unsigned m_loadRateHistoryCursorId{0};
     float m_loadRate;
 
-    Excess m_lastExcess{Timing::Duration{0}, 0.f};
+    Excess m_lastExcess{Duration{0}, 0.f};
   };
 }

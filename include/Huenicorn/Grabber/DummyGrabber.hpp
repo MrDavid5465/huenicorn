@@ -2,7 +2,7 @@
 
 #include <Huenicorn/Grabber/IGrabber.hpp>
 
-#include <Huenicorn/TimingDefinitions.hpp>
+#include <Huenicorn/Timing/Definitions.hpp>
 
 
 namespace Huenicorn::Grabber

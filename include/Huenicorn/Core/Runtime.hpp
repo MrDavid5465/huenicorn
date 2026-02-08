@@ -12,7 +12,7 @@
 #include <Huenicorn/Grabber/IGrabber.hpp>
 #include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
-#include <Huenicorn/TickSynchronizer.hpp>
+#include <Huenicorn/Timing/LoopRegulator.hpp>
 #include <Huenicorn/Imaging/UV.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Serialization/Json.hpp>
@@ -386,7 +386,7 @@ namespace Huenicorn::Core
 
     bool m_keepLooping;
     bool m_openedSetup{false};
-    std::unique_ptr<TickSynchronizer> m_tickSynchronizer;
+    std::unique_ptr<Timing::LoopRegulator> m_loopRegulator;
 
     //  API structure wrapper
     std::unique_ptr<Hue::Api::EntertainmentConfigurationSelector> m_selector;

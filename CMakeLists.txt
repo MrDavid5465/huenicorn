@@ -162,10 +162,15 @@ set(IMAGING_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Imaging/UV.hpp
 )
 
+set(TIMING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Timing/LoopRegulator.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Timing/Definitions.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Timing/LoopRegulator.cpp
+)
+
 # Declare executable
 add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
 
   ${CORE_SOURCE}
   ${GRABBER_SOURCE}
@@ -175,9 +180,7 @@ add_executable(${BINARY_NAME}
   ${PLATFORM_SOURCE}
   ${SERIALIZATION_SOURCE}
   ${STREAM_SOURCE}
-
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
+  ${TIMING_SOURCE}
 
   ${VERSION_HEADER}
   ${EMBEDDED_WEBROOT_HEADER}

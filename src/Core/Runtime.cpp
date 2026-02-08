@@ -186,7 +186,8 @@ namespace Huenicorn::Core
 
     m_config.setRefreshRate(refreshRate);
     refreshRate = m_config.refreshRate();
-    m_tickSynchronizer->setTickInterval(1.0f / refreshRate);
+
+    m_loopRegulator->setTickInterval(Timing::fromHertz(refreshRate));
   }
 
 
@@ -527,18 +528,18 @@ namespace Huenicorn::Core
 
   void Runtime::_startStreamingLoop()
   {
-    m_tickSynchronizer = std::make_unique<TickSynchronizer>(1.0f / static_cast<float>(m_config.refreshRate()));
+    m_loopRegulator = std::make_unique<Timing::LoopRegulator>(Timing::fromHertz(m_config.refreshRate()));
 
-    m_tickSynchronizer->start();
+    m_loopRegulator->start();
 
     m_keepLooping = true;
     while(m_keepLooping){
       _update();
 
-      if(!m_tickSynchronizer->sync()){
-        const auto& lastExcess = m_tickSynchronizer->lastExcess();
+      if(!m_loopRegulator->sync()){
+        const auto& lastExcess = m_loopRegulator->lastExcess();
         float percentage = lastExcess.rate * 100;
-        Logger::warn("Scheduled interval has been exceeded of ", lastExcess.extra.count(), " (", percentage, "%).\n Please reduce refresh rate if this warning persists.");
+        Logger::warn("Scheduled interval has been exceeded of ", lastExcess.extra.count(), "[s] (", percentage, "%).\n Please reduce refresh rate if this warning persists.");
       }
     }
 
