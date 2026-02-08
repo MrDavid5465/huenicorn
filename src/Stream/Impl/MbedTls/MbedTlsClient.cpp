@@ -9,7 +9,7 @@
 #include <mbedtls/platform.h>
 #endif
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Stream
@@ -72,7 +72,7 @@ namespace Huenicorn::Stream
   bool MbedTlsClient::send(std::span<const std::byte> requestBuffer)
   {
     if(!m_isConnected){
-      Logger::error("Dtls client is not connected");
+      Core::Logger::error("Dtls client is not connected");
       return false;
     }
 
@@ -228,7 +228,7 @@ namespace Huenicorn::Stream
     }
 
     m_isConnected = true;
-    Logger::log("Dtls handshake successful");
+    Core::Logger::log("Dtls handshake successful");
   }
 
 

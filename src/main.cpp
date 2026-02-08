@@ -3,8 +3,8 @@
 #include <csignal>
 
 #include <Huenicorn/Version.hpp>
-#include <Huenicorn/HuenicornCore.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Runtime.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
 
 
@@ -17,7 +17,7 @@ class Application
 public:
   void start()
   {
-    m_core = std::make_unique<Huenicorn::HuenicornCore>(Huenicorn::Version, Huenicorn::Platform::adapter.getConfigFilePath());
+    m_core = std::make_unique<Huenicorn::Core::Runtime>(Huenicorn::Version, Huenicorn::Platform::adapter.getConfigFilePath());
     m_applicationThread.emplace([&](){
       m_core->start();
     });
@@ -39,7 +39,7 @@ public:
 
 
 private:
-  std::unique_ptr<Huenicorn::HuenicornCore> m_core;
+  std::unique_ptr<Huenicorn::Core::Runtime> m_core;
   std::optional<std::thread> m_applicationThread;
 };
 
@@ -50,7 +50,7 @@ Application app;
 void signalHandler(int signal)
 {
   if(signal == SIGTERM || signal == SIGINT){
-    Huenicorn::Logger::log("Closing application");
+    Huenicorn::Core::Logger::log("Closing application");
     app.stop();
   }
 }
@@ -58,13 +58,13 @@ void signalHandler(int signal)
 
 int main()
 {
-  Huenicorn::Logger::log("Starting Huenicorn version ", Huenicorn::Version, " for ", Huenicorn::Platform::adapter.getPlatformName());
+  Huenicorn::Core::Logger::log("Starting Huenicorn version ", Huenicorn::Version, " for ", Huenicorn::Platform::adapter.getPlatformName());
 
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);
 
   app.start();
-  Huenicorn::Logger::log("Huenicorn terminated properly");
+  Huenicorn::Core::Logger::log("Huenicorn terminated properly");
 
   return 0;
 }

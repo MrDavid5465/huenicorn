@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-#include <Huenicorn/HuenicornCore.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Runtime.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Serialization/Channel.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 
@@ -13,7 +13,7 @@ namespace Huenicorn::Network::Http::Server
 {
   using namespace Serialization;
 
-  WebUIBackend::WebUIBackend(Huenicorn::HuenicornCore* huenicornCore):
+  WebUIBackend::WebUIBackend(Huenicorn::Core::Runtime* huenicornCore):
   IRestServer("index.html"),
   m_huenicornCore(huenicornCore)
   {
@@ -100,7 +100,7 @@ namespace Huenicorn::Network::Http::Server
   {
     std::stringstream ss;
     ss << "Huenicorn management panel is now available at http://localhost:" <<  m_app.port();
-    Logger::log(ss.str());
+    Core::Logger::log(ss.str());
 
     if(m_readyWebUIPromise.has_value()){
       m_readyWebUIPromise.value().set_value(true);

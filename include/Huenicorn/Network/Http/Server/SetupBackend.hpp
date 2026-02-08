@@ -8,14 +8,14 @@
 #include <Huenicorn/Serialization/Json.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
-  class HuenicornCore;
+  class Runtime;
 }
 
 namespace Huenicorn::Network::Http::Server
 {
-  class HuenicornCore;
+  class Runtime;
 
   /**
    * @brief REST service handling requests for Huenicorn initial setup
@@ -32,7 +32,7 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    SetupBackend(Huenicorn::HuenicornCore* huenicornCore);
+    SetupBackend(Huenicorn::Core::Runtime* huenicornCore);
 
 
     /**
@@ -138,7 +138,7 @@ namespace Huenicorn::Network::Http::Server
 
     // Attributes
     std::unordered_map<std::string, Callback> m_callbacks;
-    Huenicorn::HuenicornCore* m_huenicornCore;
+    Huenicorn::Core::Runtime* m_runtime;
     const std::filesystem::path m_webroot;
     std::unordered_map<std::string, std::string> m_contentTypes;
     bool m_aborted{false};

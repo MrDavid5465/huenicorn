@@ -5,14 +5,14 @@
 #include <filesystem>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
-  class HuenicornCore;
+  class Runtime;
 }
 
 namespace Huenicorn::Network::Http::Server
 {
-  class HuenicornCore;
+  class Runtime;
 
   /**
    * @brief REST service handling requests for light management
@@ -29,7 +29,7 @@ namespace Huenicorn::Network::Http::Server
      * 
      * @param huenicornCore Pointer to Huenicorn core
      */
-    WebUIBackend(Huenicorn::HuenicornCore* huenicornCore);
+    WebUIBackend(Huenicorn::Core::Runtime* huenicornCore);
 
 
   protected:
@@ -172,6 +172,6 @@ namespace Huenicorn::Network::Http::Server
 
 
     // Attributes
-    Huenicorn::HuenicornCore* m_huenicornCore;
+    Huenicorn::Core::Runtime* m_huenicornCore;
   };
 }

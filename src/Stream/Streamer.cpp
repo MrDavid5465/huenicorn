@@ -1,7 +1,7 @@
 #include <Huenicorn/Stream/Streamer.hpp>
 
 #include <Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Stream
@@ -15,7 +15,7 @@ namespace Huenicorn::Stream
       m_dtlsClient->init();
     }
     catch(const std::exception& e){
-      Logger::error(e.what());
+      Core::Logger::error(e.what());
     }
   }
 

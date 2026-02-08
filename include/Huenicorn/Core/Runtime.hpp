@@ -18,13 +18,13 @@
 #include <Huenicorn/Serialization/Json.hpp>
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
   /**
    * @brief Main execution scope of Huenicorn that handles application components and executes streaming loop.
    * 
    */
-  class HuenicornCore
+  class Runtime
   {
     // Type definitions
     struct ThreadedRestService
@@ -36,12 +36,12 @@ namespace Huenicorn
   public:
     // Constructor
     /**
-     * @brief HuenicornCore constructor
+     * @brief Runtime constructor
      * 
      * @param version Current version of Huenicorn
      * @param configRoot Path to the configuration directory
      */
-    HuenicornCore(const std::string& version, const std::filesystem::path& configRoot);
+    Runtime(const std::string& version, const std::filesystem::path& configRoot);
 
 
     // Getters

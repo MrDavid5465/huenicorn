@@ -7,7 +7,7 @@
 #include <Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Core/Config.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
@@ -106,7 +106,7 @@ namespace Huenicorn::Grabber
 
     std::stringstream ss;
     ss << "[pipewire] Error id: " << id << " seq: " << seq << " res: " << res << "" << g_strerror(res) << " " << message << std::endl;
-    Logger::error(ss.str());
+    Core::Logger::error(ss.str());
 
     //pw_thread_loop_signal(pw->loop, FALSE);
   }

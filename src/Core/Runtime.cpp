@@ -1,4 +1,4 @@
-#include <Huenicorn/HuenicornCore.hpp>
+#include <Huenicorn/Core/Runtime.hpp>
 
 #include <fstream>
 #include <chrono>
@@ -7,7 +7,7 @@
 #include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
 #include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 #include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
@@ -19,94 +19,94 @@
 using namespace std::chrono_literals;
 
 
-namespace Huenicorn
+namespace Huenicorn::Core
 {
-  HuenicornCore::HuenicornCore(const std::string& version, const std::filesystem::path& configRoot):
+  Runtime::Runtime(const std::string& version, const std::filesystem::path& configRoot):
   m_version(version),
   m_configRoot(configRoot),
   m_config(m_configRoot)
   {}
 
 
-  const std::string& HuenicornCore::version() const
+  const std::string& Runtime::version() const
   {
     return m_version;
   }
 
 
-  const std::filesystem::path HuenicornCore::configFilePath() const
+  const std::filesystem::path Runtime::configFilePath() const
   {
     return m_config.configFilePath();
   }
 
 
-  const Hue::Api::Channels& HuenicornCore::channels() const
+  const Hue::Api::Channels& Runtime::channels() const
   {
     return m_channels;
   }
 
 
-  const Hue::Api::EntertainmentConfigurations& HuenicornCore::entertainmentConfigurations() const
+  const Hue::Api::EntertainmentConfigurations& Runtime::entertainmentConfigurations() const
   {
     return m_selector->entertainmentConfigurations();
   }
 
 
-  const Hue::Api::EntertainmentConfiguration& HuenicornCore::currentEntertainmentConfiguration() const
+  const Hue::Api::EntertainmentConfiguration& Runtime::currentEntertainmentConfiguration() const
   {
     return m_selector->currentEntertainmentConfiguration();
   }
 
 
-  std::optional<std::string> HuenicornCore::currentEntertainmentConfigurationId() const
+  std::optional<std::string> Runtime::currentEntertainmentConfigurationId() const
   {
     return m_selector->currentEntertainmentConfigurationId();
   }
 
 
-  glm::ivec2 HuenicornCore::displayResolution() const
+  glm::ivec2 Runtime::displayResolution() const
   {
     return m_grabber->displayResolution();
   }
 
 
-  std::vector<glm::ivec2> HuenicornCore::subsampleResolutionCandidates() const
+  std::vector<glm::ivec2> Runtime::subsampleResolutionCandidates() const
   {
     return m_grabber->subsampleResolutionCandidates();
   }
 
 
-  unsigned HuenicornCore::subsampleWidth() const
+  unsigned Runtime::subsampleWidth() const
   {
     return m_config.subsampleWidth();
   }
 
 
-  unsigned HuenicornCore::refreshRate() const
+  unsigned Runtime::refreshRate() const
   {
     return m_config.refreshRate();
   }
 
 
-  unsigned HuenicornCore::maxRefreshRate() const
+  unsigned Runtime::maxRefreshRate() const
   {
     return m_grabber->displayRefreshRate();
   }
 
 
-  Imaging::Interpolation::Type HuenicornCore::interpolation() const
+  Imaging::Interpolation::Type Runtime::interpolation() const
   {
     return m_config.interpolation();
   }
 
 
-  const Imaging::Interpolation::Interpolations& HuenicornCore::availableInterpolations() const
+  const Imaging::Interpolation::Interpolations& Runtime::availableInterpolations() const
   {
     return Imaging::Interpolation::availableInterpolations;
   }
 
 
-  Serialization::Json HuenicornCore::autodetectedBridge() const
+  Serialization::Json Runtime::autodetectedBridge() const
   {
     auto detectedBridgeResponse = Network::Http::Client::sendRequest("https://discovery.meethue.com/", "GET");
 
@@ -120,7 +120,7 @@ namespace Huenicorn
   }
 
 
-  Serialization::Json HuenicornCore::registerNewUser()
+  Serialization::Json Runtime::registerNewUser()
   {
     std::string sessionUsername = Platform::adapter.getUsername();
     std::string deviceType = "huenicorn#" + sessionUsername;
@@ -145,7 +145,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::setEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
+  bool Runtime::setEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
   {
     if(!m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
       return false;
@@ -157,13 +157,13 @@ namespace Huenicorn
   }
 
 
-  const Imaging::UVs& HuenicornCore::setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner)
+  const Imaging::UVs& Runtime::setChannelUV(uint8_t channelId, Imaging::UV&& uv, Imaging::UVCorner uvCorner)
   {
     return m_channels.at(channelId).setUV(std::move(uv), uvCorner);
   }
 
 
-  bool HuenicornCore::setChannelGammaFactor(uint8_t channelId, float gammaExponent)
+  bool Runtime::setChannelGammaFactor(uint8_t channelId, float gammaExponent)
   {
     if(m_channels.find(channelId) == m_channels.end()){
       return false;
@@ -174,13 +174,13 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::setSubsampleWidth(unsigned subsampleWidth)
+  void Runtime::setSubsampleWidth(unsigned subsampleWidth)
   {
     m_config.setSubsampleWidth(subsampleWidth);
   }
 
 
-  void HuenicornCore::setRefreshRate(unsigned refreshRate)
+  void Runtime::setRefreshRate(unsigned refreshRate)
   {
     refreshRate = std::min(refreshRate, m_grabber->displayRefreshRate());
 
@@ -190,13 +190,13 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::setInterpolation(unsigned interpolation)
+  void Runtime::setInterpolation(unsigned interpolation)
   {
     m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
   }
 
 
-  void HuenicornCore::start()
+  void Runtime::start()
   {
     if(!m_config.initialSetupOk()){
       if(!_runInitialSetup()){
@@ -233,13 +233,13 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::stop()
+  void Runtime::stop()
   {
     m_keepLooping = false;
   }
 
 
-  bool HuenicornCore::validateBridgeAddress(const std::string& bridgeAddress)
+  bool Runtime::validateBridgeAddress(const std::string& bridgeAddress)
   {
     std::string sanitizedAddress = bridgeAddress;
 
@@ -258,7 +258,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::validateCredentials(const Hue::Auth::Credentials& credentials)
+  bool Runtime::validateCredentials(const Hue::Auth::Credentials& credentials)
   {
     auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
     if(!response.has_value()){
@@ -283,7 +283,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::setChannelActivity(uint8_t channelId, bool active)
+  bool Runtime::setChannelActivity(uint8_t channelId, bool active)
   {
     if(m_channels.find(channelId) == m_channels.end()){
       return false;
@@ -297,7 +297,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::saveProfile()
+  void Runtime::saveProfile()
   {
     if(!m_selector->validSelection()){
       Logger::error("There is currently no valid entertainment configuration selected.");
@@ -322,7 +322,7 @@ namespace Huenicorn
   }
 
 
-  std::filesystem::path HuenicornCore::_profilePath() const
+  std::filesystem::path Runtime::_profilePath() const
   {
     if(!m_config.profileName().has_value()){
       return {};
@@ -332,7 +332,7 @@ namespace Huenicorn
   }
 
 
-  std::optional<Serialization::Json> HuenicornCore::_getProfile()
+  std::optional<Serialization::Json> Runtime::_getProfile()
   {
     std::filesystem::path profilePath = _profilePath();
     Serialization::Json jsonProfile = Serialization::Json::object();
@@ -346,7 +346,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::_initSettings()
+  bool Runtime::_initSettings()
   {
     if(m_config.refreshRate() == 0){
       m_config.setRefreshRate(m_grabber->displayRefreshRate());
@@ -401,7 +401,7 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::_runInitialSetup()
+  bool Runtime::_runInitialSetup()
   {
     Logger::log("Starting setup backend");
     unsigned port = m_config.restServerPort();
@@ -422,14 +422,14 @@ namespace Huenicorn
   }
 
 
-  bool HuenicornCore::_initGrabber()
+  bool Runtime::_initGrabber()
   {
     m_grabber = Platform::adapter.getGrabber(&m_config);
     return true;
   }
 
 
-  void HuenicornCore::_initWebUI()
+  void Runtime::_initWebUI()
   {
     std::promise<bool> readyWebUIPromise;
     auto readyWebUIFuture = readyWebUIPromise.get_future();
@@ -445,7 +445,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_initChannels(const Serialization::Json& jsonChannels)
+  void Runtime::_initChannels(const Serialization::Json& jsonChannels)
   {
     const auto& username = m_config.credentials().value().username();
     const auto& bridgeAddress =  m_config.bridgeAddress().value();
@@ -482,7 +482,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_spawnBrowser()
+  void Runtime::_spawnBrowser()
   {
     while (!m_webUIService.server->running()){
       std::this_thread::sleep_for(100ms);
@@ -497,7 +497,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_enableEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
+  void Runtime::_enableEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
   {
     if(!m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
       return;
@@ -525,7 +525,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_startStreamingLoop()
+  void Runtime::_startStreamingLoop()
   {
     m_tickSynchronizer = std::make_unique<TickSynchronizer>(1.0f / static_cast<float>(m_config.refreshRate()));
 
@@ -549,7 +549,7 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_update()
+  void Runtime::_update()
   {
     m_grabber->grabFrameSubsample(m_frameData);
     if(!m_frameData.hasData()){
@@ -601,13 +601,13 @@ namespace Huenicorn
   }
 
 
-  void HuenicornCore::_shutdown()
+  void Runtime::_shutdown()
   {
     m_selector->disableStreaming();
   }
 
 
-  void HuenicornCore::_updateStreamChannelsSize()
+  void Runtime::_updateStreamChannelsSize()
   {
     m_channelStreams.resize(m_channels.size());
   }

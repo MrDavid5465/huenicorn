@@ -5,7 +5,7 @@
 #include <Huenicorn/Serialization/Device.hpp>
 #include <Huenicorn/Serialization/UV.hpp>
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Serialization

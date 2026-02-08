@@ -2,19 +2,19 @@
 
 #include <chrono>
 
-#include <Huenicorn/HuenicornCore.hpp>
+#include <Huenicorn/Core/Runtime.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 using namespace std::chrono_literals;
 
 namespace Huenicorn::Network::Http::Server
 {
-  SetupBackend::SetupBackend(Huenicorn::HuenicornCore* huenicornCore):
+  SetupBackend::SetupBackend(Huenicorn::Core::Runtime* runtime):
   IRestServer("setup.html"),
-  m_huenicornCore(huenicornCore)
+  m_runtime(runtime)
   {
     CROW_ROUTE(m_app, "/api/finishSetup").methods(crow::HTTPMethod::POST)
     ([this](const crow::request& /*req*/, crow::response& res){
@@ -81,7 +81,7 @@ namespace Huenicorn::Network::Http::Server
     std::stringstream serviceUrlStream;
     serviceUrlStream << "http://127.0.0.1:" << m_app.port();
     std::string serviceURL = serviceUrlStream.str();
-    Logger::log("Setup WebUI is ready and available at ", serviceURL);
+    Core::Logger::log("Setup WebUI is ready and available at ", serviceURL);
 
     Platform::adapter.openWebBrowser(serviceURL);
   }
@@ -90,7 +90,7 @@ namespace Huenicorn::Network::Http::Server
   void SetupBackend::_getVersion(crow::response& res) const
   {
     Serialization::Json jsonResponse = {
-      {"version", m_huenicornCore->version()},
+      {"version", m_runtime->version()},
     };
 
     std::string response = jsonResponse.dump();
@@ -126,7 +126,7 @@ namespace Huenicorn::Network::Http::Server
 
   void SetupBackend::_autodetectBridge(crow::response& res)
   {
-    Serialization::Json jsonResponse = m_huenicornCore->autodetectedBridge();
+    Serialization::Json jsonResponse = m_runtime->autodetectedBridge();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -136,7 +136,7 @@ namespace Huenicorn::Network::Http::Server
 
   void SetupBackend::_configFilePath(crow::response& res)
   {
-    Serialization::Json jsonResponse = {{"configFilePath", m_huenicornCore->configFilePath()}};
+    Serialization::Json jsonResponse = {{"configFilePath", m_runtime->configFilePath()}};
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -151,7 +151,7 @@ namespace Huenicorn::Network::Http::Server
 
     std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
 
-    Serialization::Json jsonResponse = {{"succeeded", m_huenicornCore->validateBridgeAddress(bridgeAddress)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_runtime->validateBridgeAddress(bridgeAddress)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -167,7 +167,7 @@ namespace Huenicorn::Network::Http::Server
 
     auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
 
-    Serialization::Json jsonResponse = {{"succeeded", m_huenicornCore->validateCredentials(credentials)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_runtime->validateCredentials(credentials)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -178,7 +178,7 @@ namespace Huenicorn::Network::Http::Server
 
   void SetupBackend::_registerNewUser(crow::response& res)
   {
-    Serialization::Json jsonResponse = m_huenicornCore->registerNewUser();
+    Serialization::Json jsonResponse = m_runtime->registerNewUser();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);

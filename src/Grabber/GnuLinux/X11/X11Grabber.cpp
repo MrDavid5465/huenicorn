@@ -8,7 +8,7 @@
 
 #include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Grabber
@@ -172,7 +172,7 @@ namespace Huenicorn::Grabber
       return {selectedMonitor->width, selectedMonitor->height};
     }
     catch(const std::exception& e){
-      Logger::error("No selected monitor");
+      Core::Logger::error("No selected monitor");
     }
 
     return {0, 0};
@@ -186,7 +186,7 @@ namespace Huenicorn::Grabber
       return selectedMonitor->refreshRate;
     }
     catch(const std::exception& e){
-      Logger::error("No selected monitor");
+      Core::Logger::error("No selected monitor");
     }
 
     return 0;
@@ -197,7 +197,7 @@ namespace Huenicorn::Grabber
   {
     m_xshmData.reset();
     m_monitorSelectionData.selectedMonitorId = monitorId;
-    Logger::log("selected ", m_monitorSelectionData.selectedMonitor()->name);
+    Core::Logger::log("selected ", m_monitorSelectionData.selectedMonitor()->name);
   }
 
 

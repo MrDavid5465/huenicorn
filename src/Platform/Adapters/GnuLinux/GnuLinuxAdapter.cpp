@@ -3,7 +3,7 @@
 #include <pwd.h>
 #include <unistd.h>
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 #ifdef PIPEWIRE_GRABBER_AVAILABLE
 #include <Huenicorn/Grabber/GnuLinux/Pipewire/PipewireGrabber.hpp>
@@ -39,7 +39,7 @@ namespace Huenicorn::Platform
   void GnuLinuxAdapter::openWebBrowser(const std::string& url) const
   {
     if(system(std::string("xdg-open " + url).c_str()) != 0){
-      Logger::error("Failed to open browser");
+      Core::Logger::error("Failed to open browser");
     }
   }
 

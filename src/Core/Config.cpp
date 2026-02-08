@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Serialization/Config.hpp>
 
 

@@ -9,7 +9,7 @@
 
 #include <Huenicorn/Imaging/ImageData.hpp>
 #include <Huenicorn/Grabber/MonitorData.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Core
@@ -19,7 +19,6 @@ namespace Huenicorn::Core
 
 namespace Huenicorn::Grabber
 {
-
   using UniqueMonitor = std::shared_ptr<MonitorData>;
   using Monitors = std::vector<UniqueMonitor>;
 
@@ -42,7 +41,7 @@ namespace Huenicorn::Grabber
           return monitors.at(selectedMonitorId.value()).get();
         }
         catch(const std::exception& e){
-          Logger::warn("No selected monitor");
+          Core::Logger::warn("No selected monitor");
         }
 
         return nullptr;

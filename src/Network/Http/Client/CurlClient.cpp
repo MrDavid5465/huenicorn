@@ -7,7 +7,7 @@
 #include <curl/curl.h>
 #include <curl/easy.h>
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Network::Http::Client
@@ -42,7 +42,7 @@ namespace Huenicorn::Network::Http::Client
   {
     auto handle = std::unique_ptr<CURL, CurlDeleter>(curl_easy_init());
     if(!handle){
-      Logger::error("Failed to initialize CURL handle");
+      Core::Logger::error("Failed to initialize CURL handle");
       throw std::runtime_error("CURL initialization failed");
     }
 
@@ -81,7 +81,7 @@ namespace Huenicorn::Network::Http::Client
     curl_easy_setopt(handle.get(), CURLOPT_HTTPHEADER, nullptr);
 
     if(code != CURLE_OK){
-      Logger::error("HTTP request failed: " + std::string(curl_easy_strerror(code)));
+      Core::Logger::error("HTTP request failed: " + std::string(curl_easy_strerror(code)));
       return std::nullopt;
     }
 

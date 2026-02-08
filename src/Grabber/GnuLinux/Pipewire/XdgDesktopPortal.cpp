@@ -13,7 +13,7 @@
 
 #include <gio/gunixfdlist.h>
 
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Grabber
@@ -36,7 +36,7 @@ namespace Huenicorn::Grabber
         connection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
 
         if(error){
-         Logger::warn("error retrieving D-Bus connection: ", std::string(error->message));
+         Core::Logger::warn("error retrieving D-Bus connection: ", std::string(error->message));
          return;
         }
       }
@@ -98,7 +98,7 @@ namespace Huenicorn::Grabber
         screencastProxy = g_dbus_proxy_new_sync(portalGetDbusConnection(), G_DBUS_PROXY_FLAGS_NONE, NULL, busName.c_str(), objectPath.c_str(), interfaceName.c_str(), NULL, &error);
 
         if(error){
-          Logger::warn("error retrieving D-Bus proxy: ", std::string(error->message));
+          Core::Logger::warn("error retrieving D-Bus proxy: ", std::string(error->message));
           return;
         }
       }
@@ -149,7 +149,7 @@ namespace Huenicorn::Grabber
 
       DbusCallData* call = static_cast<DbusCallData*>(data);
 
-      Logger::log("Request cancelled");
+      Core::Logger::log("Request cancelled");
 
       std::string interfaceName = "org.freedesktop.portal.Request";
 
@@ -199,7 +199,7 @@ namespace Huenicorn::Grabber
 
       if(error){
         if(!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED)){
-          Logger::error("[pipewire] error retrieving pipewire fd: ", std::string(error->message));
+          Core::Logger::error("[pipewire] error retrieving pipewire fd: ", std::string(error->message));
         }
 
         return;
@@ -211,7 +211,7 @@ namespace Huenicorn::Grabber
       int pwFd = g_unix_fd_list_get(fdList, fdIndex, &error);
       if(error){
         if(!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED)){
-          Logger::error("[pipewire] error retrieving pipewire fd: ", std::string(error->message));
+          Core::Logger::error("[pipewire] error retrieving pipewire fd: ", std::string(error->message));
         }
 
         return;
@@ -248,7 +248,7 @@ namespace Huenicorn::Grabber
       g_variant_get(parameters, "(u@a{sv})", &response, &result);
 
       if(response != 0){
-        Logger::warn("Failed to start screencast, denied or cancelled by user.");
+        Core::Logger::warn("Failed to start screencast, denied or cancelled by user.");
         capture->fdReadyPromise.set_value(false);
         return;
       }
@@ -260,7 +260,7 @@ namespace Huenicorn::Grabber
 
       size_t n_streams = g_variant_iter_n_children(&iter);
       if(n_streams != 1){
-        Logger::error("received more than one stream when only one was expected. this is probably a bug in the desktop portal implementation you are using.");
+        Core::Logger::error("received more than one stream when only one was expected. this is probably a bug in the desktop portal implementation you are using.");
       }
 
       g_autoptr(GVariant) streamProperties = NULL;
@@ -279,7 +279,7 @@ namespace Huenicorn::Grabber
       (void)result;
       if(error){
         if(!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED)){
-          Logger::error("error selecting screencast source: ", std::string(error->message));
+          Core::Logger::error("error selecting screencast source: ", std::string(error->message));
           capture->fdReadyPromise.set_value(false);
         }
         return;
@@ -300,7 +300,7 @@ namespace Huenicorn::Grabber
         g_dbus_proxy_call(getScreencastPortalProxy(), "Start", g_variant_new("(osa{sv})", capture->sessionHandle, "", &builder), G_DBUS_CALL_FLAGS_NONE, -1, capture->cancellable, onStartedCallback, call);
       }
       catch(const std::exception& e){
-        Logger::error(e.what());
+        Core::Logger::error(e.what());
       }
     }
 
@@ -323,7 +323,7 @@ namespace Huenicorn::Grabber
       g_variant_get(parameters, "(u@a{sv})", &response, &ret);
 
       if(response != 0){
-        Logger::error("failed to select source, denied or cancelled by user");
+        Core::Logger::error("failed to select source, denied or cancelled by user");
         return;
       }
 
@@ -340,7 +340,7 @@ namespace Huenicorn::Grabber
       (void)result;
       if(error){
         if(!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED)){
-          Logger::error("error selecting screencast source: ", std::string(error->message));
+          Core::Logger::error("error selecting screencast source: ", std::string(error->message));
         }
 
         return;
@@ -395,7 +395,7 @@ namespace Huenicorn::Grabber
       g_variant_get(parameters, "(u@a{sv})", &response, &result);
 
       if(response != 0){
-        Logger::warn("failed to create session, denied or cancelled by user");
+        Core::Logger::warn("failed to create session, denied or cancelled by user");
       }
 
       g_autoptr(GVariant) sessionHandleVariant = g_variant_lookup_value(result, "session_handle", NULL);
@@ -415,7 +415,7 @@ namespace Huenicorn::Grabber
 
       if(error){
         if(!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED)){
-          Logger::error("error creating screencast session: ", std::string(error->message));
+          Core::Logger::error("error creating screencast session: ", std::string(error->message));
         }
 
         return;

@@ -1,7 +1,7 @@
 #include <Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp>
 
 #include <Huenicorn/Hue/Api/ApiTools.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Hue::Api
@@ -45,7 +45,7 @@ namespace Huenicorn::Hue::Api
   bool EntertainmentConfigurationSelector::selectEntertainmentConfiguration(const std::string& entertainmentConfigurationId)
   {
     if(m_entertainmentConfigurations.size() == 0){
-      Logger::error("No entertainment configuration could be found yet. Please register one through the official Philips Hue application in order to power it with Huenicorn");
+      Core::Logger::error("No entertainment configuration could be found yet. Please register one through the official Philips Hue application in order to power it with Huenicorn");
       return false;
     }
 
@@ -53,13 +53,13 @@ namespace Huenicorn::Hue::Api
 
     if(entertainmentConfigurationId.empty()){
       m_currentEntertainmentConfiguration = m_entertainmentConfigurations.begin();
-      Logger::log("Fallback selection ", m_currentEntertainmentConfiguration->first);
+      Core::Logger::log("Fallback selection ", m_currentEntertainmentConfiguration->first);
     }
     else{
       m_currentEntertainmentConfiguration = m_entertainmentConfigurations.find(entertainmentConfigurationId);
 
       if(m_currentEntertainmentConfiguration == m_entertainmentConfigurations.end()){
-        Logger::error("Invalid selection : ", entertainmentConfigurationId);
+        Core::Logger::error("Invalid selection : ", entertainmentConfigurationId);
         return false;
       }
     }

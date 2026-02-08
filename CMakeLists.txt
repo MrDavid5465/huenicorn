@@ -128,6 +128,12 @@ set(GRABBER_SOURCE
 set(CORE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Runtime.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Runtime.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Logger.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Logger.hpp
 )
 
 set(SERIALIZATION_SOURCE
@@ -159,8 +165,6 @@ set(IMAGING_SOURCE
 # Declare executable
 add_executable(${BINARY_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
 
   ${CORE_SOURCE}
@@ -172,8 +176,6 @@ add_executable(${BINARY_NAME}
   ${SERIALIZATION_SOURCE}
   ${STREAM_SOURCE}
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
 

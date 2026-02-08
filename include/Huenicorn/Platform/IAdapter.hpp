@@ -5,7 +5,7 @@
 
 #include <Huenicorn/Grabber/IGrabber.hpp>
 #include <Huenicorn/Grabber/DummyGrabber.hpp>
-#include <Huenicorn/Logger.hpp>
+#include <Huenicorn/Core/Logger.hpp>
 
 
 namespace Huenicorn::Core
@@ -89,8 +89,8 @@ namespace Huenicorn::Platform
         }
         catch(const std::exception& e){
           // Fallback to DummyGrabber
-          Logger::warn(e.what());
-          Logger::warn("Could not start propper grabber. Now falling back to DummyGrabber.");
+          Core::Logger::warn(e.what());
+          Core::Logger::warn("Could not start propper grabber. Now falling back to DummyGrabber.");
 
           m_grabber = std::make_unique<Grabber::DummyGrabber>(config);
         }
