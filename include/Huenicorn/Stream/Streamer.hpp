@@ -5,7 +5,7 @@
 
 #include <Huenicorn/Hue/Api/Channel.hpp>
 #include <Huenicorn/Hue/Auth/Credentials.hpp>
-#include <Huenicorn/Stream/IDtlsClient.hpp>
+#include <Huenicorn/Stream/DtlsClient.hpp>
 #include <Huenicorn/Stream/HuestreamHeader.hpp>
 #include <Huenicorn/Stream/HuestreamPayload.hpp>
 
@@ -59,7 +59,7 @@ namespace Huenicorn::Stream
 
   private:
     // Attributes
-    std::unique_ptr<Stream::IDtlsClient> m_dtlsClient;
+    std::unique_ptr<Stream::DtlsClient> m_dtlsClient;
     HuestreamHeader m_header;
   };
 }

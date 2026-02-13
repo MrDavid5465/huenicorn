@@ -150,13 +150,14 @@ set(SERIALIZATION_SOURCE
 
 set(STREAM_SOURCE
   # MbedTls Impl
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Impl/MbedTls/MbedTlsClient.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Impl/MbedTls/MbedTlsClient.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/DtlsConfig.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Impl/MbedTls/MbedTlsClientImpl.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Impl/MbedTls/DtlsClient.cpp
 
   # Common
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/HuestreamHeader.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/HuestreamPayload.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/IDtlsClient.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/DtlsClient.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Stream/Streamer.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/HuestreamHeader.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
