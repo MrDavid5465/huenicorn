@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <Huenicorn/Hue/Api/Device.hpp>
@@ -10,7 +11,7 @@
 
 namespace Huenicorn::Hue::Api
 {
-  using MembersIds = std::vector<std::string>;
+  using MembersIds = std::unordered_set<std::string>;
   using ChannelsMembersIds = std::unordered_map<uint8_t, MembersIds>;
   using EntertainmentConfigurationsChannels = std::unordered_map<std::string, ChannelsMembersIds>;
 
@@ -62,9 +63,9 @@ namespace Huenicorn::Hue::Api
      * 
      * @param membersIds Members ids to match
      * @param devices Devices data
-     * @return std::vector<Device> List of matched data for each device
+     * @return Devices List of matched data for each device
      */
-    std::vector<Device> matchDevices(
+    Devices matchDevices(
       const MembersIds& membersIds,
       const Devices& devices
     );

@@ -14,8 +14,7 @@ namespace Huenicorn::Hue::Api
   {
     std::string id;
     std::string name;
-    std::string type;
   };
 
-  using Devices = std::unordered_map<std::string, Device>;
+  using Devices = std::vector<Device>;
 }

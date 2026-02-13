@@ -24,7 +24,7 @@ namespace Huenicorn::Serialization
         std::string lightId = lightService.at("rid");
         Hue::Api::Device device;
         device.id = lightId; // Initialize with default value
-        entConf.devices.insert({lightId, device});
+        entConf.devices.push_back(std::move(device));
       }
     }
 

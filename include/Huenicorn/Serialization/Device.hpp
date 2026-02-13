@@ -18,7 +18,6 @@ namespace Huenicorn::Serialization
     )
     {
       jsonDevice.at("name").get_to(device.name);
-      jsonDevice.at("archetype").get_to(device.type);
     }
 
     // Serialization
@@ -30,7 +29,6 @@ namespace Huenicorn::Serialization
       jsonDevice = {
         {"id", device.id},
         {"name", device.name},
-        {"type", device.type}
       };
     }
   };

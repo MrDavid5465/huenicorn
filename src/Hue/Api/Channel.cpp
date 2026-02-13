@@ -9,7 +9,7 @@ namespace Huenicorn::Hue::Api
 {
   Channel::Channel(
     bool active,
-    const std::vector<Device>& devices,
+    const Devices& devices,
     float gammaFactor,
     const Imaging::UVs& uvs
   ):

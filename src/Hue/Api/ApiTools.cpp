@@ -31,8 +31,8 @@ namespace Huenicorn::Hue::Api
         for(const auto& jsonEntConf : jsonEntConfs.at("data")){
           EntertainmentConfiguration entConf = jsonEntConf.get<EntertainmentConfiguration>();
 
-          for(auto& [lightId, device] : entConf.devices){
-            std::string lightUrl = "https://" + bridgeAddress + "/clip/v2/resource/light/" + lightId;
+          for(auto& device : entConf.devices){
+            std::string lightUrl = "https://" + bridgeAddress + "/clip/v2/resource/light/" + device.id;
 
             auto jsonLightData = Network::Http::Client::sendRequest(lightUrl, "GET", "", headers).value().asJson();
             auto deviceId = device.id;
@@ -70,17 +70,15 @@ namespace Huenicorn::Hue::Api
       if(resourceResponse.has_value()){
         auto jsonResource = resourceResponse.value().asJson();
         for(const auto& jsonData : jsonResource.at("data")){
-          if(jsonData.at("type") == "device"){
-            const auto& jsonServices = jsonData.at("services");
+          if(jsonData.at("type") != "device"){
+            continue;
+          }
 
-            for(const auto& service : jsonServices){
-              if(service.at("rtype") == "entertainment"){
-                std::string deviceId = service.at("rid");
-
-                auto device = jsonData.at("metadata").get<Device>();
-                device.id = deviceId;
-                devices.emplace(deviceId, device);
-              }
+          for(const auto& service : jsonData.at("services")){
+            if(service.at("rtype") == "entertainment"){
+              auto device = jsonData.at("metadata").get<Device>();
+              device.id = service.at("rid");
+              devices.push_back(device);
             }
           }
         }
@@ -112,7 +110,7 @@ namespace Huenicorn::Hue::Api
             uint8_t channelId = jsonChannel.at("channel_id");
             for(const auto& jsonMember : jsonChannel.at("members")){
               std::string jsonMemberId = jsonMember.at("service").at("rid");
-              entConfsChannels[configurationId][channelId].push_back(jsonMemberId);
+              entConfsChannels[configurationId][channelId].insert(jsonMemberId);
             }
           }
         }
@@ -122,16 +120,20 @@ namespace Huenicorn::Hue::Api
     }
 
 
-    std::vector<Device> matchDevices(
+    Devices matchDevices(
       const MembersIds& membersIds,
       const Devices& devices
     )
     {
-      std::vector<Device> matchedDevices;
-      for(const auto& memberId : membersIds){
-        const auto& it = devices.find(memberId);
-        matchedDevices.push_back(it->second);
-      }
+      Devices matchedDevices;
+      std::copy_if(
+        devices.begin(),
+        devices.end(),
+        std::back_inserter(matchedDevices),
+        [&](const Device& d){
+          return membersIds.count(d.id) > 0;
+        }
+      );
 
       return matchedDevices;
     }

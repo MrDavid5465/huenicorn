@@ -52,7 +52,7 @@ namespace Huenicorn::Hue::Api
      */
     Channel(
       bool active,
-      const std::vector<Device> &devices,
+      const Devices &devices,
       float gammaFactor,
       const Imaging::UVs &uvs = {{0, 0}, {1, 1}}
     );
@@ -100,7 +100,7 @@ namespace Huenicorn::Hue::Api
 
     // Attributes
     State state{State::Inactive};
-    std::vector<Device> devices;
+    Devices devices;
     float gammaFactor{0.0};
     Imaging::UVs uvs{};
   };
