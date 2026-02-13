@@ -13,116 +13,67 @@ namespace Huenicorn::Hue::Api
     float gammaFactor,
     const Imaging::UVs& uvs
   ):
-  m_state(active ? State::Active : State::Inactive),
-  m_devices(devices),
-  m_gammaFactor(gammaFactor),
-  m_uvs(uvs)
+  state(active ? State::Active : State::Inactive),
+  devices(devices),
+  gammaFactor(gammaFactor),
+  uvs(uvs)
   {}
-
-
-  Channel::State Channel::state() const
-  {
-    return m_state;
-  }
-
-
-  const Imaging::UVs& Channel::uvs() const
-  {
-    return m_uvs;
-  }
-
-
-  float Channel::gammaFactor() const
-  {
-    return m_gammaFactor;
-  }
-
-
-  const std::vector<Device>& Channel::devices() const
-  {
-    return m_devices;
-  }
 
 
   void Channel::setActive(bool active)
   {
     if(active){
-      m_state = State::Active;
+      state = State::Active;
     }
     else{
-      m_state = State::PendingShutdown;
+      state = State::PendingShutdown;
     }
   }
 
 
   Imaging::UVs& Channel::setUV(
-    Imaging::UV&& uv,
+    const Imaging::UV& uv,
     Imaging::UVCorner uvCorner
   )
   {
-    Imaging::UVs newUVs = m_uvs;
-    uv.x = glm::clamp(uv.x, 0.f, 1.f);
-    uv.y = glm::clamp(uv.y, 0.f, 1.f);
+    float x = glm::clamp(uv.x, 0.f, 1.f);
+    float y = glm::clamp(uv.y, 0.f, 1.f);
 
-    switch (uvCorner)
+    switch(uvCorner)
     {
       case Imaging::UVCorner::TopLeft:
-      {
-        newUVs.min.x = uv.x;
-        newUVs.min.y = uv.y;
-        newUVs.max.x = glm::max(uv.x, newUVs.max.x);
-        newUVs.max.y = glm::max(uv.y, newUVs.max.y);
+        uvs.min = {x, y};
+        uvs.max.x = glm::max(x, uvs.max.x);
+        uvs.max.y = glm::max(y, uvs.max.y);
         break;
-      }
 
       case Imaging::UVCorner::TopRight:
-      {
-        newUVs.max.x = uv.x;
-        newUVs.min.y = uv.y;
-        newUVs.min.x = glm::min(uv.x, newUVs.min.x);
-        newUVs.max.y = glm::max(uv.y, newUVs.max.y);
+        uvs.max.x = x;
+        uvs.min.y = y;
+        uvs.min.x = glm::min(x, uvs.min.x);
+        uvs.max.y = glm::max(y, uvs.max.y);
         break;
-      }
 
       case Imaging::UVCorner::BottomLeft:
-      {
-        newUVs.min.x = uv.x;
-        newUVs.max.y = uv.y;
-        newUVs.max.x = glm::max(uv.x, newUVs.max.x);
-        newUVs.min.y = glm::min(uv.y, newUVs.min.y);
+        uvs.min.x = x;
+        uvs.max.y = y;
+        uvs.max.x = glm::max(x, uvs.max.x);
+        uvs.min.y = glm::min(y, uvs.min.y);
         break;
-      }
 
       case Imaging::UVCorner::BottomRight:
-      {
-        newUVs.max.x = uv.x;
-        newUVs.max.y = uv.y;
-        newUVs.min.x = glm::min(uv.x, newUVs.min.x);
-        newUVs.min.y = glm::min(uv.y, newUVs.min.y);
-        break;
-      }
-
-      default:
+        uvs.max = {x, y};
+        uvs.min.x = glm::min(x, uvs.min.x);
+        uvs.min.y = glm::min(y, uvs.min.y);
         break;
     }
 
-    std::swap(m_uvs, newUVs);
-
-    return m_uvs;
-  }
-
-
-  void Channel::setGammaFactor(
-    float gammaFactor
-  )
-  {
-    m_gammaFactor = gammaFactor;
+    return uvs;
   }
 
 
   void Channel::acknowledgeShutdown()
   {
-    m_state = State::Inactive;
+    state = State::Inactive;
   }
-
 }

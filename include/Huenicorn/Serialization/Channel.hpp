@@ -20,10 +20,10 @@ namespace Huenicorn::Serialization
     )
     {
       jsonChannel = {
-        {"active", channel.state() == Hue::Api::Channel::State::Active},
-        {"uvs", Json(channel.uvs())},
-        {"gammaFactor", channel.gammaFactor()},
-        {"devices", Json(channel.devices())}
+        {"active", channel.state == Hue::Api::Channel::State::Active},
+        {"uvs", Json(channel.uvs)},
+        {"gammaFactor", channel.gammaFactor},
+        {"devices", Json(channel.devices)}
       };
     }
   };

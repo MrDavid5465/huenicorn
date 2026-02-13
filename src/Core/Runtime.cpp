@@ -181,7 +181,7 @@ namespace Huenicorn::Core
       return false;
     }
 
-    m_channels.at(channelId).setGammaFactor(gammaExponent);
+    m_channels.at(channelId).gammaFactor = gammaExponent;
     return true;
   }
 
@@ -590,13 +590,13 @@ namespace Huenicorn::Core
     Imaging::ImageData subframeImageData;
 
     for(auto& [channelId, channel] : m_channels){
-      if(channel.state() == Hue::Api::Channel::State::Inactive){
+      if(channel.state == Hue::Api::Channel::State::Inactive){
         continue;
       }
 
       auto& channelStream = m_channelStreams.at(channelId);
 
-      if(channel.state() == Hue::Api::Channel::State::PendingShutdown){
+      if(channel.state == Hue::Api::Channel::State::PendingShutdown){
         channelStream.id = channelId;
         channelStream.r = 0;
         channelStream.g = 0;
@@ -604,7 +604,7 @@ namespace Huenicorn::Core
         channel.acknowledgeShutdown();
       }
       else{
-        const auto& uvs = channel.uvs();
+        const auto& uvs = channel.uvs;
 
         glm::ivec2 a{uvs.min.x * m_frameData.width(), uvs.min.y * m_frameData.height()};
         glm::ivec2 b{uvs.max.x * m_frameData.width(), uvs.max.y * m_frameData.height()};

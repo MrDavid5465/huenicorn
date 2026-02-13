@@ -11,7 +11,7 @@
 namespace Huenicorn::Hue::Api
 {
   // Type definitions
-  class Channel;
+  struct Channel;
   using Channels = std::unordered_map<uint8_t, Channel>;
 
   /**
@@ -31,7 +31,7 @@ namespace Huenicorn::Hue::Api
    * @brief Wrapper around Hue Channel extended with UV and Gamma control
    *
    */
-  class Channel
+  struct Channel
   {
   public:
     // Type definitions
@@ -57,34 +57,6 @@ namespace Huenicorn::Hue::Api
       const Imaging::UVs &uvs = {{0, 0}, {1, 1}}
     );
 
-    // Getters
-    /**
-     * @brief Returns the current state of the channel
-     *
-     * @return State Channel state
-     */
-    State state() const;
-
-    /**
-     * @brief Returns the UVs of the channel
-     *
-     * @return const UVs& Channel UVs
-     */
-    const Imaging::UVs &uvs() const;
-
-    /**
-     * @brief Returns the gammaFactor of the channel
-     *
-     * @return float Channel gamma factor
-     */
-    float gammaFactor() const;
-
-    /**
-     * @brief Returns a list of member devices
-     *
-     * @return const std::vector<Device>&
-     */
-    const std::vector<Device> &devices() const;
 
     /**
      * @brief Returns the exponent factor for gamma
@@ -94,7 +66,7 @@ namespace Huenicorn::Hue::Api
     inline float gammaExponent() const
     {
       float factor = 2.f;
-      float exponent = glm::pow(2, -m_gammaFactor * factor);
+      float exponent = glm::pow(2, -gammaFactor * factor);
       return exponent;
     }
 
@@ -114,18 +86,10 @@ namespace Huenicorn::Hue::Api
      * @return UVs& Clamped UVs
      */
     Imaging::UVs &setUV(
-      Imaging::UV &&uv,
+      const Imaging::UV& uv,
       Imaging::UVCorner uvCorner
     );
 
-    /**
-     * @brief Set the gamma factor
-     *
-     * @param gammaFactor Gamma factor to affect
-     */
-    void setGammaFactor(
-      float gammaFactor
-    );
 
     // Methods
     /**
@@ -134,11 +98,10 @@ namespace Huenicorn::Hue::Api
      */
     void acknowledgeShutdown();
 
-  private:
     // Attributes
-    State m_state{State::Inactive};
-    std::vector<Device> m_devices;
-    float m_gammaFactor{0.0};
-    Imaging::UVs m_uvs{};
+    State state{State::Inactive};
+    std::vector<Device> devices;
+    float gammaFactor{0.0};
+    Imaging::UVs uvs{};
   };
 }
