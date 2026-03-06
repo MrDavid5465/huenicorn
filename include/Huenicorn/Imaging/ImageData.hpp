@@ -4,9 +4,19 @@
 
 namespace Huenicorn::Imaging
 {
+  enum class PixelFormat {
+    RGB,
+    RGBA,
+    BGR,
+    BGRA
+  };
+
+
   struct ImageData
   {
     cv::Mat imageMatrix;
+    PixelFormat format;
+    bool isSubsampled;
 
     inline int width() const
     {
@@ -24,4 +34,3 @@ namespace Huenicorn::Imaging
     }
   };
 }
-//*/

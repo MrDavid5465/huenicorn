@@ -147,11 +147,13 @@ namespace Huenicorn::Grabber
     }
 
     Imaging::ImageData capturedFrame{
-      .imageMatrix = cv::Mat(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data)
+      .imageMatrix = cv::Mat(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data),
+      .format = Imaging::PixelFormat::RGBA,
+      .isSubsampled = false
     };
 
-    Imaging::ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
-    Imaging::ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
+    //Imaging::ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
+    //Imaging::ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
 
     {
       auto lock = std::lock_guard(pw->frameDoubleBuffer.mutex);

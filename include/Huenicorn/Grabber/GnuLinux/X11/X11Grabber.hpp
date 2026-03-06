@@ -19,38 +19,6 @@ namespace Huenicorn::Grabber
    */
   class X11Grabber : public IGrabber
   {
-    /*
-    struct XRandrBases
-    {
-      int eventBase;
-      int errorBase;
-    };
-
-
-
-    class X11MonitorCache
-    {
-    public:
-      X11MonitorCache(
-        Display* display
-      );
-
-      bool updateRequired();
-      bool isConnected(
-        RROutput output
-      );
-
-    private:
-      void _refresh();
-
-      Display* m_display;
-      Window m_root;
-      std::unordered_map<RROutput, bool> m_connectedOutputs;
-    };
-    friend X11MonitorCache;
-    */
-
-
   public:
     template <auto FreeFunc>
     struct XDeleter
@@ -189,17 +157,13 @@ namespace Huenicorn::Grabber
   private:
 
     void _ensureXThreadsInit();
-    //void _initDisplayEvents();
-    //bool _ensureMonitorSelection();
     bool _ensureXShmData();
 
     // Attributes
     int m_screenId; // Once and for all
     UniqueDisplay m_display; // MUST be destroyed AFTER m_xshmData
-    //std::unique_ptr<X11MonitorCache> m_x11MonitorCache;
 
     std::unique_ptr<XShmData> m_xshmData;
-    //static const std::vector<int> s_xRandrEventFlags;
-    //static XRandrBases s_xrandrBases;
+    Imaging::ImageData m_lastFullScreenFrame;
   };
 }

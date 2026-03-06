@@ -55,9 +55,12 @@ namespace Huenicorn::Imaging
     void getSubImage(
       const ImageData& inputImageData,
       ImageData& outputImageData,
-      const glm::ivec2& a, const glm::ivec2& b
+      const UVs& uvs
     )
     {
+      glm::ivec2 a{uvs.min.x * inputImageData.width(), uvs.min.y * inputImageData.height()};
+      glm::ivec2 b{uvs.max.x * inputImageData.width(), uvs.max.y * inputImageData.height()};
+      
       cv::Range cols(std::max(0, a.x), std::min(b.x, inputImageData.width()));
       cv::Range rows(std::max(0, a.y), std::min(b.y, inputImageData.height()));
 

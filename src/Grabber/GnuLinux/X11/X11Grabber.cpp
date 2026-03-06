@@ -13,63 +13,6 @@
 
 namespace Huenicorn::Grabber
 {
-  /*
-  const std::vector<int> X11Grabber::s_xRandrEventFlags = {
-    RRScreenChangeNotify,
-    RRNotify_OutputChange
-  };
-
-  X11Grabber::XRandrBases X11Grabber::s_xrandrBases = {};
-
-
-
-  X11Grabber::X11MonitorCache::X11MonitorCache(
-    Display* display
-  ):
-  m_display(display),
-  m_root(DefaultRootWindow(m_display))
-  {
-    _refresh();
-  }
-
-
-  bool X11Grabber::X11MonitorCache::updateRequired()
-  {
-    while(XPending(m_display)){
-      XEvent e;
-      XNextEvent(m_display, &e);
-      int type = e.type - X11Grabber::s_xrandrBases.eventBase;
-      if(type == RRScreenChangeNotify || type == RRNotify_OutputChange){
-        _refresh();
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-
-  bool X11Grabber::X11MonitorCache::isConnected(
-    RROutput output
-  )
-  {
-    auto it = m_connectedOutputs.find(output);
-    return it != m_connectedOutputs.end() && it->second;
-  }
-
-
-  void X11Grabber::X11MonitorCache::_refresh()
-  {
-    UniqueScreenResources res(XRRGetScreenResourcesCurrent(m_display, m_root));
-    m_connectedOutputs.clear();
-    for(int i = 0; i < res->noutput; i++){
-      UniqueOutputInfo info(XRRGetOutputInfo(m_display, res.get(), res->outputs[i]));
-      m_connectedOutputs[res->outputs[i]] = (info && info->connection == RR_Connected && info->crtc);
-    }
-  }
-  */
-
-
   // X11MonitorData
   X11Grabber::X11MonitorData::X11MonitorData(
     const std::string& name,
@@ -114,13 +57,9 @@ namespace Huenicorn::Grabber
     m_shmInfo->shmid = shmget(IPC_PRIVATE, size, IPC_CREAT | 0777);
     m_shmInfo->readOnly = False;
 
-    /*/ // Hum...
-    m_shmInfo->shmaddr = m_ximage->data = reinterpret_cast<char*>(shmat(m_shmInfo->shmid, nullptr, 0));
-    /*/ // Maybe better
     char* addr = reinterpret_cast<char*>(shmat(m_shmInfo->shmid, nullptr, 0));
     m_shmInfo->shmaddr = addr;
     m_ximage->data = addr;
-    //*/
 
     XShmAttach(m_display, m_shmInfo.get());
   }
@@ -141,20 +80,6 @@ namespace Huenicorn::Grabber
   }
 
 
-  /*
-  void X11Grabber::_initDisplayEvents()
-  {
-    int combinedEventFlags = 0;
-    for(auto eventFlag : s_xRandrEventFlags){
-      combinedEventFlags |= eventFlag;
-    }
-
-    XRRSelectInput(m_display.get(), DefaultRootWindow(m_display.get()), combinedEventFlags);
-    XRRQueryExtension(m_display.get(), &s_xrandrBases.eventBase, &s_xrandrBases.errorBase);
-  }
-  */
-
-
   // X11 Grabber
   X11Grabber::X11Grabber(
     Core::Config* config
@@ -168,11 +93,6 @@ namespace Huenicorn::Grabber
     if(!m_display){
       throw std::runtime_error("Could not open any X11 display");
     }
-
-    /*
-    _initDisplayEvents();
-    m_x11MonitorCache = std::make_unique<X11MonitorCache>(m_display.get());
-    */
 
     m_screenId = XDefaultScreen(m_display.get()); // Once and for all
   }
@@ -228,17 +148,6 @@ namespace Huenicorn::Grabber
     Imaging::ImageData& imageData
   )
   {
-    /*
-    if(
-      m_x11MonitorCache->updateRequired() ||
-      !m_x11MonitorCache->isConnected(static_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor())->outputId)
-    ){
-      Logger::warn("Monitor disconnected or mode changed — skipping grab.");
-      _initMonitorsList();
-      m_xshmData.reset();
-    }
-    */
-
     if(!_ensureXShmData()){
       return;
     }
@@ -251,18 +160,20 @@ namespace Huenicorn::Grabber
 
     XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, selectedMonitor->xPos, selectedMonitor->yPos, AllPlanes);
 
-    Imaging::ImageData grabbedImageData;
+    unsigned cvFormat;
     if(ximage->bits_per_pixel > 24){
-      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC4, ximage->data);
-      Imaging::ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
-      Imaging::ImageProcessing::rgbaToRgb(grabbedImageData, grabbedImageData);
+      cvFormat = CV_8UC4;
+      m_lastFullScreenFrame.format = Imaging::PixelFormat::RGBA;
     }
     else{
-      grabbedImageData.imageMatrix = cv::Mat(height, width, CV_8UC3, ximage->data);
-      Imaging::ImageProcessing::rescale(grabbedImageData, grabbedImageData, m_config->subsampleWidth(), m_config->interpolation());
+      cvFormat = CV_8UC3;
+      m_lastFullScreenFrame.format = Imaging::PixelFormat::RGB;
     }
 
-    imageData = std::move(grabbedImageData);
+    m_lastFullScreenFrame.imageMatrix = cv::Mat(height, width, cvFormat, ximage->data);
+    m_lastFullScreenFrame.isSubsampled = false;
+
+    imageData = m_lastFullScreenFrame;
   }
 
 
@@ -339,21 +250,6 @@ namespace Huenicorn::Grabber
     }
 
     // Add whole display surface to choices if there are multiple screens
-    /*
-    if(monitorSelectionData.monitors.size() > 1){
-      monitorSelectionData.monitors.push_back(std::make_unique<X11MonitorData>(
-        "Combined displays",
-        maxX - minX,
-        maxY - minY,
-        minRefreshRate,
-        false,
-        minX,
-        minY,
-        0
-      ));
-    }
-    */
-
     std::swap(m_monitorSelectionData, monitorSelectionData);
   }
 

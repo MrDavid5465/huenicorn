@@ -5,6 +5,7 @@
 #include <Huenicorn/Imaging/ImageData.hpp>
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Imaging/Color.hpp>
+#include <Huenicorn/Imaging/UV.hpp>
 
 
 namespace Huenicorn::Imaging
@@ -48,8 +49,7 @@ namespace Huenicorn::Imaging
     void getSubImage(
       const ImageData& sourceImageData,
       ImageData& destImage,
-      const glm::ivec2& a,
-      const glm::ivec2& b
+      const UVs& uvs
     );
 
 

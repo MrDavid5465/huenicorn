@@ -510,7 +510,7 @@ namespace Huenicorn::Grabber
 
       GDBusProxy* proxy = getScreencastPortalProxy();
       if(!proxy){
-        return true;
+        return false;
       }
 
       createSession(capture);

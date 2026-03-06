@@ -589,6 +589,16 @@ namespace Huenicorn::Core
 
     Imaging::ImageData subframeImageData;
 
+    const auto subsampleWidth = m_config.subsampleWidth();
+
+    if(!m_frameData.isSubsampled){
+      Imaging::ImageProcessing::rescale(m_frameData, subframeImageData, subsampleWidth, m_config.interpolation());
+    }
+
+    if(m_frameData.format == Imaging::PixelFormat::RGBA){
+      Imaging::ImageProcessing::rgbaToRgb(subframeImageData, subframeImageData);
+    }
+
     for(auto& [channelId, channel] : m_channels){
       if(channel.state == Hue::Api::Channel::State::Inactive){
         continue;
@@ -604,12 +614,8 @@ namespace Huenicorn::Core
         channel.acknowledgeShutdown();
       }
       else{
-        const auto& uvs = channel.uvs;
-
-        glm::ivec2 a{uvs.min.x * m_frameData.width(), uvs.min.y * m_frameData.height()};
-        glm::ivec2 b{uvs.max.x * m_frameData.width(), uvs.max.y * m_frameData.height()};
-
-        Imaging::ImageProcessing::getSubImage(m_frameData, subframeImageData, a, b);
+        Imaging::ImageData crop;
+        Imaging::ImageProcessing::getSubImage(subframeImageData, crop, channel.uvs);
         auto color = Imaging::ImageProcessing::getDominantColor(subframeImageData);
 
         glm::vec3 normalized = color.toNormalized();
