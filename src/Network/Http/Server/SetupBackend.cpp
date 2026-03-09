@@ -1,11 +1,11 @@
 #include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 
-#include <chrono>
 
 #include <Huenicorn/Core/Runtime.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
 #include <Huenicorn/Core/Logger.hpp>
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
 
 
 using namespace std::chrono_literals;
@@ -13,10 +13,10 @@ using namespace std::chrono_literals;
 namespace Huenicorn::Network::Http::Server
 {
   SetupBackend::SetupBackend(
-    Huenicorn::Core::Runtime* runtime
+    Huenicorn::Core::CoreService* coreService
   ):
   IRestServer("setup.html"),
-  m_runtime(runtime)
+  m_coreService(coreService)
   {
     CROW_ROUTE(m_app, "/api/finishSetup").methods(crow::HTTPMethod::POST)
     ([this](const crow::request& /*req*/, crow::response& res){
@@ -94,7 +94,7 @@ namespace Huenicorn::Network::Http::Server
   ) const
   {
     Serialization::Json jsonResponse = {
-      {"version", m_runtime->version()},
+      {"version", m_coreService->version()},
     };
 
     std::string response = jsonResponse.dump();
@@ -136,7 +136,7 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   )
   {
-    Serialization::Json jsonResponse = m_runtime->autodetectedBridge();
+    Serialization::Json jsonResponse = Hue::Api::ApiTools::autodetectedBridge();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -148,7 +148,7 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   )
   {
-    Serialization::Json jsonResponse = {{"configFilePath", m_runtime->configFilePath()}};
+    Serialization::Json jsonResponse = {{"configFilePath", m_coreService->configFilePath()}};
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -166,7 +166,7 @@ namespace Huenicorn::Network::Http::Server
 
     std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
 
-    Serialization::Json jsonResponse = {{"succeeded", m_runtime->validateBridgeAddress(bridgeAddress)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateBridgeAddress(bridgeAddress)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -185,7 +185,7 @@ namespace Huenicorn::Network::Http::Server
 
     auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
 
-    Serialization::Json jsonResponse = {{"succeeded", m_runtime->validateCredentials(credentials)}};
+    Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateCredentials(credentials)}};
 
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
@@ -198,7 +198,7 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   )
   {
-    Serialization::Json jsonResponse = m_runtime->registerNewUser();
+    Serialization::Json jsonResponse = m_coreService->registerNewUser();
     std::string response = jsonResponse.dump();
     res.set_header("Content-Type", "application/json");
     res.write(response);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Huenicorn/Core/CoreService.hpp>
 #include <Huenicorn/Network/Http/Server/IRestServer.hpp>
 
 #include <filesystem>
@@ -36,7 +37,7 @@ namespace Huenicorn::Network::Http::Server
      * @param huenicornCore Pointer to Huenicorn core
      */
     SetupBackend(
-      Huenicorn::Core::Runtime* huenicornCore
+      Huenicorn::Core::CoreService* coreService
     );
 
 
@@ -161,7 +162,7 @@ namespace Huenicorn::Network::Http::Server
 
     // Attributes
     std::unordered_map<std::string, Callback> m_callbacks;
-    Huenicorn::Core::Runtime* m_runtime;
+    Huenicorn::Core::CoreService* m_coreService;
     const std::filesystem::path m_webroot;
     std::unordered_map<std::string, std::string> m_contentTypes;
     bool m_aborted{false};

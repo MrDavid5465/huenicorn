@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <vector>
 
 
 namespace Huenicorn::Hue::Api

@@ -3,6 +3,9 @@
 #include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Serialization/Device.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Platform/Selector.hpp>
+#include <Huenicorn/Hue/Auth/Credentials.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
 
 
 namespace Huenicorn::Hue::Api
@@ -178,5 +181,29 @@ namespace Huenicorn::Hue::Api
 
       return status == "active";
     }
+  }
+
+
+  Serialization::Json ApiTools::autodetectedBridge()
+  {
+    auto detectedBridgeResponse = Network::Http::Client::sendRequest("https://discovery.meethue.com/", "GET");
+
+    if(!detectedBridgeResponse.has_value()){
+      return {{"succeeded", false}, {"error", "Could not reach discovery service. Please check your internet connection."}};
+    }
+
+    auto bridges = detectedBridgeResponse.value().asJson();
+
+    return {{"succeeded", true}, {"bridges", bridges}};
+  }
+
+
+  std::optional<Network::Http::Client::Response> ApiTools::registerNewUser(const std::string& bridgeAddress)
+  {
+    std::string sessionUsername = Platform::adapter.getUsername();
+    std::string deviceType = "huenicorn#" + sessionUsername;
+
+    Serialization::Json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
+    return Network::Http::Client::sendRequest(bridgeAddress + "/api", "POST", request.dump());
   }
 }

@@ -82,6 +82,9 @@ set(CORE_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Config.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/CoreService.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/CoreService.cpp
+
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Core/Runtime.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Runtime.cpp
 

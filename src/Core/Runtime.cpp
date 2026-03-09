@@ -1,7 +1,6 @@
 #include <Huenicorn/Core/Runtime.hpp>
 
 #include <fstream>
-#include <chrono>
 
 #include <Huenicorn/Grabber/DummyGrabber.hpp>
 #include <Huenicorn/Network/Http/Client/Client.hpp>
@@ -15,6 +14,13 @@
 #include <Huenicorn/Serialization/Channel.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
 
+#include <Huenicorn/Imaging/UV.hpp>
+
+#include <Huenicorn/Core/CoreService.hpp>
+#include <Huenicorn/Hue/Api/Channel.hpp>
+
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
+
 
 using namespace std::chrono_literals;
 
@@ -27,191 +33,16 @@ namespace Huenicorn::Core
   ):
   m_version(version),
   m_configRoot(configRoot),
-  m_config(m_configRoot)
-  {}
+  m_config(m_configRoot),
+  m_coreService(std::make_unique<CoreService>(*this, m_config))
+  {
+
+  }
 
 
   const std::string& Runtime::version() const
   {
     return m_version;
-  }
-
-
-  const std::filesystem::path Runtime::configFilePath() const
-  {
-    return m_config.configFilePath();
-  }
-
-
-  const Hue::Api::Channels& Runtime::channels() const
-  {
-    return m_channels;
-  }
-
-
-  const Hue::Api::EntertainmentConfigurations& Runtime::entertainmentConfigurations() const
-  {
-    return m_selector->entertainmentConfigurations();
-  }
-
-
-  const Hue::Api::EntertainmentConfiguration& Runtime::currentEntertainmentConfiguration() const
-  {
-    return m_selector->currentEntertainmentConfiguration();
-  }
-
-
-  std::optional<std::string> Runtime::currentEntertainmentConfigurationId() const
-  {
-    return m_selector->currentEntertainmentConfigurationId();
-  }
-
-
-  glm::ivec2 Runtime::displayResolution() const
-  {
-    return m_grabber->displayResolution();
-  }
-
-
-  std::vector<glm::ivec2> Runtime::subsampleResolutionCandidates() const
-  {
-    return m_grabber->subsampleResolutionCandidates();
-  }
-
-
-  unsigned Runtime::subsampleWidth() const
-  {
-    return m_config.subsampleWidth();
-  }
-
-
-  unsigned Runtime::refreshRate() const
-  {
-    return m_config.refreshRate();
-  }
-
-
-  unsigned Runtime::maxRefreshRate() const
-  {
-    return m_grabber->displayRefreshRate();
-  }
-
-
-  Imaging::Interpolation::Type Runtime::interpolation() const
-  {
-    return m_config.interpolation();
-  }
-
-
-  const Imaging::Interpolation::Interpolations& Runtime::availableInterpolations() const
-  {
-    return Imaging::Interpolation::availableInterpolations;
-  }
-
-
-  Serialization::Json Runtime::autodetectedBridge() const
-  {
-    auto detectedBridgeResponse = Network::Http::Client::sendRequest("https://discovery.meethue.com/", "GET");
-
-    if(!detectedBridgeResponse.has_value()){
-      return {{"succeeded", false}, {"error", "Could not reach discovery service. Please check your internet connection."}};
-    }
-
-    auto bridges = detectedBridgeResponse.value().asJson();
-
-    return {{"succeeded", true}, {"bridges", bridges}};
-  }
-
-
-  Serialization::Json Runtime::registerNewUser()
-  {
-    std::string sessionUsername = Platform::adapter.getUsername();
-    std::string deviceType = "huenicorn#" + sessionUsername;
-
-    Serialization::Json request = {{"devicetype", deviceType}, {"generateclientkey", true}};
-    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api", "POST", request.dump());
-
-    if(!response.has_value()){
-      return {{"succeeded", false}, {"error", "unreachable bridge"}};
-    }
-
-    auto jsonResponse = response.value().asJson();
-
-    if(jsonResponse.at(0).contains("error")){
-      return {{"succeeded", false}, {"error", jsonResponse.at(0).at("error").at("description")}};
-    }
-
-    auto credentials = jsonResponse.at(0).at("success").get<Hue::Auth::Credentials>();
-    m_config.setCredentials(credentials);
-
-    return {{"succeeded", true}, {"username", credentials.username()}, {"clientkey", credentials.clientkey()}};
-  }
-
-
-  bool Runtime::setEntertainmentConfiguration(
-    const std::string& entertainmentConfigurationId
-  )
-  {
-    if(!m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
-      return false;
-    }
-
-    _enableEntertainmentConfiguration(entertainmentConfigurationId);
-
-    return true;
-  }
-
-
-  const Imaging::UVs& Runtime::setChannelUV(
-    uint8_t channelId,
-    Imaging::UV&& uv,
-    Imaging::UVCorner uvCorner
-  )
-  {
-    return m_channels.at(channelId).setUV(std::move(uv), uvCorner);
-  }
-
-
-  bool Runtime::setChannelGammaFactor(
-    uint8_t channelId,
-    float gammaExponent
-  )
-  {
-    if(m_channels.find(channelId) == m_channels.end()){
-      return false;
-    }
-
-    m_channels.at(channelId).gammaFactor = gammaExponent;
-    return true;
-  }
-
-
-  void Runtime::setSubsampleWidth(
-    unsigned subsampleWidth
-  )
-  {
-    m_config.setSubsampleWidth(subsampleWidth);
-  }
-
-
-  void Runtime::setRefreshRate(
-    unsigned refreshRate
-  )
-  {
-    refreshRate = std::min(refreshRate, m_grabber->displayRefreshRate());
-
-    m_config.setRefreshRate(refreshRate);
-    refreshRate = m_config.refreshRate();
-
-    m_loopRegulator->setTickInterval(Timing::fromHertz(refreshRate));
-  }
-
-
-  void Runtime::setInterpolation(
-    unsigned interpolation
-  )
-  {
-    m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
   }
 
 
@@ -257,95 +88,6 @@ namespace Huenicorn::Core
     m_keepLooping = false;
   }
 
-
-  bool Runtime::validateBridgeAddress(
-    const std::string& bridgeAddress
-  )
-  {
-    std::string sanitizedAddress = bridgeAddress;
-
-    while(sanitizedAddress.back() == '/'){
-      sanitizedAddress.pop_back();
-    }
-
-    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api", "GET", "");
-    if(!response.has_value()){
-      return false;
-    }
-
-    m_config.setBridgeAddress(sanitizedAddress);
-
-    return true;
-  }
-
-
-  bool Runtime::validateCredentials(
-    const Hue::Auth::Credentials& credentials
-  )
-  {
-    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
-    if(!response.has_value()){
-      return false;
-    }
-
-    try{
-      auto jsonResponse = response.value().asJson();
-
-      if(jsonResponse.is_array() && jsonResponse.at(0).contains("error")){
-        return false;
-      }
-    }
-    catch(const std::exception& e){
-      Logger::error(e.what());
-      return false;
-    }
-
-    m_config.setCredentials(credentials);
-    Logger::log("Successfully registered credentials");
-    return true;
-  }
-
-
-  bool Runtime::setChannelActivity(
-    uint8_t channelId,
-    bool active
-  )
-  {
-    if(m_channels.find(channelId) == m_channels.end()){
-      return false;
-    }
-
-    m_channels.at(channelId).setActive(active);
-
-    _updateStreamChannelsSize();
-
-    return true;
-  }
-
-
-  void Runtime::saveProfile()
-  {
-    if(!m_selector->validSelection()){
-      Logger::error("There is currently no valid entertainment configuration selected.");
-      return;
-    }
-
-    Serialization::Json profile;
-    if(m_selector->validSelection()){
-      profile = Serialization::Json{
-        {"entertainmentConfigurationId", m_selector->currentEntertainmentConfigurationId().value()},
-        {"channels", m_channels}
-      };
-    }
-
-    if(!m_config.profileName().has_value()){
-      m_config.setProfileName("profile");
-    }
-
-    std::ofstream profileFile(_profilePath(), std::ofstream::out);
-    profileFile << profile.dump(2) << "\n";
-    profileFile.close();
-  }
 
 
   std::filesystem::path Runtime::_profilePath() const
@@ -433,7 +175,7 @@ namespace Huenicorn::Core
     unsigned port = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
 
-    Network::Http::Server::SetupBackend sb(this);
+    Network::Http::Server::SetupBackend sb(m_coreService.get());
     sb.start(port, boundBackendIP);
 
     if(sb.aborted()){
@@ -462,7 +204,7 @@ namespace Huenicorn::Core
 
     unsigned restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
-    m_webUIService.server = std::make_unique<Network::Http::Server::WebUIBackend>(this);
+    m_webUIService.server = std::make_unique<Network::Http::Server::WebUIBackend>(m_coreService.get());
     m_webUIService.thread.emplace([&](){
       m_webUIService.server->start(restServerPort, boundBackendIP, std::move(readyWebUIPromise));
     });
@@ -558,7 +300,6 @@ namespace Huenicorn::Core
   void Runtime::_startStreamingLoop()
   {
     m_loopRegulator = std::make_unique<Timing::LoopRegulator>(Timing::fromHertz(m_config.refreshRate()));
-
     m_loopRegulator->start();
 
     m_keepLooping = true;

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 #include <Huenicorn/Hue/Api/Device.hpp>
 #include <Huenicorn/Hue/Api/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
 
 
 namespace Huenicorn::Hue::Api
@@ -99,5 +100,19 @@ namespace Huenicorn::Hue::Api
       const std::string& username,
       const std::string& bridgeAddress
     );
+
+    /**
+     * @brief Returns the resolved Hue bridge IP address
+     * 
+     * @return Serialization::Json Object containing Hue bridge address and request status
+     */
+    Serialization::Json autodetectedBridge();
+
+    /**
+     * @brief Requests the addition of a new user on the Hue bridge
+     * 
+     * @return Serialization::Json Newly created user's credentials
+     */
+    std::optional<Network::Http::Client::Response> registerNewUser(const std::string& bridgeAddress);
   }
 }

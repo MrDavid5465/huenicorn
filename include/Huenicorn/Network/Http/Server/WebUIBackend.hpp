@@ -1,19 +1,16 @@
 #pragma once
 
+#include <Huenicorn/Core/CoreService.hpp>
 #include <Huenicorn/Network/Http/Server/IRestServer.hpp>
-
-#include <filesystem>
 
 
 namespace Huenicorn::Core
 {
-  class Runtime;
+  class CoreService;
 }
 
 namespace Huenicorn::Network::Http::Server
 {
-  class Runtime;
-
   /**
    * @brief REST service handling requests for light management
    * 
@@ -30,7 +27,7 @@ namespace Huenicorn::Network::Http::Server
      * @param huenicornCore Pointer to Huenicorn core
      */
     WebUIBackend(
-      Huenicorn::Core::Runtime* huenicornCore
+      Huenicorn::Core::CoreService* coreService
     );
 
 
@@ -217,6 +214,6 @@ namespace Huenicorn::Network::Http::Server
 
 
     // Attributes
-    Huenicorn::Core::Runtime* m_huenicornCore;
+    Huenicorn::Core::CoreService* m_coreService;
   };
 }

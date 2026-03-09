@@ -1,12 +1,12 @@
 #include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 
-#include <fstream>
 #include <sstream>
 
 #include <Huenicorn/Core/Runtime.hpp>
 #include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Serialization/Channel.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Core/CoreService.hpp>
 
 
 namespace Huenicorn::Network::Http::Server
@@ -14,10 +14,10 @@ namespace Huenicorn::Network::Http::Server
   using namespace Serialization;
 
   WebUIBackend::WebUIBackend(
-    Huenicorn::Core::Runtime* huenicornCore
+    Huenicorn::Core::CoreService* coreService
   ):
   IRestServer("index.html"),
-  m_huenicornCore(huenicornCore)
+  m_coreService(coreService)
   {
     CROW_ROUTE(m_app, "/api/webUIStatus").methods(crow::HTTPMethod::GET)
     ([this](const crow::request& /*req*/, crow::response& res){
@@ -115,7 +115,7 @@ namespace Huenicorn::Network::Http::Server
   ) const
   {
     Json jsonResponse = {
-      {"version", m_huenicornCore->version()},
+      {"version", m_coreService->version()},
     };
 
     std::string response = jsonResponse.dump();
@@ -144,8 +144,8 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   ) const
   {
-    const auto& entertainmentConfigurations = m_huenicornCore->entertainmentConfigurations();
-    std::string currentEntertainmentConfigurationId = m_huenicornCore->currentEntertainmentConfigurationId().value();
+    const auto& entertainmentConfigurations = m_coreService->entertainmentConfigurations();
+    std::string currentEntertainmentConfigurationId = m_coreService->currentEntertainmentConfigurationId().value();
 
     Json jsonResponse = {
       {"entertainmentConfigurations", entertainmentConfigurations},
@@ -164,7 +164,7 @@ namespace Huenicorn::Network::Http::Server
     uint8_t channelId
   ) const
   {
-    std::string response = Json(m_huenicornCore->channels().at(channelId)).dump();
+    std::string response = Json(m_coreService->channels().at(channelId)).dump();
 
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -176,7 +176,7 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   ) const
   {
-    std::string response = Json(m_huenicornCore->channels()).dump();
+    std::string response = Json(m_coreService->channels()).dump();
 
     res.set_header("Content-Type", "application/json");
     res.write(response);
@@ -188,10 +188,10 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   ) const
   {
-    auto displayResolution = m_huenicornCore->displayResolution();
+    auto displayResolution = m_coreService->displayResolution();
 
     Json jsonSubsampleCandidates = Json::array();
-    for(const auto& candidate : m_huenicornCore->subsampleResolutionCandidates()){
+    for(const auto& candidate : m_coreService->subsampleResolutionCandidates()){
       jsonSubsampleCandidates.push_back({
         {"x", candidate.x},
         {"y", candidate.y}
@@ -201,10 +201,10 @@ namespace Huenicorn::Network::Http::Server
     Json jsonDisplayInfo{
       {"x", displayResolution.x},
       {"y", displayResolution.y},
-      {"subsampleWidth", m_huenicornCore->subsampleWidth()},
+      {"subsampleWidth", m_coreService->subsampleWidth()},
       {"subsampleResolutionCandidates", jsonSubsampleCandidates},
-      {"selectedRefreshRate", m_huenicornCore->refreshRate()},
-      {"maxRefreshRate", m_huenicornCore->maxRefreshRate()}
+      {"selectedRefreshRate", m_coreService->refreshRate()},
+      {"maxRefreshRate", m_coreService->maxRefreshRate()}
     };
 
     std::string response = jsonDisplayInfo.dump();
@@ -219,7 +219,7 @@ namespace Huenicorn::Network::Http::Server
   ) const
   {
     Json jsonAvailableInterpolations = Json::array();
-    for(const auto& [key, value] : m_huenicornCore->availableInterpolations()){
+    for(const auto& [key, value] : m_coreService->availableInterpolations()){
       jsonAvailableInterpolations.push_back({
         {key, value},
       });
@@ -227,7 +227,7 @@ namespace Huenicorn::Network::Http::Server
 
     Json jsonInterpolationInfo = {
       {"available", jsonAvailableInterpolations},
-      {"current", m_huenicornCore->interpolation()}
+      {"current", m_coreService->interpolation()}
     };
 
     std::string response = jsonInterpolationInfo.dump();
@@ -245,12 +245,12 @@ namespace Huenicorn::Network::Http::Server
     const std::string& data = req.body;
     std::string entertainmentConfigurationId = Json::parse(data);
 
-    bool succeeded = m_huenicornCore->setEntertainmentConfiguration(entertainmentConfigurationId);
+    bool succeeded = m_coreService->setEntertainmentConfiguration(entertainmentConfigurationId);
 
     Json jsonResponse = {
       {"succeeded", succeeded},
       {"entertainmentConfigurationId", entertainmentConfigurationId},
-      {"channels", Json(m_huenicornCore->channels())}
+      {"channels", Json(m_coreService->channels())}
     };
 
     std::string response = jsonResponse.dump();
@@ -273,7 +273,7 @@ namespace Huenicorn::Network::Http::Server
     float y = jsonUV.at("y");
     Imaging::UVCorner uvCorner = static_cast<Imaging::UVCorner>(jsonUV.at("type").get<int>());
 
-    const auto& clampedUVs = m_huenicornCore->setChannelUV(channelId, {x, y}, uvCorner);
+    const auto& clampedUVs = m_coreService->setChannelUV(channelId, {x, y}, uvCorner);
 
     // TODO : Serialize from JsonSerializer
     Json jsonResponse = {
@@ -298,7 +298,7 @@ namespace Huenicorn::Network::Http::Server
     Json jsonGammaFactorData = Json::parse(data);
     float gammaFactor = jsonGammaFactorData.at("gammaFactor");
 
-    if(!m_huenicornCore->setChannelGammaFactor(channelId, gammaFactor)){
+    if(!m_coreService->setChannelGammaFactor(channelId, gammaFactor)){
       std::string response = Json{
         {"succeeded", false},
         {"error", "invalid channel id"}
@@ -329,13 +329,13 @@ namespace Huenicorn::Network::Http::Server
   {
     const std::string& data = req.body;
     int subsampleWidth = Json::parse(data).get<int>();
-    m_huenicornCore->setSubsampleWidth(subsampleWidth);
+    m_coreService->setSubsampleWidth(subsampleWidth);
 
-    glm::ivec2 displayResolution = m_huenicornCore->displayResolution();
+    glm::ivec2 displayResolution = m_coreService->displayResolution();
     Json jsonDisplay{
       {"x", displayResolution.x},
       {"y", displayResolution.y},
-      {"subsampleWidth", m_huenicornCore->subsampleWidth()}
+      {"subsampleWidth", m_coreService->subsampleWidth()}
     };
 
     std::string response = jsonDisplay.dump();
@@ -352,10 +352,10 @@ namespace Huenicorn::Network::Http::Server
   {
     const std::string& data = req.body;
     unsigned refreshRate = Json::parse(data).get<unsigned>();
-    m_huenicornCore->setRefreshRate(refreshRate);
+    m_coreService->setRefreshRate(refreshRate);
 
     Json jsonRefreshRate{
-      {"refreshRate", m_huenicornCore->refreshRate()}
+      {"refreshRate", m_coreService->refreshRate()}
     };
 
     std::string response = jsonRefreshRate.dump();
@@ -373,10 +373,10 @@ namespace Huenicorn::Network::Http::Server
     const std::string& data = req.body;
     unsigned interpolation = Json::parse(data).get<unsigned>();
 
-    m_huenicornCore->setInterpolation(interpolation);
+    m_coreService->setInterpolation(interpolation);
 
     Json jsonInterpolation{
-      {"interpolation", m_huenicornCore->interpolation()}
+      {"interpolation", m_coreService->interpolation()}
     };
 
     std::string response = jsonInterpolation.dump();
@@ -396,7 +396,7 @@ namespace Huenicorn::Network::Http::Server
     Json jsonChannelData = Json::parse(data);
     bool active = jsonChannelData.at("active");
 
-    if(!m_huenicornCore->setChannelActivity(channelId, active)){
+    if(!m_coreService->setChannelActivity(channelId, active)){
       std::string response = Json{
         {"succeeded", false},
         {"error", "invalid channel id"}
@@ -410,7 +410,7 @@ namespace Huenicorn::Network::Http::Server
 
     Json jsonResponse = Json{
       {"succeeded", true},
-      {"channels", Json(m_huenicornCore->channels())},
+      {"channels", Json(m_coreService->channels())},
     };
 
     if(active){
@@ -428,7 +428,7 @@ namespace Huenicorn::Network::Http::Server
     crow::response& res
   ) const
   {
-    m_huenicornCore->saveProfile();
+    m_coreService->saveProfile();
 
     Json jsonResponse = {
       "succeeded", true
@@ -454,6 +454,6 @@ namespace Huenicorn::Network::Http::Server
     res.write(response);
     res.end();
 
-    m_huenicornCore->stop();
+    m_coreService->stop();
   }
 }
