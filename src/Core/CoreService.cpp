@@ -1,3 +1,5 @@
+#include <optional>
+
 #include <Huenicorn/Version.hpp>
 #include <Huenicorn/Core/CoreService.hpp>
 #include <Huenicorn/Core/Logger.hpp>
@@ -8,6 +10,7 @@
 #include <Huenicorn/Serialization/JsonSerializer.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
 #include <Huenicorn/Core/Runtime.hpp>
+#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 
 
 namespace Huenicorn::Core
@@ -275,7 +278,7 @@ namespace Huenicorn::Core
       m_config.setProfileName("profile");
     }
 
-    std::ofstream profileFile(m_runtime._profilePath(), std::ofstream::out);
+    std::ofstream profileFile(profilePath(), std::ofstream::out);
     profileFile << profile.dump(2) << "\n";
     profileFile.close();
   }
@@ -284,5 +287,54 @@ namespace Huenicorn::Core
   void CoreService::stop()
   {
     m_runtime.stop();
+  }
+
+
+  bool CoreService::ensureInitialSetup()
+  {
+    if(m_config.initialSetupOk()){
+      return true;
+    }
+
+    Logger::log("Starting setup backend");
+    unsigned port = m_config.restServerPort();
+    const std::string& boundBackendIP = m_config.boundBackendIP();
+
+    Network::Http::Server::SetupBackend sb(this);
+    sb.start(port, boundBackendIP);
+    m_runtime.m_openedSetup = true;
+
+    if(sb.aborted()){
+      Logger::log("Initial setup was aborted");
+      return false;
+    }
+
+    Logger::log("Finished setup");
+
+    return true;
+  }
+
+
+  std::filesystem::path CoreService::profilePath() const
+  {
+    if(!m_config.profileName().has_value()){
+      return {};
+    }
+
+    return m_runtime.m_configRoot / std::filesystem::path(m_config.profileName().value()).replace_extension("json");
+  }
+
+
+  std::optional<Serialization::Json> CoreService::getProfile()
+  {
+    std::filesystem::path pp = profilePath();
+    Serialization::Json jsonProfile = Serialization::Json::object();
+
+    if(!pp.empty() && std::filesystem::exists(pp) && std::filesystem::is_regular_file(pp)){
+      std::ifstream profileFile(pp);
+      return Serialization::Json::parse(profileFile);
+    }
+
+    return std::nullopt;
   }
 }

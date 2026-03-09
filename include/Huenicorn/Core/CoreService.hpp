@@ -243,7 +243,31 @@ namespace Huenicorn::Core
      */
     void stop();
 
- 
+    /**
+     * @brief Checks for setup validity
+     *
+     * @return true Setup finished success
+     * @return false Setup was not completed
+    */
+    bool ensureInitialSetup();
+
+
+    // Private getter
+    /**
+     * @brief Returns the path to the current profile
+     * 
+     * @return std::filesystem::path Path to the current profile
+     */
+    std::filesystem::path profilePath() const;
+
+
+    /**
+     * @brief Loads the last profile
+     * 
+     * @return Loaded profile. Empty if not found
+     */
+    std::optional<Serialization::Json> getProfile();
+
   private:
     Runtime& m_runtime;
     Config& m_config;

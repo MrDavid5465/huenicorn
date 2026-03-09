@@ -8,7 +8,6 @@
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
-#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 #include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 
 #include <Huenicorn/Serialization/Channel.hpp>
@@ -48,10 +47,8 @@ namespace Huenicorn::Core
 
   void Runtime::start()
   {
-    if(!m_config.initialSetupOk()){
-      if(!_runInitialSetup()){
-        return;
-      }
+    if(!m_coreService->ensureInitialSetup()){
+      return;
     }
 
     if(!_initGrabber()){
@@ -69,15 +66,8 @@ namespace Huenicorn::Core
       // so the official application would no longer be a requirement
     }
 
-    _initWebUI();
-
-
-    // Spawn UI if no profiles are found
-    auto optJsonProfile = _getProfile();
-    if(!optJsonProfile.has_value() && !m_openedSetup){
-      std::thread spawnBrowser([this](){_spawnBrowser();});
-      spawnBrowser.detach();
-    }
+    bool spawnBrowser = (!m_coreService->getProfile().has_value() && !m_openedSetup);
+    _initWebUI(spawnBrowser);
 
     _startStreamingLoop();
   }
@@ -88,30 +78,6 @@ namespace Huenicorn::Core
     m_keepLooping = false;
   }
 
-
-
-  std::filesystem::path Runtime::_profilePath() const
-  {
-    if(!m_config.profileName().has_value()){
-      return {};
-    }
-
-    return m_configRoot / std::filesystem::path(m_config.profileName().value()).replace_extension("json");
-  }
-
-
-  std::optional<Serialization::Json> Runtime::_getProfile()
-  {
-    std::filesystem::path profilePath = _profilePath();
-    Serialization::Json jsonProfile = Serialization::Json::object();
-
-    if(!profilePath.empty() && std::filesystem::exists(profilePath) && std::filesystem::is_regular_file(profilePath)){
-      std::ifstream profileFile(profilePath);
-      return Serialization::Json::parse(profileFile);
-    }
-
-    return std::nullopt;
-  }
 
 
   bool Runtime::_initSettings()
@@ -154,7 +120,7 @@ namespace Huenicorn::Core
     m_selector = std::make_unique<Hue::Api::EntertainmentConfigurationSelector>(credentials, bridgeAddress);
 
     std::string entertainmentConfigurationId = {};
-    auto optJsonProfile = _getProfile();
+    auto optJsonProfile = m_coreService->getProfile();
 
     if(optJsonProfile.has_value()){
       const auto& jsonProfile = optJsonProfile.value();
@@ -169,27 +135,6 @@ namespace Huenicorn::Core
   }
 
 
-  bool Runtime::_runInitialSetup()
-  {
-    Logger::log("Starting setup backend");
-    unsigned port = m_config.restServerPort();
-    const std::string& boundBackendIP = m_config.boundBackendIP();
-
-    Network::Http::Server::SetupBackend sb(m_coreService.get());
-    sb.start(port, boundBackendIP);
-
-    if(sb.aborted()){
-      Logger::log("Initial setup was aborted");
-      return false;
-    }
-
-    Logger::log("Finished setup");
-    m_openedSetup = true;
-
-    return true;
-  }
-
-
   bool Runtime::_initGrabber()
   {
     m_grabber = Platform::adapter.getGrabber(&m_config);
@@ -197,7 +142,9 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::_initWebUI()
+  void Runtime::_initWebUI(
+    bool spawnBrowser
+  )
   {
     std::promise<bool> readyWebUIPromise;
     auto readyWebUIFuture = readyWebUIPromise.get_future();
@@ -210,6 +157,15 @@ namespace Huenicorn::Core
     });
 
     readyWebUIFuture.wait();
+
+    if(spawnBrowser){
+      std::stringstream serviceUrlStream;
+      serviceUrlStream << "http://127.0.0.1:" << m_config.restServerPort();
+      std::string serviceURL = serviceUrlStream.str();
+      Logger::log("Management WebUI is ready and available at ", serviceURL);
+
+      Platform::adapter.openWebBrowser(serviceURL);
+    }
   }
 
 
@@ -252,21 +208,6 @@ namespace Huenicorn::Core
   }
 
 
-  void Runtime::_spawnBrowser()
-  {
-    while (!m_webUIService.server->running()){
-      std::this_thread::sleep_for(100ms);
-    }
-
-    std::stringstream serviceUrlStream;
-    serviceUrlStream << "http://127.0.0.1:" << m_config.restServerPort();
-    std::string serviceURL = serviceUrlStream.str();
-    Logger::log("Management WebUI is ready and available at ", serviceURL);
-
-    Platform::adapter.openWebBrowser(serviceURL);
-  }
-
-
   void Runtime::_enableEntertainmentConfiguration(
     const std::string& entertainmentConfigurationId
   )
@@ -283,11 +224,11 @@ namespace Huenicorn::Core
       m_streamer->setEntertainmentConfigurationId(m_selector->currentEntertainmentConfigurationId().value());
     }
 
-    auto profilePath = _profilePath();
+    auto pp = m_coreService->profilePath();
     Serialization::Json jsonChannels = Serialization::Json::object();
 
-    if(std::filesystem::is_regular_file(profilePath)){
-      Serialization::Json jsonProfile = Serialization::Json::parse(std::ifstream(_profilePath()));
+    if(std::filesystem::is_regular_file(pp)){
+      Serialization::Json jsonProfile = Serialization::Json::parse(std::ifstream(pp));
       if(jsonProfile.contains("channels")){
         jsonChannels = jsonProfile.at("channels");
       }

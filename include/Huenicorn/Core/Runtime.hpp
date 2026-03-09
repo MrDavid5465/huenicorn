@@ -73,21 +73,7 @@ namespace Huenicorn::Core
 
 
   private:
-    // Private getter
-    /**
-     * @brief Returns the path to the current profile
-     * 
-     * @return std::filesystem::path Path to the current profile
-     */
-    std::filesystem::path _profilePath() const;
 
-
-    /**
-     * @brief Loads the last profile
-     * 
-     * @return Loaded profile. Empty if not found
-     */
-    std::optional<Serialization::Json> _getProfile();
 
 
     // Private methods
@@ -102,15 +88,6 @@ namespace Huenicorn::Core
 
 
     /**
-     * @brief Starts the initial setup wizard
-     *
-     * @return true Setup finished success
-     * @return false Setup was not completed
-    */
-    bool _runInitialSetup();
-
-
-    /**
      * Brief Initializes a grabber based on the graphical session
      * 
      * @return true Relevant grabber was found and initialized
@@ -122,7 +99,9 @@ namespace Huenicorn::Core
     /**
      * Brief Initializes the web UI
     */
-    void _initWebUI();
+    void _initWebUI(
+      bool spawnBrowser
+    );
 
 
     /**
@@ -133,13 +112,6 @@ namespace Huenicorn::Core
     void _initChannels(
       const Serialization::Json& jsonProfile
     );
-
-
-    /**
-     * @brief Opens the user's default browser on the Huenicorn page
-     * 
-     */
-    void _spawnBrowser();
 
 
     /**
