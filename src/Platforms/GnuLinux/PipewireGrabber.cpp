@@ -3,6 +3,8 @@
 #include <sstream>
 #include <future>
 #include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 #include <Huenicorn/Platforms/GnuLinux/XdgDesktopPortal.hpp>
 #include <Huenicorn/ImageProcessing.hpp>
@@ -115,17 +117,62 @@ namespace Huenicorn
 
     spa_buffer* spaBuffer = pwBuffer->buffer;
     if(spaBuffer->datas[0].data == NULL){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
       return;
     }
 
-    cv::Mat rgbaFrame(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data);
-    ImageProcessing::rescale(rgbaFrame, pw->config->subsampleWidth(), pw->config->interpolation());
-    cv::cvtColor(rgbaFrame, rgbaFrame, cv::COLOR_RGBA2RGB);
+    const uint32_t width = pw->format.info.raw.size.width;
+    const uint32_t height = pw->format.info.raw.size.height;
+    if(width == 0 || height == 0){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
+      return;
+    }
+
+    auto* chunk = spaBuffer->datas[0].chunk;
+    if(chunk == nullptr || chunk->size == 0){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
+      return;
+    }
+
+    const size_t step = chunk->stride > 0
+      ? static_cast<size_t>(chunk->stride)
+      : static_cast<size_t>(width) * 4;
+
+    // Some xdg-desktop-portal / pipewire combinations advertise SPA_DATA_MemFd
+    // buffers without auto-mapping them with PROT_READ even when
+    // PW_STREAM_FLAG_MAP_BUFFERS is set. Reading via the provided
+    // datas[0].data pointer then segfaults. Map the fd ourselves for the
+    // duration of this frame as a defensive fallback.
+    void* readPtr = spaBuffer->datas[0].data;
+    void* localMap = MAP_FAILED;
+    size_t localMapSize = 0;
+    const bool needRemap = spaBuffer->datas[0].type == SPA_DATA_MemFd
+      && spaBuffer->datas[0].fd >= 0;
+
+    if(needRemap){
+      localMapSize = static_cast<size_t>(spaBuffer->datas[0].maxsize) + chunk->offset;
+      localMap = mmap(nullptr, localMapSize, PROT_READ, MAP_SHARED,
+                      static_cast<int>(spaBuffer->datas[0].fd), 0);
+      if(localMap != MAP_FAILED){
+        readPtr = localMap;
+      }
+    }
+
+    cv::Mat rgbaFrame(height, width, CV_8UC4,
+      static_cast<uint8_t*>(readPtr) + chunk->offset, step);
+    cv::Mat ownedFrame = rgbaFrame.clone();
+
+    if(localMap != MAP_FAILED){
+      munmap(localMap, localMapSize);
+    }
+
+    ImageProcessing::rescale(ownedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
+    cv::cvtColor(ownedFrame, ownedFrame, cv::COLOR_RGBA2RGB);
 
     {
       auto lock = std::lock_guard(pw->frameDoubleBuffer.mutex);
       std::swap(pw->frameDoubleBuffer.frame[0], pw->frameDoubleBuffer.frame[1]);
-      pw->frameDoubleBuffer.frame[0] = std::move(rgbaFrame);
+      pw->frameDoubleBuffer.frame[0] = std::move(ownedFrame);
     }
 
     pw_stream_queue_buffer(pw->stream, pwBuffer);
