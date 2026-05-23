@@ -3,6 +3,8 @@
 #include <sstream>
 #include <future>
 #include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 #include <Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
@@ -143,17 +145,64 @@ namespace Huenicorn::Grabber
 
     spa_buffer* spaBuffer = pwBuffer->buffer;
     if(spaBuffer->datas[0].data == NULL){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
       return;
     }
 
+    const uint32_t width = pw->format.info.raw.size.width;
+    const uint32_t height = pw->format.info.raw.size.height;
+
+    if(width == 0 || height == 0){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
+      return;
+    }
+
+    auto* chunk = spaBuffer->datas[0].chunk;
+
+    if(chunk == nullptr || chunk->size == 0){
+      pw_stream_queue_buffer(pw->stream, pwBuffer);
+      return;
+    }
+
+    const size_t step = chunk->stride > 0
+      ? static_cast<size_t>(chunk->stride)
+      : static_cast<size_t>(width) * 4;
+
+    // Some xdg-desktop-portal / pipewire combinations advertise SPA_DATA_MemFd
+    // buffers without auto-mapping them with PROT_READ even when
+    // PW_STREAM_FLAG_MAP_BUFFERS is set. Reading via the provided
+    // datas[0].data pointer then segfaults. Map the fd ourselves for the
+    // duration of this frame as a defensive fallback.
+    void* readPtr = spaBuffer->datas[0].data;
+    void* localMap = MAP_FAILED;
+    size_t localMapSize = 0;
+    const bool needRemap = spaBuffer->datas[0].type == SPA_DATA_MemFd
+      && spaBuffer->datas[0].fd >= 0;
+
+    if(needRemap){
+      localMapSize = static_cast<size_t>(spaBuffer->datas[0].maxsize) + chunk->offset;
+      localMap = mmap(nullptr, localMapSize, PROT_READ, MAP_SHARED,
+                      static_cast<int>(spaBuffer->datas[0].fd), 0);
+      if(localMap != MAP_FAILED){
+        readPtr = localMap;
+      }
+    }
+
+    cv::Mat rgbaFrame(height, width, CV_8UC4, static_cast<uint8_t*>(readPtr) + chunk->offset, step);
+
+    // CRITICAL:
+    // Pipewire memory becomes invalid after queue_buffer()
+    cv::Mat ownedFrame = rgbaFrame.clone();
+
+    if(localMap != MAP_FAILED){
+      munmap(localMap, localMapSize);
+    }
+
     Imaging::ImageData capturedFrame{
-      .imageMatrix = cv::Mat(pw->format.info.raw.size.height, pw->format.info.raw.size.width, CV_8UC4, spaBuffer->datas[0].data),
+      .imageMatrix = cv::Mat(ownedFrame),
       .format = Imaging::PixelFormat::RGBA,
       .isSubsampled = false
     };
-
-    //Imaging::ImageProcessing::rescale(capturedFrame, capturedFrame, pw->config->subsampleWidth(), pw->config->interpolation());
-    //Imaging::ImageProcessing::rgbaToRgb(capturedFrame, capturedFrame);
 
     {
       auto lock = std::lock_guard(pw->frameDoubleBuffer.mutex);
@@ -238,13 +287,13 @@ namespace Huenicorn::Grabber
     //capture->updateXdgContext = false;
 
     pw_init(NULL, NULL);
-    pw_core_events coreEvents;
+    pw_core_events coreEvents = {};
     coreEvents.version = PW_VERSION_CORE_EVENTS;
     coreEvents.info = _onCoreInfoCallback;
     coreEvents.done = _onCoreDoneCallback;
     coreEvents.error = _onCoreErrorCallback;
 
-    pw_stream_events streamEvents;
+    pw_stream_events streamEvents = {};
     streamEvents.version = PW_VERSION_STREAM_EVENTS;
     streamEvents.param_changed = _onStreamParamChanged;
     streamEvents.process = _onStreamProcess;
@@ -275,10 +324,6 @@ namespace Huenicorn::Grabber
       &streamEvents,
       pw
     );
-
-    spa_hook streamListener;
-    pw_stream_add_listener(pw->stream, &streamListener, &streamEvents, pw);
-
 
     uint8_t buffer[1024];
     spa_pod_builder b = SPA_POD_BUILDER_INIT(buffer, sizeof(buffer));
