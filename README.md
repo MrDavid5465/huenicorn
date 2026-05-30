@@ -40,10 +40,7 @@ Huenicorn 1.0.11 is available.
 
 * [X.Org](https://xorg.freedesktop.org) or [Wayland](https://wayland.freedesktop.org)
 * [OpenCV](https://github.com/opencv/opencv)
-* [Crow](https://crowcpp.org/master)
 * [Mbed-TLS](https://github.com/Mbed-TLS/mbedtls)
-* [GLM](https://github.com/g-truc/glm)
-* [nlohmann-json](https://github.com/nlohmann/json)
 * [Curl](https://curl.se)
 
 #### Dependencies intallation
@@ -54,8 +51,7 @@ Huenicorn 1.0.11 is available.
 
 ```bash
 # Required dependencies
-sudo pacman -S git cmake make gcc curl opencv mbedtls glm nlohmann-json
-yay -S crow
+sudo pacman -S git cmake make gcc curl opencv mbedtls
 
 # For X11 support
 sudo pacman -S xorg-server
@@ -72,19 +68,14 @@ sudo pacman -S wayland glib2 pipewire
 
 ```bash
 # Required dependencies
-sudo dnf install -y git cmake gcc gcc-c++ opencv-devel json-devel asio-devel curl-devel mbedtls-devel glm-devel
+sudo dnf install -y git cmake gcc gcc-c++ opencv-devel curl-devel mbedtls-devel
 
 # For X11 support
 sudo dnf install -y libXrandr-devel
 
 # For Wayland support
 sudo dnf install -y pipewire-devel glib2-devel
-
-# Crow
-# Download the zip available at : https://github.com/CrowCpp/Crow/releases/tag/v1.1.0
 # Extract the archive and copy its content to the target directories:
-sudo cp -r include/* /usr/local/include
-sudo cp -r lib/* /usr/local/lib
 ```
 
 </details>
@@ -96,16 +87,10 @@ sudo cp -r lib/* /usr/local/lib
 These dependencies needed to be installed on OpenSUSE Tumbleweed 20231011 to build and run Huenicorn:
 
 ```bash
-sudo zypper install opencv-devel libopencv408 python311-jsonschema asio-devel glm-devel nlohmann_json-devel
+sudo zypper install opencv-devel libopencv408 python311-jsonschema
 
 # For Wayland support
 sudo zypper install pipewire-devel glib2-devel
-
-# Crow
-# Download the zip available at : https://github.com/CrowCpp/Crow/releases/tag/v1.1.0
-# Extract the archive and copy its content to the target directories:
-sudo cp -r include/* /usr/local/include
-sudo cp -r lib/* /usr/local/lib
 
 ```
 
@@ -124,17 +109,13 @@ sudo add-apt-repository universe
 sudo apt-get update
 
 # Required dependencies
-sudo apt-get install build-essential libopencv-dev libglm-dev libcurl4-openssl-dev nlohmann-json3-dev libmbedtls-dev libboost-all-dev
+sudo apt-get install build-essential libopencv-dev libcurl4-openssl-dev libmbedtls-dev
 
 # For X11 support
 sudo apt-get install libx11-dev libxext-dev libxrandr-dev
 
 # For Wayland support
 sudo apt-get install libglib2.0-dev libpipewire-0.3-dev wayland-utils
-
-# Crow .deb installer can be downloaded from deb on their repository: https://github.com/CrowCpp/Crow/releases/tag/v1.0+5
-sudo dpkg -i crow-v1.0+5.deb
-
 
 # Make sure to use gcc/g++ v12
 sudo apt install gcc-12 g++-12

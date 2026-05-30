@@ -1,22 +1,50 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-
 project(Huenicorn VERSION 1.0.11)
-
 
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
 set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
+
+include(FetchContent)
 
 
 # Check mandatory libraries
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc)
 find_package(CURL REQUIRED)
-#find_package(Crow REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
 find_library(MBEDTLS_LIBS mbedtls REQUIRED)
 find_library(MBEDTLS_X509 mbedx509 REQUIRED)
 find_library(MBEDTLS_CRYPTO mbedcrypto REQUIRED)
+
+# NLohmann JSON
+FetchContent_Declare(
+  nlohmann_json
+  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+  GIT_TAG v3.12.0
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+
+# Crow
+set(CROW_USE_BOOST OFF CACHE BOOL "" FORCE)
+set(ASIO_STANDALONE ON CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+  crow
+  GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
+  GIT_TAG v1.3.2
+)
+
+FetchContent_MakeAvailable(crow)
+
+
+# GLM
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG 1.0.3
+)
+FetchContent_MakeAvailable(glm)
 
 
 # Generate version header
@@ -220,6 +248,8 @@ target_link_libraries(huenicorn PUBLIC
   ${MBEDTLS_X509}
   ${MBEDTLS_CRYPTO}
   nlohmann_json::nlohmann_json
+  Crow::Crow
+  glm::glm
 )
 
 
