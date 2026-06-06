@@ -16,10 +16,12 @@ namespace Huenicorn::Network::Http::Server
     HttpServer();
     ~HttpServer();
 
-    bool start(
+    bool bind(
       const std::string& boundAddress,
       unsigned port
     );
+
+    bool listen();
 
     bool stop();
 

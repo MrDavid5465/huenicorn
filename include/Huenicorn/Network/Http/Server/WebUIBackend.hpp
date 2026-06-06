@@ -1,5 +1,6 @@
 #pragma once
 
+#include <future>
 
 #include <Huenicorn/Network/Http/Server/HttpServer.hpp>
 #include <Huenicorn/Network/Http/Server/WebrootUtils.hpp>
@@ -23,15 +24,16 @@ namespace Huenicorn::Network::Http::Server
 
     bool start(
       uint32_t port,
-      const std::string& boundBackendIP
+      const std::string& boundBackendIP,
+      std::promise<bool>&& readyPromise
     )
     {
-      if(m_httpServer.start(boundBackendIP, port)){
-        return true;
-      }
-      else{
+      if(!m_httpServer.bind(boundBackendIP, port)){
         return false;
       }
+
+      readyPromise.set_value(true);
+      return m_httpServer.listen();
     }
 
 

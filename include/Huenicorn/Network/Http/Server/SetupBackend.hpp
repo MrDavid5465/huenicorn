@@ -1,7 +1,11 @@
 #pragma once
 
+#include <thread>
+
+#include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Network/Http/Server/HttpServer.hpp>
 #include <Huenicorn/Network/Http/Server/WebrootUtils.hpp>
+#include <Huenicorn/Platform/Selector.hpp>
 
 
 namespace Huenicorn::Core
@@ -26,7 +30,21 @@ namespace Huenicorn::Network::Http::Server
       const std::string& boundBackendIP
     )
     {
-      m_httpServer.start(boundBackendIP, port);
+      if(!m_httpServer.bind(boundBackendIP, port)){
+        return false;
+      }
+
+      std::thread spawnBrowserThread([port](){
+        std::stringstream serviceUrlStream;
+        serviceUrlStream << "http://127.0.0.1:" << port;
+        std::string serviceURL = serviceUrlStream.str();
+        Core::Logger::log("Setup WebUI is ready and available at ", serviceURL);
+
+        Platform::adapter.openWebBrowser(serviceURL);
+      });
+      spawnBrowserThread.detach();
+
+      m_httpServer.listen();
 
       return m_setupCompleted;
     }

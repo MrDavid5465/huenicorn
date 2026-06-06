@@ -15,19 +15,20 @@ namespace Huenicorn::Network::Http::Server
   }
 
 
-  bool HttpServer::start(
+  bool HttpServer::bind(
     const std::string& boundAddress,
     unsigned port
   )
   {
     m_httpServerImpl = std::make_unique<Impl>(m_routes);
 
-    if(!m_httpServerImpl->bind(boundAddress, port)){
-      return false;
-    }
+    return m_httpServerImpl->bind(boundAddress, port);
+  }
 
+
+  bool HttpServer::listen()
+  {
     return m_httpServerImpl->listen();
-
   }
 
 

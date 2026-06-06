@@ -146,18 +146,17 @@ namespace Huenicorn::Core
     bool spawnBrowser
   )
   {
-    // TODO : REINTRODUCE PROMISE
-    //std::promise<bool> readyWebUIPromise;
-    //auto readyWebUIFuture = readyWebUIPromise.get_future();
+    std::promise<bool> readyWebUIPromise;
+    auto readyWebUIFuture = readyWebUIPromise.get_future();
 
     unsigned restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
-    m_webUIService.thread = std::jthread([&server = m_webUIService.server, restServerPort, boundBackendIP, this](){
+    m_webUIService.thread = std::jthread([&server = m_webUIService.server, restServerPort, boundBackendIP, &readyWebUIPromise, this](){
       server.emplace(m_coreService.get());
-      server->start(restServerPort, boundBackendIP/*, std::move(readyWebUIPromise)*/);
+      server->start(restServerPort, boundBackendIP, std::move(readyWebUIPromise));
     });
 
-    //readyWebUIFuture.wait();
+    readyWebUIFuture.wait();
 
     if(spawnBrowser){
       std::stringstream serviceUrlStream;
