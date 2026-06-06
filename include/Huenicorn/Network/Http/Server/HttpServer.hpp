@@ -1,0 +1,36 @@
+#pragma once
+
+#include <memory>
+
+#include <Huenicorn/Network/Http/Server/HttpDataStructs.hpp>
+
+
+namespace Huenicorn::Network::Http::Server
+{
+  class Impl;
+
+
+  class HttpServer
+  {
+  public:
+    HttpServer();
+    ~HttpServer();
+
+    bool start(
+      const std::string& boundAddress,
+      unsigned port
+    );
+
+    bool stop();
+
+    void addRoute(
+      HttpMethod method,
+      const std::string& path,
+      Handler handler
+    );
+
+  private:
+    std::unique_ptr<Impl> m_httpServerImpl;
+    std::vector<Route> m_routes;
+  };
+}

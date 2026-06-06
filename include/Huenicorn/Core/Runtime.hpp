@@ -2,14 +2,13 @@
 
 #include <filesystem>
 #include <memory>
-#include <optional>
 #include <thread>
 
 #include <Huenicorn/Core/CoreService.hpp>
 #include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Hue/Api/EntertainmentConfigurationSelector.hpp>
 #include <Huenicorn/Grabber/IGrabber.hpp>
-#include <Huenicorn/Network/Http/Server/IRestServer.hpp>
+#include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 #include <Huenicorn/Stream/Streamer.hpp>
 #include <Huenicorn/Timing/LoopRegulator.hpp>
 #include <Huenicorn/Serialization/Json.hpp>
@@ -30,8 +29,8 @@ namespace Huenicorn::Core
     // Type definitions
     struct ThreadedRestService
     {
-      std::unique_ptr<Network::Http::Server::IRestServer> server;
-      std::optional<std::thread> thread;
+      std::optional<Huenicorn::Network::Http::Server::WebUIBackend> server;
+      std::jthread thread;
     };
 
   public:

@@ -20,22 +20,17 @@ find_library(MBEDTLS_CRYPTO mbedcrypto REQUIRED)
 FetchContent_Declare(
   nlohmann_json
   URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-  GIT_TAG v3.12.0
 )
 FetchContent_MakeAvailable(nlohmann_json)
 
 
-# Crow
-set(CROW_USE_BOOST OFF CACHE BOOL "" FORCE)
-set(ASIO_STANDALONE ON CACHE BOOL "" FORCE)
-
+# CppHttpLip
 FetchContent_Declare(
-  crow
-  GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
-  GIT_TAG v1.3.2
+  cpp_httplib
+  URL https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
 )
+FetchContent_MakeAvailable(cpp_httplib)
 
-FetchContent_MakeAvailable(crow)
 
 
 # GLM
@@ -156,11 +151,9 @@ set(NETWORK_SOURCE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Client/Client.hpp
 
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/IRestServer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/WebUIBackend.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Network/Http/Server/SetupBackend.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/SetupBackend.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/WebUIBackend.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/HttpServer.cpp
 )
 
 set(PLATFORM_SOURCE
@@ -248,7 +241,7 @@ target_link_libraries(huenicorn PUBLIC
   ${MBEDTLS_X509}
   ${MBEDTLS_CRYPTO}
   nlohmann_json::nlohmann_json
-  Crow::Crow
+  httplib::httplib
   glm::glm
 )
 

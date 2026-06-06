@@ -1,6 +1,7 @@
 #include <Huenicorn/Core/Runtime.hpp>
 
 #include <fstream>
+#include <future>
 
 #include <Huenicorn/Grabber/DummyGrabber.hpp>
 #include <Huenicorn/Network/Http/Client/Client.hpp>
@@ -8,7 +9,6 @@
 #include <Huenicorn/Imaging/Interpolation.hpp>
 #include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
-#include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
 
 #include <Huenicorn/Serialization/Channel.hpp>
 #include <Huenicorn/Serialization/Credentials.hpp>
@@ -146,17 +146,18 @@ namespace Huenicorn::Core
     bool spawnBrowser
   )
   {
-    std::promise<bool> readyWebUIPromise;
-    auto readyWebUIFuture = readyWebUIPromise.get_future();
+    // TODO : REINTRODUCE PROMISE
+    //std::promise<bool> readyWebUIPromise;
+    //auto readyWebUIFuture = readyWebUIPromise.get_future();
 
     unsigned restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
-    m_webUIService.server = std::make_unique<Network::Http::Server::WebUIBackend>(m_coreService.get());
-    m_webUIService.thread.emplace([&](){
-      m_webUIService.server->start(restServerPort, boundBackendIP, std::move(readyWebUIPromise));
+    m_webUIService.thread = std::jthread([&server = m_webUIService.server, restServerPort, boundBackendIP, this](){
+      server.emplace(m_coreService.get());
+      server->start(restServerPort, boundBackendIP/*, std::move(readyWebUIPromise)*/);
     });
 
-    readyWebUIFuture.wait();
+    //readyWebUIFuture.wait();
 
     if(spawnBrowser){
       std::stringstream serviceUrlStream;
@@ -257,7 +258,7 @@ namespace Huenicorn::Core
     _shutdown();
 
     m_webUIService.server->stop();
-    m_webUIService.thread.value().join();
+    m_webUIService.thread.join();
   }
 
 

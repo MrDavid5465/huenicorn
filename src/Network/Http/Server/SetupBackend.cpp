@@ -1,207 +1,125 @@
 #include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
 
-
-#include <Huenicorn/Core/Runtime.hpp>
-#include <Huenicorn/Platform/Selector.hpp>
-#include <Huenicorn/Serialization/Credentials.hpp>
-#include <Huenicorn/Core/Logger.hpp>
+#include <Huenicorn/Core/CoreService.hpp>
 #include <Huenicorn/Hue/Api/ApiTools.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
 
-
-using namespace std::chrono_literals;
 
 namespace Huenicorn::Network::Http::Server
 {
   SetupBackend::SetupBackend(
     Huenicorn::Core::CoreService* coreService
   ):
-  IRestServer("setup.html"),
   m_coreService(coreService)
   {
-    CROW_ROUTE(m_app, "/api/finishSetup").methods(crow::HTTPMethod::POST)
-    ([this](const crow::request& /*req*/, crow::response& res){
-      _finish(res);
+    // WEB PAGES
+
+    m_httpServer.addRoute(HttpMethod::Get, "/", [](const Request& /*req*/, Response& res){
+      std::filesystem::path pageName = "setup.html";
+      Utils::getWebFile(res, pageName);
     });
 
-    CROW_ROUTE(m_app, "/api/abort").methods(crow::HTTPMethod::POST)
-    ([this](const crow::request& /*req*/, crow::response& res){
-      _abort(res);
+
+    m_httpServer.addRoute(HttpMethod::Get, "/:pageName", [](const Request& req, Response& res){
+      std::filesystem::path pageName = req.pathParams.at("pageName");
+
+      if(pageName == "index.html"){
+        pageName = "404.html";
+      }
+
+      Utils::getWebFile(res, pageName);
     });
 
-    CROW_ROUTE(m_app, "/api/autodetectBridge").methods(crow::HTTPMethod::GET)
-    ([this](const crow::request& /*req*/, crow::response& res){
-      _autodetectBridge(res);
+
+    // GET METHODS
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/version", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {
+        {"version", m_coreService->version()},
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
     });
 
-    CROW_ROUTE(m_app, "/api/configFilePath").methods(crow::HTTPMethod::GET)
-    ([this](const crow::request& /*req*/, crow::response& res){
-      _configFilePath(res);
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/autodetectBridge", [](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = Hue::Api::ApiTools::autodetectedBridge();
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
     });
 
-    CROW_ROUTE(m_app, "/api/validateBridgeAddress").methods(crow::HTTPMethod::PUT)
-    ([this](const crow::request& req, crow::response& res){
-      _validateBridgeAddress(req, res);
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/configFilePath", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {{"configFilePath", m_coreService->configFilePath()}};
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
     });
 
-    CROW_ROUTE(m_app, "/api/validateCredentials").methods(crow::HTTPMethod::PUT)
-    ([this](const crow::request& req, crow::response& res){
-      _validateCredentials(req, res);
+
+    // POST METHODS
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/finishSetup", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {
+        {"version", m_coreService->version()},
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+      m_setupCompleted = true;
+      m_httpServer.stop();
     });
 
-    CROW_ROUTE(m_app, "/api/registerNewUser").methods(crow::HTTPMethod::PUT)
-    ([this](const crow::request& /*req*/, crow::response& res){
-      _registerNewUser(res);
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/abort", [this](const Request& /*req*/, Response& res){
+      std::string response = "{}";
+      res.contentType = "application/json";
+      res.body = response;
+
+      m_setupCompleted = false;
+      m_httpServer.stop();
     });
 
-    m_webfileBlackList.insert("index.html");
-  }
+
+    // PUT METHODS
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/validateBridgeAddress", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      Serialization::Json jsonBridgeAddressData = Serialization::Json::parse(data);
+
+      std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
+
+      Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateBridgeAddress(bridgeAddress)}};
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
 
 
-  SetupBackend::~SetupBackend()
-  {}
+    m_httpServer.addRoute(HttpMethod::Put, "/api/validateCredentials", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      Serialization::Json jsonCredentials = Serialization::Json::parse(data);
+
+      auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
+
+      Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateCredentials(credentials)}};
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
 
 
-  bool SetupBackend::aborted() const
-  {
-    return m_aborted;
-  }
-
-
-  void SetupBackend::_onStart()
-  {
-    std::thread spawnBrowserThread([this](){_spawnBrowser();});
-    spawnBrowserThread.detach();
-  }
-
-
-  void SetupBackend::_spawnBrowser()
-  {
-    while (!running()){
-      std::this_thread::sleep_for(100ms);
-    }
-
-    std::stringstream serviceUrlStream;
-    serviceUrlStream << "http://127.0.0.1:" << m_app.port();
-    std::string serviceURL = serviceUrlStream.str();
-    Core::Logger::log("Setup WebUI is ready and available at ", serviceURL);
-
-    Platform::adapter.openWebBrowser(serviceURL);
-  }
-
-
-  void SetupBackend::_getVersion(
-    crow::response& res
-  ) const
-  {
-    Serialization::Json jsonResponse = {
-      {"version", m_coreService->version()},
-    };
-
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-  }
-
-
-  void SetupBackend::_finish(
-    crow::response& res
-  )
-  {
-    std::string response = "{}";
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-
-    stop();
-  }
-
-
-  void SetupBackend::_abort(
-    crow::response& res
-  )
-  {
-    std::string response = "{}";
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-
-    m_aborted = true;
-
-    stop();
-  }
-
-
-  void SetupBackend::_autodetectBridge(
-    crow::response& res
-  )
-  {
-    Serialization::Json jsonResponse = Hue::Api::ApiTools::autodetectedBridge();
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-  }
-
-
-  void SetupBackend::_configFilePath(
-    crow::response& res
-  )
-  {
-    Serialization::Json jsonResponse = {{"configFilePath", m_coreService->configFilePath()}};
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-  }
-
-
-  void SetupBackend::_validateBridgeAddress(
-    const crow::request& req,
-    crow::response& res
-  )
-  {
-    const std::string& data = req.body;
-    Serialization::Json jsonBridgeAddressData = Serialization::Json::parse(data);
-
-    std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
-
-    Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateBridgeAddress(bridgeAddress)}};
-
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-  }
-
-
-  void SetupBackend::_validateCredentials(
-    const crow::request& req,
-    crow::response& res
-  )
-  {
-    const std::string& data = req.body;
-    Serialization::Json jsonCredentials = Serialization::Json::parse(data);
-
-    auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
-
-    Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateCredentials(credentials)}};
-
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
-  }
-
-
-  void SetupBackend::_registerNewUser(
-    crow::response& res
-  )
-  {
-    Serialization::Json jsonResponse = m_coreService->registerNewUser();
-    std::string response = jsonResponse.dump();
-    res.set_header("Content-Type", "application/json");
-    res.write(response);
-    res.end();
+    m_httpServer.addRoute(HttpMethod::Put, "/api/registerNewUser", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = m_coreService->registerNewUser();
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
   }
 }

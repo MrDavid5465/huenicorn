@@ -1,3 +1,4 @@
+#include <fstream>
 #include <optional>
 
 #include <Huenicorn/Version.hpp>
@@ -45,14 +46,25 @@ namespace Huenicorn::Core
       sanitizedAddress.pop_back();
     }
 
-    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api", "GET", "");
+    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api/0/config", "GET", "");
     if(!response.has_value()){
       return false;
     }
 
-    m_config.setBridgeAddress(sanitizedAddress);
+    try{
+      auto responseData = response->asJson();
+      if(!responseData.contains("name") || !responseData.contains("bridgeid")){
+        return false;
+      }
 
-    return true;
+      m_config.setBridgeAddress(sanitizedAddress);
+
+      return true;
+    }
+    catch(const std::exception& e){
+      Logger::error(e.what());
+      return false;
+    }
   }
 
 
@@ -301,10 +313,10 @@ namespace Huenicorn::Core
     const std::string& boundBackendIP = m_config.boundBackendIP();
 
     Network::Http::Server::SetupBackend sb(this);
-    sb.start(port, boundBackendIP);
+    bool succeeded = sb.execute(port, boundBackendIP);
     m_runtime.m_openedSetup = true;
 
-    if(sb.aborted()){
+    if(!succeeded){
       Logger::log("Initial setup was aborted");
       return false;
     }
