@@ -1,6 +1,5 @@
 # Adapter
 target_sources(huenicorn PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Platform/Adapters/GnuLinux/GnuLinuxAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Adapters/GnuLinux/GnuLinuxAdapter.cpp
 )
 
@@ -23,7 +22,6 @@ if(${X11_FOUND})
 
   set(X11_GRABBER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/X11/X11Grabber.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/X11/X11Grabber.hpp
   )
 endif()
 
@@ -34,8 +32,6 @@ if(LIB_PIPEWIRE_FOUND AND GIO_FOUND AND LIBGLIB_FOUND)
   set(PIPEWIRE_GRABBER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/Pipewire/PipewireGrabber.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/Pipewire/PipewireGrabber.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp
   )
 endif()
 

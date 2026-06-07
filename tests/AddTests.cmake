@@ -4,9 +4,6 @@ find_package(OpenCV REQUIRED COMPONENTS imgproc opencv_highgui)
 
 add_executable(TestImageProcessing
   #Huenicorn
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ImageProcessing.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Interpolation.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
@@ -29,14 +26,6 @@ target_link_libraries(TestImageProcessing PUBLIC
 # TestGrabber
 add_executable(TestGrabber
   #Huenicorn
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Credentials.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/MonitorData.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
@@ -50,7 +39,6 @@ add_executable(TestGrabber
 )
 
 target_sources(TestGrabber PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/Adapters/GnuLinux/GnuLinuxAdapter.cpp
 )
 

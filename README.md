@@ -20,12 +20,16 @@ Huenicorn provides a simple web interface to assign specific portions of screen 
 
 ## Project status
 
-Huenicorn 1.0.11 is available.
+Huenicorn 1.0.12 is available.
 
 ### This revision brings
 
-* Webroot files are now embeded to binary to make installation easier
-* Initial setup now allows to select between multiple bridges if detected
+* Less build dependencies to ease the build process
+* Fix for Hyprland session
+* Reworked grabbers
+* Some fixes in Pipewire grabbed
+* Better runtime checks
+* Global architectural refactor
 
 ## Getting Started
 
@@ -101,15 +105,31 @@ Follow the build instructions in their respective README files and copy them to 
 
 <details>
 
-<summary>Ubuntu >= 22.04</summary>
+<summary>Ubuntu 26.04 LTS and newer</summary>
 
 ```bash
-# Add this repository for mbedtls, opencv
+# Required dependencies
+sudo apt-get install build-essential cmake libopencv-dev libcurl4-openssl-dev libmbedtls-dev
+
+# For X11 support
+sudo apt-get install libx11-dev libxext-dev libxrandr-dev
+
+# For Wayland support
+sudo apt-get install libglib2.0-dev libpipewire-0.3-dev wayland-utils
+```
+
+</details>
+
+<details>
+<summary>Ubuntu : 22.04 - 24.04</summary>
+
+```bash
+# Some Ubuntu installations may require the Universe repository
 sudo add-apt-repository universe
 sudo apt-get update
 
 # Required dependencies
-sudo apt-get install build-essential libopencv-dev libcurl4-openssl-dev libmbedtls-dev
+sudo apt-get install build-essential cmake libopencv-dev libcurl4-openssl-dev libmbedtls-dev
 
 # For X11 support
 sudo apt-get install libx11-dev libxext-dev libxrandr-dev
@@ -117,16 +137,15 @@ sudo apt-get install libx11-dev libxext-dev libxrandr-dev
 # For Wayland support
 sudo apt-get install libglib2.0-dev libpipewire-0.3-dev wayland-utils
 
-# Make sure to use gcc/g++ v12
+# Huenicorn requires GCC/G++ 12 or newer.
+# Ubuntu 22.04 ships GCC 11 by default, so install GCC 12 or later if needed.
+# If your current version of GCC/G++ is < 12, you need to install it
 sudo apt install gcc-12 g++-12
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
-sudo update-alternatives --set gcc /usr/bin/gcc-12
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
-sudo update-alternatives --set g++ /usr/bin/g++-12
+# And then this command will be required instead of ```cmake ..``` in the "Building Huenicorn" chapter
+cmake -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12 ..
 ```
 
-Earlier versions of Ubuntu are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
-
+Versions of Ubuntu earlier than 24.04 are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
 </details>
 
 ### Building Huenicorn
@@ -330,7 +349,9 @@ Additionnal information and news can be found on [Huenicorn.org](http://huenicor
 
 ## Version history
 
-* 1.0.11 (latest)
+* 1.0.12 (latest)
+  * Global refactor for less dependencies and clearer workflow
+* 1.0.11
   * Embed webroot into binary, handle multiple bridges at setup
 * 1.0.10
   * Change default port, fix color computation, fix some minor bugs
