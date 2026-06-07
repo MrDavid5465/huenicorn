@@ -24,12 +24,21 @@ Huenicorn 1.0.12 is available.
 
 ### This revision brings
 
+* Global architecture refactor
+  * Better abstractions/responsibilities for clearer workflow
+  * Implementations are now generalized behind PImpl
 * Less build dependencies to ease the build process
-* Fix for Hyprland session
+  * Replaced Crow with cpp_httplib
+  * Asio is no longer required
+  * Specific dependencies are now fetched during the build configuration
 * Reworked grabbers
-* Some fixes in Pipewire grabbed
+  * Fixed Hyprland sessions
+  * Fixed errors in Pipewire Grabber (Hopefully solving problem for good)
+  * Added XinitThreads in X11Grabber
 * Better runtime checks
-* Global architectural refactor
+  * Better checks when registering bridge address
+* Cross-Platform
+  * Build is now possible for MacOS and Windows (No grabber yet)
 
 ## Getting Started
 
