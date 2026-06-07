@@ -1,3 +1,5 @@
+log = console.log;
+
 function getVersion()
 {
   let versionPromise = RequestUtils.get("/api/version");

@@ -20,12 +20,25 @@ Huenicorn provides a simple web interface to assign specific portions of screen 
 
 ## Project status
 
-Huenicorn 1.0.11 is available.
+Huenicorn 1.0.12 is available.
 
 ### This revision brings
 
-* Webroot files are now embeded to binary to make installation easier
-* Initial setup now allows to select between multiple bridges if detected
+* Global architecture refactor
+  * Better abstractions/responsibilities for clearer workflow
+  * Implementations are now generalized behind PImpl
+* Less build dependencies to ease the build process
+  * Replaced Crow with cpp_httplib
+  * Asio is no longer required
+  * Specific dependencies are now fetched during the build configuration
+* Reworked grabbers
+  * Fixed Hyprland sessions
+  * Fixed errors in Pipewire Grabber (Hopefully solving problem for good)
+  * Added XinitThreads in X11Grabber
+* Better runtime checks
+  * Better checks when registering bridge address
+* Cross-Platform
+  * Build is now possible for MacOS and Windows (No grabber yet)
 
 ## Getting Started
 
@@ -40,10 +53,7 @@ Huenicorn 1.0.11 is available.
 
 * [X.Org](https://xorg.freedesktop.org) or [Wayland](https://wayland.freedesktop.org)
 * [OpenCV](https://github.com/opencv/opencv)
-* [Crow](https://crowcpp.org/master)
 * [Mbed-TLS](https://github.com/Mbed-TLS/mbedtls)
-* [GLM](https://github.com/g-truc/glm)
-* [nlohmann-json](https://github.com/nlohmann/json)
 * [Curl](https://curl.se)
 
 #### Dependencies intallation
@@ -54,8 +64,7 @@ Huenicorn 1.0.11 is available.
 
 ```bash
 # Required dependencies
-sudo pacman -S git cmake make gcc curl opencv mbedtls glm nlohmann-json
-yay -S crow
+sudo pacman -S git cmake make gcc curl opencv mbedtls
 
 # For X11 support
 sudo pacman -S xorg-server
@@ -72,19 +81,14 @@ sudo pacman -S wayland glib2 pipewire
 
 ```bash
 # Required dependencies
-sudo dnf install -y git cmake gcc gcc-c++ opencv-devel json-devel asio-devel curl-devel mbedtls-devel glm-devel
+sudo dnf install -y git cmake gcc gcc-c++ opencv-devel curl-devel mbedtls-devel
 
 # For X11 support
 sudo dnf install -y libXrandr-devel
 
 # For Wayland support
 sudo dnf install -y pipewire-devel glib2-devel
-
-# Crow
-# Download the zip available at : https://github.com/CrowCpp/Crow/releases/tag/v1.1.0
 # Extract the archive and copy its content to the target directories:
-sudo cp -r include/* /usr/local/include
-sudo cp -r lib/* /usr/local/lib
 ```
 
 </details>
@@ -93,19 +97,13 @@ sudo cp -r lib/* /usr/local/lib
 
 <summary>OpenSUSE Tumbleweed</summary>
 
-These dependencies needed to be installed on OpenSUSE Tumbleweed 20231011 to build and run Huenicorn:  
+These dependencies needed to be installed on OpenSUSE Tumbleweed 20231011 to build and run Huenicorn:
 
 ```bash
-sudo zypper install opencv-devel libopencv408 python311-jsonschema asio-devel glm-devel nlohmann_json-devel
+sudo zypper install opencv-devel libopencv408 python311-jsonschema
 
 # For Wayland support
 sudo zypper install pipewire-devel glib2-devel
-
-# Crow
-# Download the zip available at : https://github.com/CrowCpp/Crow/releases/tag/v1.1.0
-# Extract the archive and copy its content to the target directories:
-sudo cp -r include/* /usr/local/include
-sudo cp -r lib/* /usr/local/lib
 
 ```
 
@@ -116,15 +114,31 @@ Follow the build instructions in their respective README files and copy them to 
 
 <details>
 
-<summary>Ubuntu >= 22.04</summary>
+<summary>Ubuntu 26.04 LTS and newer</summary>
 
 ```bash
-# Add this repository for mbedtls, opencv
+# Required dependencies
+sudo apt-get install build-essential cmake libopencv-dev libcurl4-openssl-dev libmbedtls-dev
+
+# For X11 support
+sudo apt-get install libx11-dev libxext-dev libxrandr-dev
+
+# For Wayland support
+sudo apt-get install libglib2.0-dev libpipewire-0.3-dev wayland-utils
+```
+
+</details>
+
+<details>
+<summary>Ubuntu : 22.04 - 24.04</summary>
+
+```bash
+# Some Ubuntu installations may require the Universe repository
 sudo add-apt-repository universe
 sudo apt-get update
 
 # Required dependencies
-sudo apt-get install build-essential libopencv-dev libglm-dev libcurl4-openssl-dev nlohmann-json3-dev libmbedtls-dev libboost-all-dev
+sudo apt-get install build-essential cmake libopencv-dev libcurl4-openssl-dev libmbedtls-dev
 
 # For X11 support
 sudo apt-get install libx11-dev libxext-dev libxrandr-dev
@@ -132,20 +146,15 @@ sudo apt-get install libx11-dev libxext-dev libxrandr-dev
 # For Wayland support
 sudo apt-get install libglib2.0-dev libpipewire-0.3-dev wayland-utils
 
-# Crow .deb installer can be downloaded from deb on their repository: https://github.com/CrowCpp/Crow/releases/tag/v1.0+5
-sudo dpkg -i crow-v1.0+5.deb
-
-
-# Make sure to use gcc/g++ v12
+# Huenicorn requires GCC/G++ 12 or newer.
+# Ubuntu 22.04 ships GCC 11 by default, so install GCC 12 or later if needed.
+# If your current version of GCC/G++ is < 12, you need to install it
 sudo apt install gcc-12 g++-12
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
-sudo update-alternatives --set gcc /usr/bin/gcc-12
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
-sudo update-alternatives --set g++ /usr/bin/g++-12
+# And then this command will be required instead of ```cmake ..``` in the "Building Huenicorn" chapter
+cmake -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12 ..
 ```
 
-Earlier versions of Ubuntu are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
-
+Versions of Ubuntu earlier than 24.04 are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
 </details>
 
 ### Building Huenicorn
@@ -349,7 +358,9 @@ Additionnal information and news can be found on [Huenicorn.org](http://huenicor
 
 ## Version history
 
-* 1.0.11 (latest)
+* 1.0.12 (latest)
+  * Global refactor for less dependencies and clearer workflow
+* 1.0.11
   * Embed webroot into binary, handle multiple bridges at setup
 * 1.0.10
   * Change default port, fix color computation, fix some minor bugs

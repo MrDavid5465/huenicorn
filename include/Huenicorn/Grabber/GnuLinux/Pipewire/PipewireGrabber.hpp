@@ -1,0 +1,165 @@
+#pragma once
+
+#include <Huenicorn/Grabber/IGrabber.hpp>
+
+#include <mutex>
+#include <optional>
+#include <thread>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#include <pipewire/pipewire.h>
+#include <spa/param/video/format-utils.h>
+#pragma GCC diagnostic pop
+
+#include <Huenicorn/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.hpp>
+
+
+namespace Huenicorn::Grabber
+{
+  /**
+   * Pipewire implementation of screen grabber instanciated for Wayland support
+  */
+  class PipewireGrabber : public IGrabber
+  {
+  private:
+    /**
+     * Thread-safe double buffer for grabbed frames
+    */
+    struct SafeDoubleBuffer
+    {
+      std::array<Imaging::ImageData, 2> frame;
+      std::mutex mutex;
+    };
+
+
+    /**
+     * Pipewire-specific data shared between processes
+    */
+    struct PipewireData
+    {
+      spa_hook coreListener;
+      pw_main_loop* loop{nullptr};
+      pw_context* context{nullptr};
+      pw_stream* stream{nullptr};
+      spa_video_info format;
+      SafeDoubleBuffer frameDoubleBuffer;
+      std::promise<bool> screenDataReadyPromise;
+      bool promiseSetAlready{false};
+      Core::Config* config;
+    };
+
+
+  public:
+    // Constructor / destructor
+    /**
+     * PipewireGrabber constructor
+    */
+    PipewireGrabber(
+      Core::Config* config
+    );
+
+
+    /**
+     * PipewireGrabber destructor
+    */
+    virtual ~PipewireGrabber();
+
+
+    virtual const std::string& name() const override;
+
+    /**
+     * @brief Returns the resolution of the selected display
+     * 
+     * @return Resolution Resolution of the selected display
+     */
+    virtual Resolution displayResolution() const override;
+
+
+    /**
+     * @brief Returns the resolution of the selected display
+     * 
+     * @return Resolution Resolution of the selected display
+     */
+    virtual RefreshRate displayRefreshRate() const override;
+
+
+    // Methods
+    /**
+     * @brief Returns a subsample of the last captured frame
+     * 
+     * @param imageData Subsample of the last captured frame
+     */
+    virtual void grabFrameSubsample(
+      Imaging::ImageData& imageData
+    ) override;
+
+
+  private:
+    // Methods
+    static void _onCoreInfoCallback(
+      void* userData,
+      const pw_core_info* info
+    );
+
+    static void _onCoreDoneCallback(
+      void* userData,
+      uint32_t id,
+      int seq
+    );
+
+    static void _onCoreErrorCallback(
+      void* userData,
+      uint32_t id,
+      int seq,
+      int res,
+      const char* message
+    );
+
+    static void _onStreamProcess(
+      void* userdata
+    );
+
+    static void _onStreamParamChanged(
+      void* userdata,
+      uint32_t id,
+      const struct spa_pod* param
+    );
+
+    /**
+     * Screencast portal thread
+    */
+    static void _initCapture(
+      XdgDesktopPortal::Capture* capture
+    );
+
+
+    /**
+     * Pipewire thread
+    */
+    static void _pipewireThread(
+      XdgDesktopPortal::Capture* capture,
+      PipewireData* pw
+    );
+
+
+    /**
+     * Proper shutdown for Pipewire session
+    */
+    void _teardownPipewire();
+
+
+    /**
+     * Terminates all inner executions
+    */
+    void _stop();
+
+
+    // Attributes
+    std::optional<std::thread> m_xdgThread;
+    std::optional<std::thread> m_pipewireThread;
+    XdgDesktopPortal::Capture m_capture;
+    PipewireData m_pwData;
+  };
+}

@@ -1,0 +1,352 @@
+#include <fstream>
+#include <optional>
+
+#include <Huenicorn/Version.hpp>
+#include <Huenicorn/Core/CoreService.hpp>
+#include <Huenicorn/Core/Logger.hpp>
+
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
+#include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
+#include <Huenicorn/Serialization/JsonSerializer.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
+#include <Huenicorn/Core/Runtime.hpp>
+#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
+
+
+namespace Huenicorn::Core
+{
+  CoreService::CoreService(Runtime& runtime, Config& config):
+  m_runtime(runtime),
+  m_config(config)
+  {
+
+  }
+
+
+  const std::string& CoreService::version() const
+  {
+    return Huenicorn::Version;
+  }
+
+
+  const std::filesystem::path CoreService::configFilePath() const
+  {
+    return m_config.configFilePath();
+  }
+
+
+  bool CoreService::validateBridgeAddress(
+    const std::string& bridgeAddress
+  )
+  {
+    std::string sanitizedAddress = bridgeAddress;
+
+    while(sanitizedAddress.back() == '/'){
+      sanitizedAddress.pop_back();
+    }
+
+    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api/0/config", "GET", "");
+    if(!response.has_value()){
+      return false;
+    }
+
+    try{
+      auto responseData = response->asJson();
+      if(!responseData.contains("name") || !responseData.contains("bridgeid")){
+        return false;
+      }
+
+      m_config.setBridgeAddress(sanitizedAddress);
+
+      return true;
+    }
+    catch(const std::exception& e){
+      Logger::error(e.what());
+      return false;
+    }
+  }
+
+
+  bool CoreService::validateCredentials(
+    const Hue::Auth::Credentials& credentials
+  )
+  {
+    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
+    if(!response.has_value()){
+      return false;
+    }
+
+    try{
+      auto jsonResponse = response.value().asJson();
+
+      if(jsonResponse.is_array() && jsonResponse.at(0).contains("error")){
+        return false;
+      }
+    }
+    catch(const std::exception& e){
+      Logger::error(e.what());
+      return false;
+    }
+
+    m_config.setCredentials(credentials);
+    Logger::log("Successfully registered credentials");
+    return true;
+  }
+
+
+  Serialization::Json CoreService::registerNewUser()
+  {
+    auto response = Hue::Api::ApiTools::registerNewUser(m_config.bridgeAddress().value());
+
+    if(!response.has_value()){
+      return {{"succeeded", false}, {"error", "unreachable bridge"}};
+    }
+
+    auto jsonResponse = response.value().asJson();
+
+    if(jsonResponse.at(0).contains("error")){
+      return {{"succeeded", false}, {"error", jsonResponse.at(0).at("error").at("description")}};
+    }
+
+    auto credentials = jsonResponse.at(0).at("success").get<Hue::Auth::Credentials>();
+    m_config.setCredentials(credentials);
+
+    return {{"succeeded", true}, {"username", credentials.username()}, {"clientkey", credentials.clientkey()}};
+  }
+
+
+
+  const Hue::Api::EntertainmentConfigurations& CoreService::entertainmentConfigurations() const
+  {
+    return m_runtime.m_selector->entertainmentConfigurations();
+  }
+
+
+  std::optional<std::string> CoreService::currentEntertainmentConfigurationId() const
+  {
+    return m_runtime.m_selector->currentEntertainmentConfigurationId();
+  }
+
+
+  bool CoreService::setChannelActivity(
+    uint8_t channelId,
+    bool active
+  )
+  {
+    auto& channels = m_runtime.m_channels;
+    if(channels.find(channelId) == channels.end()){
+      return false;
+    }
+
+    channels.at(channelId).setActive(active);
+
+    m_runtime._updateStreamChannelsSize();
+
+    return true;
+  }
+
+
+  const Hue::Api::Channels& CoreService::channels() const
+  {
+    return m_runtime.m_channels;
+  }
+
+
+  const Hue::Api::EntertainmentConfiguration& CoreService::currentEntertainmentConfiguration() const
+  {
+    return m_runtime.m_selector->currentEntertainmentConfiguration();
+  }
+
+
+
+  glm::ivec2 CoreService::displayResolution() const
+  {
+    return m_runtime.m_grabber->displayResolution();
+  }
+
+
+  std::vector<glm::ivec2> CoreService::subsampleResolutionCandidates() const
+  {
+    return m_runtime.m_grabber->subsampleResolutionCandidates();
+  }
+
+
+  unsigned CoreService::subsampleWidth() const
+  {
+    return m_config.subsampleWidth();
+  }
+
+
+  unsigned CoreService::refreshRate() const
+  {
+    return m_config.refreshRate();
+  }
+
+
+  unsigned CoreService::maxRefreshRate() const
+  {
+    return m_runtime.m_grabber->displayRefreshRate();
+  }
+
+
+  Imaging::Interpolation::Type CoreService::interpolation() const
+  {
+    return m_config.interpolation();
+  }
+
+
+  const Imaging::Interpolation::Interpolations& CoreService::availableInterpolations() const
+  {
+    return Imaging::Interpolation::availableInterpolations;
+  }
+
+
+  bool CoreService::setEntertainmentConfiguration(
+    const std::string& entertainmentConfigurationId
+  )
+  {
+    if(!m_runtime.m_selector->selectEntertainmentConfiguration(entertainmentConfigurationId)){
+      return false;
+    }
+
+    m_runtime._enableEntertainmentConfiguration(entertainmentConfigurationId);
+
+    return true;
+  }
+
+
+  const Imaging::UVs& CoreService::setChannelUV(
+    uint8_t channelId,
+    Imaging::UV&& uv,
+    Imaging::UVCorner uvCorner
+  )
+  {
+    return m_runtime.m_channels.at(channelId).setUV(std::move(uv), uvCorner);
+  }
+
+
+  bool CoreService::setChannelGammaFactor(
+    uint8_t channelId,
+    float gammaExponent
+  )
+  {
+    auto& channels = m_runtime.m_channels;
+
+    if(channels.find(channelId) == channels.end()){
+      return false;
+    }
+
+    channels.at(channelId).gammaFactor = gammaExponent;
+    return true;
+  }
+
+
+  void CoreService::setSubsampleWidth(
+    unsigned subsampleWidth
+  )
+  {
+    m_config.setSubsampleWidth(subsampleWidth);
+  }
+
+
+  void CoreService::setRefreshRate(
+    unsigned refreshRate
+  )
+  {
+    refreshRate = std::min(refreshRate, m_runtime.m_grabber->displayRefreshRate());
+
+    m_config.setRefreshRate(refreshRate);
+    refreshRate = m_config.refreshRate();
+
+    m_runtime.m_loopRegulator->setTickInterval(Timing::fromHertz(refreshRate));
+  }
+
+
+  void CoreService::setInterpolation(
+    unsigned interpolation
+  )
+  {
+    m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
+  }
+
+
+  void CoreService::saveProfile()
+  {
+    if(!m_runtime.m_selector->validSelection()){
+      Logger::error("There is currently no valid entertainment configuration selected.");
+      return;
+    }
+
+    Serialization::Json profile;
+    if(m_runtime.m_selector->validSelection()){
+      profile = Serialization::Json{
+        {"entertainmentConfigurationId", m_runtime.m_selector->currentEntertainmentConfigurationId().value()},
+        {"channels", m_runtime.m_channels}
+      };
+    }
+
+    if(!m_config.profileName().has_value()){
+      m_config.setProfileName("profile");
+    }
+
+    std::ofstream profileFile(profilePath(), std::ofstream::out);
+    profileFile << profile.dump(2) << "\n";
+    profileFile.close();
+  }
+
+
+  void CoreService::stop()
+  {
+    m_runtime.stop();
+  }
+
+
+  bool CoreService::ensureInitialSetup()
+  {
+    if(m_config.initialSetupOk()){
+      return true;
+    }
+
+    Logger::log("Starting setup backend");
+    unsigned port = m_config.restServerPort();
+    const std::string& boundBackendIP = m_config.boundBackendIP();
+
+    Network::Http::Server::SetupBackend sb(this);
+    bool succeeded = sb.execute(port, boundBackendIP);
+    m_runtime.m_openedSetup = true;
+
+    if(!succeeded){
+      Logger::log("Initial setup was aborted");
+      return false;
+    }
+
+    Logger::log("Finished setup");
+
+    return true;
+  }
+
+
+  std::filesystem::path CoreService::profilePath() const
+  {
+    if(!m_config.profileName().has_value()){
+      return {};
+    }
+
+    return m_runtime.m_configRoot / std::filesystem::path(m_config.profileName().value()).replace_extension("json");
+  }
+
+
+  std::optional<Serialization::Json> CoreService::getProfile()
+  {
+    std::filesystem::path pp = profilePath();
+    Serialization::Json jsonProfile = Serialization::Json::object();
+
+    if(!pp.empty() && std::filesystem::exists(pp) && std::filesystem::is_regular_file(pp)){
+      std::ifstream profileFile(pp);
+      return Serialization::Json::parse(profileFile);
+    }
+
+    return std::nullopt;
+  }
+}

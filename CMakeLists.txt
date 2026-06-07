@@ -1,24 +1,45 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-set(PROJECT_NAME huenicorn)
-set(BINARY_NAME huenicorn)
-
-project(${PROJECT_NAME} VERSION 1.0.11)
-
+project(Huenicorn VERSION 1.0.12)
 
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
 set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
+
+include(FetchContent)
 
 
 # Check mandatory libraries
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS imgproc)
 find_package(CURL REQUIRED)
-find_package(Crow REQUIRED)
-find_package(nlohmann_json 3.2.0 REQUIRED)
 find_library(MBEDTLS_LIBS mbedtls REQUIRED)
 find_library(MBEDTLS_X509 mbedx509 REQUIRED)
 find_library(MBEDTLS_CRYPTO mbedcrypto REQUIRED)
+
+# NLohmann JSON
+FetchContent_Declare(
+  nlohmann_json
+  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+
+# CppHttpLip
+FetchContent_Declare(
+  cpp_httplib
+  URL https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
+)
+FetchContent_MakeAvailable(cpp_httplib)
+
+
+
+# GLM
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG 1.0.3
+)
+FetchContent_MakeAvailable(glm)
 
 
 # Generate version header
@@ -76,85 +97,115 @@ configure_file(
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
+set(APP_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/App/main.cpp
+)
+
+set(CORE_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Config.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/CoreService.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Runtime.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Logger.cpp
+)
+
+set(GRABBER_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Grabber/DummyGrabber.cpp
+)
+
+set(HUE_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Auth/Credentials.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/ApiTools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/Channel.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Hue/Api/EntertainmentConfigurationSelector.cpp
+)
+
+set(IMAGING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/ImageProcessing.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Imaging/Interpolation.cpp
+)
+
+set(NETWORK_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Client/CurlClient.cpp
+
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/SetupBackend.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/WebUIBackend.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/Http/Server/HttpServer.cpp
+)
+
+set(PLATFORM_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Selector.cpp
+)
+
+set(STREAM_SOURCE
+  # Dtls Impl
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Impl/MbedTls/DtlsClient.cpp
+
+  # Common
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/HuestreamHeader.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Stream/Streamer.cpp
+)
+
+set(TIMING_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Timing/LoopRegulator.cpp
+)
+
+
 # Declare executable
-add_executable(${BINARY_NAME}
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ApiTools.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Credentials.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/CurlHttpClient.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Device.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/DtlsClient.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/DummyGrabber.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfiguration.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/EntertainmentConfigurationSelector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/HttpRequestUtils.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/HuenicornCore.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ImageProcessing.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Interpolation.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/PlatformSelector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/SetupBackend.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Streamer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/TickSynchronizer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/UV.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/WebUIBackend.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ApiTools.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Channel.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Color.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Config.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Credentials.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/CurlHttpClient.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Device.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DtlsClient.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/DummyGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfiguration.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/EntertainmentConfigurationSelector.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HttpRequestUtils.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/HuenicornCore.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IGrabber.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/ImageProcessing.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Interpolation.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/IRestServer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Logger.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/PlatformSelector.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/SetupBackend.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/Streamer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TickSynchronizer.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/TimingDefinitions.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/UV.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/Huenicorn/WebUIBackend.hpp
+add_executable(huenicorn
+  ${APP_SOURCE}
+  ${CORE_SOURCE}
+  ${GRABBER_SOURCE}
+  ${HUE_SOURCE}
+  ${IMAGING_SOURCE}
+  ${NETWORK_SOURCE}
+  ${PLATFORM_SOURCE}
+  ${STREAM_SOURCE}
+  ${TIMING_SOURCE}
 
   ${VERSION_HEADER}
   ${EMBEDDED_WEBROOT_HEADER}
 )
 
-add_dependencies(${PROJECT_NAME} generate_version_header generate_webroot_header)
+add_dependencies(huenicorn generate_version_header generate_webroot_header)
 
 if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
 endif()
 
-set_target_properties(${BINARY_NAME} PROPERTIES CXX_STANDARD 20)
+if(APPLE) # For MacOS
+  include(cmake/platforms/MacOS.cmake)
+endif()
 
-target_include_directories(${BINARY_NAME} PUBLIC
+if(WIN32) #For Windows
+  include(cmake/platforms/Windows.cmake)
+endif()
+
+set_target_properties(huenicorn PROPERTIES CXX_STANDARD 20)
+
+target_include_directories(huenicorn PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR} # For adapters and grabbers
   ${OpenCV_INCLUDE_DIRS}
   include
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
-target_link_libraries(${BINARY_NAME} PUBLIC
+target_link_libraries(huenicorn PUBLIC
   ${OpenCV_LIBS}
   ${CURL_LIBRARIES}
   ${MBEDTLS_LIBS}
   ${MBEDTLS_X509}
   ${MBEDTLS_CRYPTO}
   nlohmann_json::nlohmann_json
+  httplib::httplib
+  glm::glm
 )
 
 
-target_compile_options(${BINARY_NAME} PRIVATE
+target_compile_options(huenicorn PRIVATE
   -Werror
   -Wall
   -Wextra
@@ -163,7 +214,6 @@ target_compile_options(${BINARY_NAME} PRIVATE
   -Wno-deprecated-declarations
   -Wno-deprecated-copy
 )
-
 
 if(${BUILD_TESTS})
   include(tests/AddTests.cmake)
@@ -201,25 +251,25 @@ endif(${BUILD_DOCUMENTATION})
 # Post build commands
 
 # Copy readme to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_CURRENT_SOURCE_DIR}/README.md $<TARGET_FILE_DIR:${PROJECT_NAME}>/README.md
+  ${CMAKE_CURRENT_SOURCE_DIR}/README.md $<TARGET_FILE_DIR:huenicorn>/README.md
 )
 
 # Copy screenshots to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}/screenshots $<TARGET_FILE_DIR:${PROJECT_NAME}>/screenshots
+  ${CMAKE_CURRENT_SOURCE_DIR}/screenshots $<TARGET_FILE_DIR:huenicorn>/screenshots
 )
 
 # Copy assets to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
+  ${CMAKE_CURRENT_SOURCE_DIR}/assets $<TARGET_FILE_DIR:huenicorn>/assets
 )
 
 # Copy license to build
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET huenicorn POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt $<TARGET_FILE_DIR:${PROJECT_NAME}>/LICENSE.txt
+  ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt $<TARGET_FILE_DIR:huenicorn>/LICENSE.txt
 )

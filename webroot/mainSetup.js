@@ -7,7 +7,7 @@ class SetupUI
   {
     this.setupSection = document.getElementById("setupSection");
     this.stepNodes = document.getElementsByClassName("step");
-    this.errorMessages = document.getElementsByClassName("errorMessages");
+    this.errorMessages = document.getElementsByClassName("errorMessage");
 
     this.setConfigFilePath();
 
@@ -17,12 +17,15 @@ class SetupUI
 
   setConfigFilePath()
   {
-    RequestUtils.get("/api/configFilePath", (jsonData) => {
-      let data = JSON.parse(jsonData);
+    RequestUtils.get("/api/configFilePath")
+    .then((jsonData) => {
       let configFileLink = document.getElementById("configFilePath");
-      configFileLink.href = `file://${data.configFilePath}`;
-      configFileLink.innerHTML = data.configFilePath;
+      configFileLink.href = `file://${jsonData.configFilePath}`;
+      configFileLink.innerHTML = jsonData.configFilePath;
     })
+    .catch((error) => {
+      log(error);
+    });
   }
 
 

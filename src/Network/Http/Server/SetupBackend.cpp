@@ -1,0 +1,125 @@
+#include <Huenicorn/Network/Http/Server/SetupBackend.hpp>
+
+#include <Huenicorn/Core/CoreService.hpp>
+#include <Huenicorn/Hue/Api/ApiTools.hpp>
+#include <Huenicorn/Serialization/Credentials.hpp>
+
+
+namespace Huenicorn::Network::Http::Server
+{
+  SetupBackend::SetupBackend(
+    Huenicorn::Core::CoreService* coreService
+  ):
+  m_coreService(coreService)
+  {
+    // WEB PAGES
+
+    m_httpServer.addRoute(HttpMethod::Get, "/", [](const Request& /*req*/, Response& res){
+      std::filesystem::path pageName = "setup.html";
+      Utils::getWebFile(res, pageName);
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/:pageName", [](const Request& req, Response& res){
+      std::filesystem::path pageName = req.pathParams.at("pageName");
+
+      if(pageName == "index.html"){
+        pageName = "404.html";
+      }
+
+      Utils::getWebFile(res, pageName);
+    });
+
+
+    // GET METHODS
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/version", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {
+        {"version", m_coreService->version()},
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/autodetectBridge", [](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = Hue::Api::ApiTools::autodetectedBridge();
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/configFilePath", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {{"configFilePath", m_coreService->configFilePath()}};
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    // POST METHODS
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/finishSetup", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {
+        {"version", m_coreService->version()},
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+      m_setupCompleted = true;
+      m_httpServer.stop();
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/abort", [this](const Request& /*req*/, Response& res){
+      std::string response = "{}";
+      res.contentType = "application/json";
+      res.body = response;
+
+      m_setupCompleted = false;
+      m_httpServer.stop();
+    });
+
+
+    // PUT METHODS
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/validateBridgeAddress", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      Serialization::Json jsonBridgeAddressData = Serialization::Json::parse(data);
+
+      std::string bridgeAddress = jsonBridgeAddressData.at("bridgeAddress");
+
+      Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateBridgeAddress(bridgeAddress)}};
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/validateCredentials", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      Serialization::Json jsonCredentials = Serialization::Json::parse(data);
+
+      auto credentials = jsonCredentials.get<Hue::Auth::Credentials>();
+
+      Serialization::Json jsonResponse = {{"succeeded", m_coreService->validateCredentials(credentials)}};
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/registerNewUser", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = m_coreService->registerNewUser();
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+  }
+}

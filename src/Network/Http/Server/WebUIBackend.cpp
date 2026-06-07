@@ -1,0 +1,319 @@
+#include <Huenicorn/Network/Http/Server/WebUIBackend.hpp>
+
+#include <filesystem>
+
+#include <Huenicorn/Core/CoreService.hpp>
+#include <Huenicorn/Serialization/Json.hpp>
+#include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
+
+
+namespace Huenicorn::Network::Http::Server
+{
+  using namespace Serialization;
+
+  WebUIBackend::WebUIBackend(
+    Huenicorn::Core::CoreService* coreService
+  ):
+  m_coreService(coreService)
+  {
+    // WEB PAGES
+
+    m_httpServer.addRoute(HttpMethod::Get, "/", [](const Request& /*req*/, Response& res){
+      std::filesystem::path pageName = "index.html";
+      Utils::getWebFile(res, pageName);
+    });
+
+    m_httpServer.addRoute(HttpMethod::Get, "/:pageName", [](const Request& req, Response& res){
+      std::filesystem::path pageName = req.pathParams.at("pageName");
+
+      if(pageName == "setup.html"){
+        pageName = "404.html";
+      }
+
+      Utils::getWebFile(res, pageName);
+    });
+
+
+    // GET METHODS
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/version", [this](const Request& /*req*/, Response& res){
+      Serialization::Json jsonResponse = {
+        {"version", m_coreService->version()},
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/webUIStatus", [](const Request& /*req*/, Response& res){
+      Json jsonResponse = {{
+        "ready", true
+      }};
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/entertainmentConfigurations", [this](const Request& /*req*/, Response& res){
+      const auto& entertainmentConfigurations = m_coreService->entertainmentConfigurations();
+      std::string currentEntertainmentConfigurationId = m_coreService->currentEntertainmentConfigurationId().value();
+
+      Json jsonResponse = {
+        {"entertainmentConfigurations", entertainmentConfigurations},
+        {"currentEntertainmentConfigurationId", currentEntertainmentConfigurationId}
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/channel/:channelId", [this](const Request& req, Response& res){
+      int channelId = std::stoi(req.pathParams.at("channelId"));
+
+      std::string response = Json(m_coreService->channels().at(channelId)).dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/channels", [this](const Request& /*req*/, Response& res){
+      std::string response = Json(m_coreService->channels()).dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/displayInfo", [this](const Request& /*req*/, Response& res){
+      auto displayResolution = m_coreService->displayResolution();
+
+      Json jsonSubsampleCandidates = Json::array();
+      for(const auto& candidate : m_coreService->subsampleResolutionCandidates()){
+        jsonSubsampleCandidates.push_back({
+          {"x", candidate.x},
+          {"y", candidate.y}
+        });
+      }
+
+      Json jsonDisplayInfo{
+        {"x", displayResolution.x},
+        {"y", displayResolution.y},
+        {"subsampleWidth", m_coreService->subsampleWidth()},
+        {"subsampleResolutionCandidates", jsonSubsampleCandidates},
+        {"selectedRefreshRate", m_coreService->refreshRate()},
+        {"maxRefreshRate", m_coreService->maxRefreshRate()}
+      };
+
+      std::string response = jsonDisplayInfo.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Get, "/api/interpolationInfo", [this](const Request& /*req*/, Response& res){
+      Json jsonAvailableInterpolations = Json::array();
+      for(const auto& [key, value] : m_coreService->availableInterpolations()){
+        jsonAvailableInterpolations.push_back({
+          {key, value},
+        });
+      }
+
+      Json jsonInterpolationInfo = {
+        {"available", jsonAvailableInterpolations},
+        {"current", m_coreService->interpolation()}
+      };
+
+      std::string response = jsonInterpolationInfo.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    // PUT METHODS
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setEntertainmentConfiguration", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      std::string entertainmentConfigurationId = Json::parse(data);
+
+      bool succeeded = m_coreService->setEntertainmentConfiguration(entertainmentConfigurationId);
+
+      Json jsonResponse = {
+        {"succeeded", succeeded},
+        {"entertainmentConfigurationId", entertainmentConfigurationId},
+        {"channels", Json(m_coreService->channels())}
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setChannelUV/:channelId", [this](const Request& req, Response& res){
+      int channelId = std::stoi(req.pathParams.at("channelId"));
+
+      const std::string& data = req.body;
+      Json jsonUV = Json::parse(data);
+
+      float x = jsonUV.at("x");
+      float y = jsonUV.at("y");
+      Imaging::UVCorner uvCorner = static_cast<Imaging::UVCorner>(jsonUV.at("type").get<int>());
+
+      const auto& clampedUVs = m_coreService->setChannelUV(channelId, {x, y}, uvCorner);
+
+      // TODO : Serialize from JsonSerializer
+      Json jsonResponse = {
+        {"uvA", {{"x", clampedUVs.min.x}, {"y", clampedUVs.min.y}}},
+        {"uvB", {{"x", clampedUVs.max.x}, {"y", clampedUVs.max.y}}}
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setChannelGammaFactor/:channelId", [this](const Request& req, Response& res){
+      int channelId = std::stoi(req.pathParams.at("channelId"));
+      const std::string& data = req.body;
+      Json jsonGammaFactorData = Json::parse(data);
+      float gammaFactor = jsonGammaFactorData.at("gammaFactor");
+
+      if(!m_coreService->setChannelGammaFactor(channelId, gammaFactor)){
+        std::string response = Json{
+          {"succeeded", false},
+          {"error", "invalid channel id"}
+        }.dump();
+
+        res.contentType = "application/json";
+        res.body = response;
+        return;
+      }
+
+      Json jsonResponse = Json{
+        {"succeeded", true},
+        {"gammaFactor", gammaFactor}
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setSubsampleWidth", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      int subsampleWidth = Json::parse(data).get<int>();
+      m_coreService->setSubsampleWidth(subsampleWidth);
+
+      glm::ivec2 displayResolution = m_coreService->displayResolution();
+      Json jsonDisplay{
+        {"x", displayResolution.x},
+        {"y", displayResolution.y},
+        {"subsampleWidth", m_coreService->subsampleWidth()}
+      };
+
+      std::string response = jsonDisplay.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setRefreshRate", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      unsigned refreshRate = Json::parse(data).get<unsigned>();
+      m_coreService->setRefreshRate(refreshRate);
+
+      Json jsonRefreshRate{
+        {"refreshRate", m_coreService->refreshRate()}
+      };
+
+      std::string response = jsonRefreshRate.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setInterpolation", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      unsigned interpolation = Json::parse(data).get<unsigned>();
+
+      m_coreService->setInterpolation(interpolation);
+
+      Json jsonInterpolation{
+        {"interpolation", m_coreService->interpolation()}
+      };
+
+      std::string response = jsonInterpolation.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    // POST METHODS
+    m_httpServer.addRoute(HttpMethod::Post, "/api/setChannelActivity/:channelId", [this](const Request& req, Response& res){
+      int channelId = std::stoi(req.pathParams.at("channelId"));
+
+      const std::string& data = req.body;
+      Json jsonChannelData = Json::parse(data);
+      bool active = jsonChannelData.at("active");
+
+      if(!m_coreService->setChannelActivity(channelId, active)){
+        std::string response = Json{
+          {"succeeded", false},
+          {"error", "invalid channel id"}
+        }.dump();
+
+        res.contentType = "application/json";
+        res.body = response;
+        return;
+      }
+
+      Json jsonResponse = Json{
+        {"succeeded", true},
+        {"channels", Json(m_coreService->channels())},
+      };
+
+      if(active){
+        jsonResponse["newActiveChannelId"] = channelId;
+      }
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/saveProfile", [this](const Request& /*req*/, Response& res){
+      m_coreService->saveProfile();
+
+      Json jsonResponse = {
+        "succeeded", true
+      };
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Post, "/api/stop", [this](const Request& /*req*/, Response& res){
+
+      Json jsonResponse = {{
+        "succeeded", true
+      }};
+
+      std::string response = jsonResponse.dump();
+
+      res.contentType = "application/json";
+      res.body = response;
+
+      m_coreService->stop();
+    });
+  }
+}
