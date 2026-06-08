@@ -298,7 +298,7 @@ namespace Huenicorn::Core
       else{
         Imaging::ImageData crop;
         Imaging::ImageProcessing::getSubImage(subframeImageData, crop, channel.uvs);
-        auto color = Imaging::ImageProcessing::getDominantColor(subframeImageData);
+        auto color = Imaging::ImageProcessing::getDominantColor(crop);
 
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));
