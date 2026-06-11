@@ -91,22 +91,22 @@ namespace Huenicorn::Core
       float percentThreshold = 1.0;
       auto subsampleCandidates = m_grabber->subsampleResolutionCandidates();
 
-      unsigned bestSubsampleWidth = subsampleCandidates.back().x;
-      for(int i = subsampleCandidates.size(); i--;){
-        unsigned candidate = subsampleCandidates.at(i).x;
+      auto bestSubsampleWidth = subsampleCandidates.back().x;
+      for(auto i = subsampleCandidates.size(); i--;){
+        auto candidate = subsampleCandidates.at(i).x;
 
-        if((static_cast<float>(candidate) / displayResolution.x) * 100 >= percentThreshold){
+        if((static_cast<float>(candidate) / static_cast<float>(displayResolution.x)) * 100 >= percentThreshold){
           bestSubsampleWidth = candidate;
           break;
         }
       }
 
-      m_config.setSubsampleWidth(bestSubsampleWidth);
+      m_config.setSubsampleWidth(static_cast<unsigned>(bestSubsampleWidth));
     }
 
     const float warningThreshold = 50.0;
 
-    float ratio = static_cast<float>(m_config.subsampleWidth()) / m_grabber->displayResolution().x;
+    float ratio = static_cast<float>(m_config.subsampleWidth()) / static_cast<float>(m_grabber->displayResolution().x);
 
     if(ratio >= warningThreshold / 100){
       Logger::warn("Subsample width is >= ", warningThreshold, "% of the display resolution. Color computation might be intensive.");
@@ -149,7 +149,7 @@ namespace Huenicorn::Core
     std::promise<bool> readyWebUIPromise;
     auto readyWebUIFuture = readyWebUIPromise.get_future();
 
-    unsigned restServerPort = m_config.restServerPort();
+    auto restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
     m_webUIService.thread = std::jthread([&server = m_webUIService.server, restServerPort, boundBackendIP, &readyWebUIPromise, this](){
       server.emplace(m_coreService.get());
@@ -271,7 +271,7 @@ namespace Huenicorn::Core
 
     Imaging::ImageData subframeImageData;
 
-    const auto subsampleWidth = m_config.subsampleWidth();
+    const auto subsampleWidth = static_cast<int>(m_config.subsampleWidth());
 
     if(!m_frameData.isSubsampled){
       Imaging::ImageProcessing::rescale(m_frameData, subframeImageData, subsampleWidth, m_config.interpolation());

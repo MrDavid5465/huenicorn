@@ -19,9 +19,9 @@ namespace Huenicorn::Imaging
         return;
       }
 
-      float scaleRatio = static_cast<float>(outputWidth) / sourceWidth;
+      float scaleRatio = static_cast<float>(outputWidth) / static_cast<float>(sourceWidth);
 
-      int targetHeight = sourceHeight * scaleRatio;
+      int targetHeight = static_cast<int>(static_cast<float>(sourceHeight) * scaleRatio);
 
       cv::InterpolationFlags interpolationFlag = cv::InterpolationFlags::INTER_AREA;
 
@@ -58,8 +58,10 @@ namespace Huenicorn::Imaging
       const UVs& uvs
     )
     {
-      glm::ivec2 a{uvs.min.x * inputImageData.width(), uvs.min.y * inputImageData.height()};
-      glm::ivec2 b{uvs.max.x * inputImageData.width(), uvs.max.y * inputImageData.height()};
+      float width = static_cast<float>(inputImageData.width());
+      float height = static_cast<float>(inputImageData.width());
+      glm::ivec2 a{uvs.min.x * width, uvs.min.y * height};
+      glm::ivec2 b{uvs.max.x * width, uvs.max.y * height};
       
       cv::Range cols(std::max(0, a.x), std::min(b.x, inputImageData.width()));
       cv::Range rows(std::max(0, a.y), std::min(b.y, inputImageData.height()));
@@ -88,7 +90,7 @@ namespace Huenicorn::Imaging
       {
         const auto& imageMatrix = imageData.imageMatrix;
 
-        cv::Mat data = imageMatrix.reshape(3, imageMatrix.total());
+        cv::Mat data = imageMatrix.reshape(3, static_cast<int>(imageMatrix.total()));
         auto mean = cv::mean(data);
 
         return Color{

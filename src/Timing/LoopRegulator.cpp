@@ -85,7 +85,7 @@ namespace Huenicorn::Timing
 
     Duration excess = std::chrono::duration_cast<Duration>(now - next);
 
-    float ratio = excess.count() / m_tickInterval.count();
+    float ratio = static_cast<float>(excess.count() / m_tickInterval.count());
     m_lastExcess = {excess, ratio};
 
     return excess;

@@ -131,7 +131,7 @@ namespace Huenicorn::Timing
       Duration duration = now - startTime;
       m_tickAverage = _approxRollingAverage<Duration>(m_tickAverage, duration);
 
-      return m_tickAverage.count() / m_tickInterval.count();
+      return static_cast<float>(m_tickAverage.count() / m_tickInterval.count());
     }
 
 

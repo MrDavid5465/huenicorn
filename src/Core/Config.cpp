@@ -43,7 +43,7 @@ namespace Huenicorn::Core
   }
 
 
-  int Config::restServerPort() const
+  unsigned Config::restServerPort() const
   {
     return m_configData.value().restServerPort.value();
   }

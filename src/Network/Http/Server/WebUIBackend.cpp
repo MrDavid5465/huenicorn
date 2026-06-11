@@ -74,7 +74,7 @@ namespace Huenicorn::Network::Http::Server
 
 
     m_httpServer.addRoute(HttpMethod::Get, "/api/channel/:channelId", [this](const Request& req, Response& res){
-      int channelId = std::stoi(req.pathParams.at("channelId"));
+      uint8_t channelId = static_cast<uint8_t>(std::stoi(req.pathParams.at("channelId")));
 
       std::string response = Json(m_coreService->channels().at(channelId)).dump();
       res.contentType = "application/json";
@@ -155,7 +155,7 @@ namespace Huenicorn::Network::Http::Server
 
 
     m_httpServer.addRoute(HttpMethod::Put, "/api/setChannelUV/:channelId", [this](const Request& req, Response& res){
-      int channelId = std::stoi(req.pathParams.at("channelId"));
+      uint8_t channelId = static_cast<uint8_t>(std::stoi(req.pathParams.at("channelId")));
 
       const std::string& data = req.body;
       Json jsonUV = Json::parse(data);
@@ -179,7 +179,7 @@ namespace Huenicorn::Network::Http::Server
 
 
     m_httpServer.addRoute(HttpMethod::Put, "/api/setChannelGammaFactor/:channelId", [this](const Request& req, Response& res){
-      int channelId = std::stoi(req.pathParams.at("channelId"));
+      uint8_t channelId = static_cast<uint8_t>(std::stoi(req.pathParams.at("channelId")));
       const std::string& data = req.body;
       Json jsonGammaFactorData = Json::parse(data);
       float gammaFactor = jsonGammaFactorData.at("gammaFactor");
@@ -208,7 +208,7 @@ namespace Huenicorn::Network::Http::Server
 
     m_httpServer.addRoute(HttpMethod::Put, "/api/setSubsampleWidth", [this](const Request& req, Response& res){
       const std::string& data = req.body;
-      int subsampleWidth = Json::parse(data).get<int>();
+      unsigned subsampleWidth = Json::parse(data).get<unsigned>();
       m_coreService->setSubsampleWidth(subsampleWidth);
 
       glm::ivec2 displayResolution = m_coreService->displayResolution();
@@ -257,7 +257,7 @@ namespace Huenicorn::Network::Http::Server
 
     // POST METHODS
     m_httpServer.addRoute(HttpMethod::Post, "/api/setChannelActivity/:channelId", [this](const Request& req, Response& res){
-      int channelId = std::stoi(req.pathParams.at("channelId"));
+      uint8_t channelId = static_cast<uint8_t>(std::stoi(req.pathParams.at("channelId")));
 
       const std::string& data = req.body;
       Json jsonChannelData = Json::parse(data);

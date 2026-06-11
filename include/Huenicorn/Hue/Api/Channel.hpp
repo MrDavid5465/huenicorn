@@ -66,7 +66,7 @@ namespace Huenicorn::Hue::Api
     inline float gammaExponent() const
     {
       float factor = 2.f;
-      float exponent = glm::pow(2, -gammaFactor * factor);
+      float exponent = glm::pow(2.f, -gammaFactor * factor);
       return exponent;
     }
 

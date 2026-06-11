@@ -65,7 +65,7 @@ namespace Huenicorn::Core
      * 
      * @return int Registered REST port
      */
-    int restServerPort() const;
+    unsigned restServerPort() const;
 
 
     /**

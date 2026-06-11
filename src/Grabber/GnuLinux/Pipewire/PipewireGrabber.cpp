@@ -11,12 +11,26 @@
 #include <Huenicorn/Core/Config.hpp>
 #include <Huenicorn/Core/Logger.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#if defined(__clang__)
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wpedantic"
+  #pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wpedantic"
+  #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
 #include <spa/debug/types.h>
 #include <spa/param/video/type-info.h>
-#pragma GCC diagnostic pop
+
+#if defined(__clang__)
+  #pragma clang diagnostic pop
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic pop
+#endif
+
+
 
 using namespace std::chrono_literals;
 
@@ -149,8 +163,8 @@ namespace Huenicorn::Grabber
       return;
     }
 
-    const uint32_t width = pw->format.info.raw.size.width;
-    const uint32_t height = pw->format.info.raw.size.height;
+    const auto width = static_cast<int>(pw->format.info.raw.size.width);
+    const auto height = static_cast<int>(pw->format.info.raw.size.height);
 
     if(width == 0 || height == 0){
       pw_stream_queue_buffer(pw->stream, pwBuffer);
@@ -301,7 +315,7 @@ namespace Huenicorn::Grabber
     pw->loop = pw_main_loop_new(NULL);
     pw->context = pw_context_new(pw_main_loop_get_loop(pw->loop), NULL, 0);
 
-    auto core = pw_context_connect_fd(pw->context, fcntl(capture->pwFd, F_DUPFD_CLOEXEC, 5), NULL, 0);
+    auto core = pw_context_connect_fd(pw->context, fcntl(static_cast<int>(capture->pwFd), F_DUPFD_CLOEXEC, 5), NULL, 0);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
@@ -397,7 +411,7 @@ namespace Huenicorn::Grabber
     }
 
     if(m_capture.pwFd > 0){
-      close(m_capture.pwFd);
+      close(static_cast<int>(m_capture.pwFd));
       m_capture.pwFd = 0;
     }
 
