@@ -163,7 +163,10 @@ Versions of Ubuntu earlier than 24.04 are not officially supported. Please refer
 git clone https://gitlab.com/openjowelsofts/huenicorn.git
 cd huenicorn
 mkdir build && cd build
+# Use this line for default configuration
 cmake ..
+# or this one to disable automatic online-fetching fallback for dependencies (glm, nlohmann_json, httplib)
+cmake -DHUENICORN_FETCH_DEPS=OFF ..
 make
 ```
 

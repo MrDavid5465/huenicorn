@@ -5,6 +5,8 @@ project(Huenicorn VERSION 1.0.12)
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
 set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
 
+option(HUENICORN_FETCH_DEPS "Download dependencies if missing" ON)
+
 include(FetchContent)
 
 
@@ -16,30 +18,59 @@ find_library(MBEDTLS_LIBS mbedtls REQUIRED)
 find_library(MBEDTLS_X509 mbedx509 REQUIRED)
 find_library(MBEDTLS_CRYPTO mbedcrypto REQUIRED)
 
+
 # NLohmann JSON
-FetchContent_Declare(
-  nlohmann_json
-  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-)
-FetchContent_MakeAvailable(nlohmann_json)
+find_package(nlohmann_json QUIET)
+if(NOT nlohmann_json_FOUND)
+  if(HUENICORN_FETCH_DEPS)
+    message(STATUS "nlohmann_json is not installed. Now fetching online...")
+    FetchContent_Declare(
+      nlohmann_json
+      URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+  else()
+    message(FATAL_ERROR "nlohmann_json is not installed and online fetch is disabled")
+  endif()
+else()
+  message(STATUS "nlohmann_json is installed.")
+endif()
 
 
 # CppHttpLip
-FetchContent_Declare(
-  cpp_httplib
-  URL https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
-)
-FetchContent_MakeAvailable(cpp_httplib)
-
+find_package(httplib QUIET)
+if(NOT httplib_FOUND)
+  if(HUENICORN_FETCH_DEPS)
+    message(STATUS "httplib is not installed. Now fetching online...")
+    FetchContent_Declare(
+      cpp_httplib
+      URL https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
+    )
+    FetchContent_MakeAvailable(cpp_httplib)
+  else()
+    message(FATAL_ERROR "httplib is not installed and online fetch is disabled")
+  endif()
+else()
+  message(STATUS "httplib is installed.")
+endif()
 
 
 # GLM
-FetchContent_Declare(
-  glm
-  GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 1.0.3
-)
-FetchContent_MakeAvailable(glm)
+find_package(glm QUIET)
+if(NOT glm_FOUND)
+  if(HUENICORN_FETCH_DEPS)
+    message(STATUS "glm is not installed. Now fetching online...")
+    FetchContent_Declare(
+      glm
+      URL https://github.com/g-truc/glm/archive/refs/tags/1.0.3.tar.gz
+    )
+    FetchContent_MakeAvailable(glm)
+  else()
+    message(FATAL_ERROR "glm is not installed and online fetch is disabled")
+  endif()
+else()
+  message(STATUS "glm is installed")
+endif()
 
 
 # Generate version header
