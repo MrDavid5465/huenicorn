@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-project(Huenicorn VERSION 1.0.12)
+project(Huenicorn VERSION 1.1.0)
 
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
 set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
@@ -129,6 +129,7 @@ configure_file(
 )
 
 set(APP_SOURCE
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/App/CommandLine.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/App/main.cpp
 )
 

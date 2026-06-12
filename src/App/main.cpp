@@ -1,11 +1,12 @@
-#include <thread>
-#include <memory>
 #include <csignal>
+#include <memory>
+#include <thread>
 
-#include <Huenicorn/Version.hpp>
+#include <Huenicorn/App/CommandLine.hpp>
 #include <Huenicorn/Core/Runtime.hpp>
 #include <Huenicorn/Core/Logger.hpp>
 #include <Huenicorn/Platform/Selector.hpp>
+#include <Huenicorn/Version.hpp>
 
 
 /**
@@ -58,8 +59,17 @@ void signalHandler(
 }
 
 
-int main()
+int main(
+  int argc,
+  char* argv[]
+)
 {
+  Huenicorn::App::CommandLine::Params params;
+  Huenicorn::App::CommandLine::getOpt(argc, argv, params);
+  if(params.shouldStop){
+    return 0;
+  }
+
   Huenicorn::Core::Logger::log("Starting Huenicorn version ", Huenicorn::Version, " for ", Huenicorn::Platform::adapter.getPlatformName());
 
   signal(SIGTERM, signalHandler);
