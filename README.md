@@ -157,6 +157,16 @@ cmake -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12 ..
 Versions of Ubuntu earlier than 24.04 are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
 </details>
 
+<details>
+<summary>NixOS</summary>
+
+A Nix Flake is provided with this repository:
+
+```bash
+nix run gitlab:openjowelsofts/huenicorn
+```
+</details>
+
 ### Building Huenicorn
 
 ```bash
