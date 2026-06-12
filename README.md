@@ -165,8 +165,6 @@ A Nix Flake is provided with this repository:
 ```bash
 nix run gitlab:openjowelsofts/huenicorn
 ```
-
-Versions of Ubuntu earlier than 24.04 are not officially supported. Please refer to [This post](https://gitlab.com/openjowelsofts/huenicorn/-/issues/5#note_1700387996) if you still want to give it a try.
 </details>
 
 ### Building Huenicorn
