@@ -171,7 +171,6 @@ namespace Huenicorn::Grabber
     }
 
     m_lastFullScreenFrame.imageMatrix = cv::Mat(height, width, cvFormat, ximage->data);
-    m_lastFullScreenFrame.isSubsampled = false;
 
     imageData = m_lastFullScreenFrame;
   }
@@ -248,6 +247,16 @@ namespace Huenicorn::Grabber
         }
       }
     }
+
+    if(monitorSelectionData.monitors.empty()){
+      throw std::runtime_error("No monitor available");
+    }
+
+    if(!monitorSelectionData.selectedMonitorId.has_value()){
+      Core::Logger::warn("No primary monitor reported by X11. Falling back to first monitor");
+      monitorSelectionData.selectedMonitorId = 0;
+    }
+
 
     // Add whole display surface to choices if there are multiple screens
     std::swap(m_monitorSelectionData, monitorSelectionData);

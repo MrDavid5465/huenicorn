@@ -64,6 +64,8 @@ namespace Huenicorn::Platform
     }
 #endif
 
-    return nullptr;
+    throw std::runtime_error(
+      "Unsupported session type: " + sessionType
+    );
   }
 }

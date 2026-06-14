@@ -16,7 +16,6 @@ namespace Huenicorn::Imaging
   {
     cv::Mat imageMatrix;
     PixelFormat format;
-    bool isSubsampled;
 
     inline int width() const
     {

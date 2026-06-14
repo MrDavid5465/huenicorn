@@ -215,7 +215,6 @@ namespace Huenicorn::Grabber
     Imaging::ImageData capturedFrame{
       .imageMatrix = cv::Mat(ownedFrame),
       .format = Imaging::PixelFormat::RGBA,
-      .isSubsampled = false
     };
 
     {

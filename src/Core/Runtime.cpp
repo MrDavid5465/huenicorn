@@ -269,16 +269,21 @@ namespace Huenicorn::Core
       return;
     }
 
-    Imaging::ImageData subframeImageData;
+    Imaging::ImageData source = m_frameData;
 
     const auto subsampleWidth = static_cast<int>(m_config.subsampleWidth());
 
-    if(!m_frameData.isSubsampled){
-      Imaging::ImageProcessing::rescale(m_frameData, subframeImageData, subsampleWidth, m_config.interpolation());
+    if(m_frameData.width() > subsampleWidth){
+      Imaging::ImageData resized;
+      Imaging::ImageProcessing::rescale(m_frameData, resized, subsampleWidth, m_config.interpolation());
+
+      if(resized.hasData()){
+        source = std::move(resized);
+      }
     }
 
-    if(m_frameData.format == Imaging::PixelFormat::RGBA){
-      Imaging::ImageProcessing::rgbaToRgb(subframeImageData, subframeImageData);
+    if(source.format == Imaging::PixelFormat::RGBA){
+      Imaging::ImageProcessing::rgbaToRgb(source, source);
     }
 
     for(auto& [channelId, channel] : m_channels){
@@ -297,7 +302,7 @@ namespace Huenicorn::Core
       }
       else{
         Imaging::ImageData crop;
-        Imaging::ImageProcessing::getSubImage(subframeImageData, crop, channel.uvs);
+        Imaging::ImageProcessing::getSubImage(source, crop, channel.uvs);
         auto color = Imaging::ImageProcessing::getDominantColor(crop);
 
         glm::vec3 normalized = color.toNormalized();
