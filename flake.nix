@@ -79,8 +79,8 @@
         };
 
         checks = {
-          builds-an-executable = pkgs.stdenv.mkDerivation {
-            name = "Huenicorn is an executable";
+          huenicorn-version-works = pkgs.stdenv.mkDerivation {
+            name = "Huenicorn `--version` smoke test";
 
             src = ./.;
 
@@ -88,12 +88,7 @@
             doCheck = true;
 
             checkPhase = ''
-               if [[ -f "${built}/bin/huenicorn" && -r "${built}/bin/huenicorn" && -x "${built}/bin/huenicorn" ]]; then
-                 echo "OK" >> $out;
-               else
-                 echo "KO" >> $out;
-                 exit 1;
-              fi
+               ${built}/bin/huenicorn --version | ${pkgs.gnugrep}/bin/grep Huenicorn >> $out;
             '';
           };
         };
