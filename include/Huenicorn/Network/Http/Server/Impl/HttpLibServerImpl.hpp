@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <httplib.h>
 
 #include <Huenicorn/Network/Http/Server/HttpDataStructs.hpp>
