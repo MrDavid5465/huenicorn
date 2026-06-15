@@ -59,7 +59,7 @@ namespace Huenicorn::Imaging
     )
     {
       float width = static_cast<float>(inputImageData.width());
-      float height = static_cast<float>(inputImageData.width());
+      float height = static_cast<float>(inputImageData.height());
       glm::ivec2 a{uvs.min.x * width, uvs.min.y * height};
       glm::ivec2 b{uvs.max.x * width, uvs.max.y * height};
       
@@ -88,10 +88,7 @@ namespace Huenicorn::Imaging
         const ImageData& imageData
       )
       {
-        const auto& imageMatrix = imageData.imageMatrix;
-
-        cv::Mat data = imageMatrix.reshape(3, static_cast<int>(imageMatrix.total()));
-        auto mean = cv::mean(data);
+        auto mean = cv::mean(imageData.imageMatrix);
 
         return Color{
           static_cast<uint8_t>(mean[2]),
