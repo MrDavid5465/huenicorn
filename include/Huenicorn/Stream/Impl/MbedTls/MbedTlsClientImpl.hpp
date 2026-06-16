@@ -253,7 +253,7 @@ namespace Huenicorn::Stream
      */
     void _handshake(const DtlsConfig& dtlsConfig)
     {
-      int result;
+      int result = -1;
       for(unsigned attempt = 0; attempt <  dtlsConfig.handshakeAttempts; attempt++){
         mbedtls_ssl_conf_handshake_timeout(conf.get(), 400, 1000);
         do{
