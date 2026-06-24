@@ -305,8 +305,15 @@ namespace Huenicorn::Core
         Imaging::ImageProcessing::getSubImage(source, crop, channel.uvs);
         auto color = Imaging::ImageProcessing::getDominantColor(crop);
 
+        glm::vec3 correctedColor;
+        /*/
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));
+        /*/
+        glm::vec3 xybColor = color.toXYB();
+        xybColor.z = glm::pow(xybColor.z, channel.gammaExponent());
+        correctedColor = xybColor;
+        //*/
 
         channelStream.id = channelId;
         channelStream.r = correctedColor.r;
