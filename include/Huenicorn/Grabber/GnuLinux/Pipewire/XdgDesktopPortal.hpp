@@ -14,8 +14,9 @@
 
 namespace Huenicorn::Grabber
 {
-  namespace XdgDesktopPortal
+  class XdgDesktopPortal
   {
+  public:
     // Type definitions
     using StringPair = std::pair<std::string, std::string>;
 
@@ -65,52 +66,72 @@ namespace Huenicorn::Grabber
       gulong cancelledId;
     };
 
+    // Public methods
+    static void createSession(
+      Capture* capture
+    );
 
-    // Functions
-    void ensureConnection();
+    static bool initScreencastCapture(
+      Capture* capture
+    );
 
-    std::string getSenderName();
+    static void screencastPortalDesktopCaptureCreate(
+      Capture* capture,
+      CaptureType captureType,
+      bool cursorVisible
+    );
 
-    GDBusConnection* portalGetDbusConnection();
+    static void screencastPortalCaptureDestroy(
+      Capture* capture
+    );
 
-    StringPair portalCreatePath(
+
+    // private methods
+  private:
+    static void ensureConnection();
+
+    static std::string getSenderName();
+
+    static GDBusConnection* portalGetDbusConnection();
+
+    static StringPair portalCreatePath(
       CreatePathTokenType createPathTokenType
     );
 
-    void ensureScreencastPortalProxy();
+    static void ensureScreencastPortalProxy();
 
-    GDBusProxy* getScreencastPortalProxy();
+    static GDBusProxy* getScreencastPortalProxy();
 
-    uint32_t getAvailableCursorModes();
+    static uint32_t getAvailableCursorModes();
 
-    uint32_t getScreencastVersion();
+    static uint32_t getScreencastVersion();
 
-    void onCancelledCallback(
+    static void onCancelledCallback(
       GCancellable* cancellable,
       void* data
     );
 
-    DbusCallData* subscribeToSignal(
+    static DbusCallData* subscribeToSignal(
       Capture* capture,
       const char* path,
       GDBusSignalCallback callback
     );
 
-    void dbusCallDataFree(
+    static void dbusCallDataFree(
       DbusCallData* call
     );
 
-    void onPipewireRemoteOpenedCallback(
+    static void onPipewireRemoteOpenedCallback(
       GObject* source,
       GAsyncResult* res,
       void* userData
     );
 
-    void openPipewireRemote(
+    static void openPipewireRemote(
       Capture* capture
     );
 
-    void onStartResponseReceivedCallback(
+    static void onStartResponseReceivedCallback(
       GDBusConnection* connection,
       const char* sender_name,
       const char* object_path,
@@ -120,17 +141,17 @@ namespace Huenicorn::Grabber
       void* userData
     );
 
-    void onStartedCallback(
+    static void onStartedCallback(
       GObject* source,
       GAsyncResult* res,
       void* userData
     );
 
-    void start(
+    static void start(
       Capture* capture
     );
 
-    void onSelectSourceResponseReceivedCallback(
+    static void onSelectSourceResponseReceivedCallback(
       GDBusConnection* connection,
       const char* senderName,
       const char* objectPath,
@@ -140,17 +161,17 @@ namespace Huenicorn::Grabber
       void* userData
     );
 
-    void onSourceSelectedCallback(
+    static void onSourceSelectedCallback(
       GObject* source,
       GAsyncResult* res,
       void* userData
     );
 
-    void selectSource(
+    static void selectSource(
       Capture* capture
     );
 
-    void onCreateSessionResponseReceivedCallback(
+    static void onCreateSessionResponseReceivedCallback(
       GDBusConnection* connection,
       const char* senderName,
       const char* objectPath,
@@ -160,28 +181,18 @@ namespace Huenicorn::Grabber
       void* userData
     );
 
-    void onSessionCreatedCallback(
+    static void onSessionCreatedCallback(
       GObject* source,
       GAsyncResult* res,
       void* userData
     );
 
-    void createSession(
-      Capture* capture
-    );
+  private:
+    // Attributes
+    static GDBusConnection* m_connection;
+    static GDBusProxy* m_screencastProxy;
 
-    bool initScreencastCapture(
-      Capture* capture
-    );
-
-    void screencastPortalDesktopCaptureCreate(
-      Capture* capture,
-      CaptureType captureType,
-      bool cursorVisible
-    );
-
-    void screencastPortalCaptureDestroy(
-      Capture* capture
-    );
-  }
+    static const std::string ObjectPath;
+    static const std::string BusName;
+  };
 }

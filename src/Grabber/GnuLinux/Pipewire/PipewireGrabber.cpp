@@ -280,7 +280,7 @@ namespace Huenicorn::Grabber
     XdgDesktopPortal::Capture* capture
   )
   {
-    screencastPortalDesktopCaptureCreate(capture, XdgDesktopPortal::CaptureType::Monitor, true);
+    XdgDesktopPortal::screencastPortalDesktopCaptureCreate(capture, XdgDesktopPortal::CaptureType::Monitor, true);
 
     GMainLoop* gmain = g_main_loop_new(NULL, FALSE);
 
