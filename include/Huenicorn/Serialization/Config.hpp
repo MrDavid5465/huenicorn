@@ -34,6 +34,10 @@ namespace Huenicorn::Serialization
       if(configData.profileName.has_value()){
         jsonConfigData["profileName"] = configData.profileName.value();
       }
+
+      if(configData.restoreToken.has_value()){
+        jsonConfigData["restoreToken"] = configData.restoreToken.value();
+      }
     }
 
 
@@ -72,6 +76,10 @@ namespace Huenicorn::Serialization
 
       if(jsonConfigData.contains("interpolation")){
         configData.interpolation = jsonConfigData.at("interpolation");
+      }
+
+      if(jsonConfigData.contains("restoreToken")){
+        configData.restoreToken = jsonConfigData.at("restoreToken");
       }
     }
   };

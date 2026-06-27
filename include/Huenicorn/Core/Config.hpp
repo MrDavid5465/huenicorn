@@ -28,6 +28,7 @@ namespace Huenicorn::Core
       std::optional<unsigned> refreshRate{0};
       std::optional<unsigned> subsampleWidth{0};
       std::optional<Imaging::Interpolation::Type> interpolation{Imaging::Interpolation::Type::Area};
+      std::optional<std::string> restoreToken;
     };
 
 
@@ -124,6 +125,14 @@ namespace Huenicorn::Core
     Imaging::Interpolation::Type interpolation() const;
 
 
+    /**
+     * @brief Returns the registered restoration token for screen selection portal
+     * 
+     * @return Optional restore token string
+    */
+    const std::optional<std::string>& restoreToken() const;
+
+
     // Setters
     /**
      * @brief Registers Hue bridge address
@@ -183,6 +192,17 @@ namespace Huenicorn::Core
     void setInterpolation(
       Imaging::Interpolation::Type interpolation
     );
+
+
+    /**
+     * @brief Registers the restore token for screen selection
+     * 
+     * @param std::string Token for xdg session restauration
+    */
+    void setRestoreToken(
+      const std::string& restoreToken
+    );
+
 
   private:
     // Private methods

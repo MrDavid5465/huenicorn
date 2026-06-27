@@ -73,6 +73,12 @@ namespace Huenicorn::Core
   }
 
 
+  const std::optional<std::string>& Config::restoreToken() const
+  {
+    return m_configData->restoreToken;
+  }
+
+
   const std::optional<std::string>& Config::bridgeAddress() const
   {
     return m_configData.value().bridgeAddress;
@@ -149,17 +155,27 @@ namespace Huenicorn::Core
   }
 
 
+  void Config::setRestoreToken(
+    const std::string& restoreToken
+  )
+  {
+    m_configData->restoreToken = restoreToken;
+    _save();
+  }
+
+
   bool Config::_loadConfigFile()
   {
     const Data defaultConfigData = {
       .restServerPort = 8215,
       .boundBackendIP = "0.0.0.0",
-      .bridgeAddress = {},
-      .credentials = {},
-      .profileName = {},
+      .bridgeAddress = std::nullopt,
+      .credentials = std::nullopt,
+      .profileName = std::nullopt,
       .refreshRate = 0,
       .subsampleWidth = 0,
-      .interpolation = Imaging::Interpolation::Type::Area
+      .interpolation = Imaging::Interpolation::Type::Area,
+      .restoreToken = std::nullopt
     };
 
     Json jsonConfig = Json::object();

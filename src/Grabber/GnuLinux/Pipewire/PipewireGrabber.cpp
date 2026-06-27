@@ -43,6 +43,7 @@ namespace Huenicorn::Grabber
   IGrabber(config)
   {
     m_pwData.config = config;
+    m_capture.config = config;
 
     std::promise<bool> fdReadyPromise;
     auto fdReadyFuture = fdReadyPromise.get_future();

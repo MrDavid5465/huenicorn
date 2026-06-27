@@ -11,6 +11,8 @@
 
 #include <gio/gunixfdlist.h>
 
+#include <Huenicorn/Core/Config.hpp>
+
 
 namespace Huenicorn::Grabber
 {
@@ -55,6 +57,7 @@ namespace Huenicorn::Grabber
       char cursorVisible;
       std::promise<bool> fdReadyPromise;
       bool updateXdgContext{true};
+      Core::Config* config;
     };
 
 

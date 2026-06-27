@@ -327,6 +327,7 @@ namespace Huenicorn::Grabber
     {
       DbusCallData* call = static_cast<DbusCallData*>(userData);
       Capture* capture = call->capture;
+
       g_clear_pointer(&call, dbusCallDataFree);
 
       uint32_t response;
@@ -347,6 +348,16 @@ namespace Huenicorn::Grabber
       size_t n_streams = g_variant_iter_n_children(&iter);
       if(n_streams != 1){
         Core::Logger::error("received more than one stream when only one was expected. this is probably a bug in the desktop portal implementation you are using.");
+      }
+
+      const char* token = nullptr;
+      if(g_variant_lookup(result, "restore_token", "&s", &token)){
+        Core::Config* config = capture->config;
+
+        if(!config->restoreToken().has_value()){
+          capture->config->setRestoreToken(token);
+          Core::Logger::log("Registered restore token: '", token, "' into config");
+        }
       }
 
       g_autoptr(GVariant) streamProperties = NULL;
@@ -458,6 +469,15 @@ namespace Huenicorn::Grabber
       g_variant_builder_add(&builder, "{sv}", "types", g_variant_new_uint32(capture->captureType));
       g_variant_builder_add(&builder, "{sv}", "multiple", g_variant_new_boolean(FALSE));
       g_variant_builder_add(&builder, "{sv}", "handle_token", g_variant_new_string(pathAndToken.second.c_str()));
+
+      if(capture->config->restoreToken().has_value()){
+        g_variant_builder_add(
+          &builder,
+          "{sv}",
+          "restore_token",
+          g_variant_new_string(capture->config->restoreToken()->c_str())
+        );
+      }
 
       uint32_t available_cursor_modes = getAvailableCursorModes();
       if(available_cursor_modes & CursorMode::Metadata){
