@@ -20,29 +20,25 @@ Huenicorn provides a simple web interface to assign specific portions of screen 
 
 ## Project status
 
-Huenicorn 1.0.12 is available.
+Huenicorn 1.1.0 is available.
 
-### This revision brings
+### This new version brings
 
-* Global architecture refactor
-  * Better abstractions/responsibilities for clearer workflow
-  * Implementations are now generalized behind PImpl
-* Less build dependencies to ease the build process
-  * Replaced Crow with cpp_httplib
-  * Asio is no longer required
-  * Specific dependencies are now fetched during the build configuration
-* Reworked grabbers
-  * Fixed Hyprland sessions
-  * Fixed errors in Pipewire Grabber (Hopefully solving problem for good)
-  * Added XinitThreads in X11Grabber
-* Better runtime checks
-  * Better checks when registering bridge address
-* Cross-Platform
-  * Build is now possible for MacOS and Windows (No grabber yet)
+- New features
+  - Switched to XY/Brightness color space (Better color brightness/saturation)
+  - Added Wayland restore token support to avoid repeated portal prompts
+  - Added command-line params for version / help
+
+- Fixes and improvements
+  - Ensured support Hue Bridge Pro
+  - Improved error handling during Grabber creation
+  - Added NixOS support and installation instructions
+  - Fixed CMake dependencies to allow offline builds
+  - Fixed some compiler-dependent warnings
 
 ## Getting Started
 
-* Before using Huenicorn, you need to define some entertainment area on your Hue bridge through the official application provided by Philips.
+ Before using Huenicorn, you need to define some entertainment area on your Hue bridge through the official application provided by Philips.
 
 ### Requirements
 
@@ -243,6 +239,7 @@ The data structure of these files is JSON.
   * Area = 2 : (Recommended) Smooth and respectful of overall content
 * **profile**:  (String) Name of the current user-defined light profile
 * **refreshRate**:  (Unsigned) Screen capture and light update frequency
+* **restoreToken**:  (String) Token to remember last session settings (Wayland only)
 * **restServerPort**:  (Unsigned) Port on which the web UI must respond
 * **subsampleWidth**:  (Unsigned) Width of the treated image subsample
 
@@ -259,6 +256,7 @@ Here is an example
   "interpolation": 2,
   "profileName": "profile",
   "refreshRate": 60,
+  "restoreToken": "aBcDeFgH_iJkLmNoPqRsT1",
   "restServerPort": 8215,
   "subsampleWidth": 32
 }
@@ -333,6 +331,14 @@ cmake ..
 
 Wayland requires the ```Pipewire``` Grabber.
 
+### The monitor-selection portal on Wayland doesn't show anymore and I need to change my settings
+
+1. Shutdown Huenicorn if running
+2. Open the `~/.config/huenicorn/config.json` file and remove the line regarding `restoreToken`
+3. Start Huenicorn
+4. The monitor selection portal will spawn again
+
+
 ### Crash after screen selection on Wayland session
 
 There is a known bug affecting Huenicorn depending on build parameters. This problem was "half-solved" since 1.0.9 but can somehow persist under certain circumstances.
@@ -371,7 +377,9 @@ Additionnal information and news can be found on [Huenicorn.org](http://huenicor
 
 ## Version history
 
-* 1.0.12 (latest)
+* 1.1.0 (latest)
+  * Better color brightness/saturation, Bridge Pro support, automatic wayland screen selection
+* 1.0.12
   * Global refactor for less dependencies and clearer workflow
 * 1.0.11
   * Embed webroot into binary, handle multiple bridges at setup
