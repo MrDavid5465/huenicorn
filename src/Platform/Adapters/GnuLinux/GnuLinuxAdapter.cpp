@@ -64,7 +64,7 @@ namespace Huenicorn::Platform
     }
 #endif
 
-    throw std::runtime_error(
+    throw Grabber::GrabberUnavailable(
       "Unsupported session type: " + sessionType
     );
   }

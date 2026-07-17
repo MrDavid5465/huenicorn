@@ -53,7 +53,7 @@ namespace Huenicorn::Grabber
 
     if(!fdReadyFuture.get()){
       _stop();
-      throw std::runtime_error("Failed to get monitor file descriptor");
+      throw Grabber::GrabberCancelled("Failed to get monitor file descriptor");
     }
 
     auto configDataReadyFuture = m_pwData.screenDataReadyPromise.get_future();

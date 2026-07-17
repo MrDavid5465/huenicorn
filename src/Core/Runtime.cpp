@@ -138,7 +138,7 @@ namespace Huenicorn::Core
   bool Runtime::_initGrabber()
   {
     m_grabber = Platform::adapter.getGrabber(&m_config);
-    return true;
+    return m_grabber != nullptr;
   }
 
 
