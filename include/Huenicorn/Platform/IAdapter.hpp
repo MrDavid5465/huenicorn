@@ -93,12 +93,19 @@ namespace Huenicorn::Platform
           m_grabber = _createGrabber(config);
           m_grabber->init();
         }
-        catch(const std::exception& e){
+        catch(const Grabber::GrabberUnavailable& e){
           // Fallback to DummyGrabber
           Core::Logger::warn(e.what());
           Core::Logger::warn("Could not start propper grabber. Now falling back to DummyGrabber.");
 
           m_grabber = std::make_unique<Grabber::DummyGrabber>(config);
+        }
+        catch(const Grabber::GrabberCancelled& e){
+          Core::Logger::warn(e.what());
+          Core::Logger::warn("Now quitting");
+        }
+        catch(const std::exception& e){
+          Core::Logger::warn(e.what());
         }
       }
 

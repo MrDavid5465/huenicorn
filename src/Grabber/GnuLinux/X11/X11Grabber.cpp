@@ -35,8 +35,8 @@ namespace Huenicorn::Grabber
   X11Grabber::XShmData::XShmData(
     Display* display,
     int screenId,
-    int width,
-    int height
+    unsigned width,
+    unsigned height
   ):
   m_display(display)
   {
@@ -52,7 +52,7 @@ namespace Huenicorn::Grabber
       height
     ));
 
-    int size = m_ximage->bytes_per_line * m_ximage->height;
+    size_t size = static_cast<size_t>(m_ximage->bytes_per_line * m_ximage->height);
 
     m_shmInfo->shmid = shmget(IPC_PRIVATE, size, IPC_CREAT | 0777);
     m_shmInfo->readOnly = False;
@@ -123,7 +123,7 @@ namespace Huenicorn::Grabber
   {
     try{
       auto selectedMonitor = m_monitorSelectionData.selectedMonitor();
-      return selectedMonitor->refreshRate;
+      return static_cast<IGrabber::RefreshRate>(selectedMonitor->refreshRate);
     }
     catch(const std::exception& e){
       Core::Logger::error("No selected monitor");
@@ -154,13 +154,13 @@ namespace Huenicorn::Grabber
 
     auto* selectedMonitor = dynamic_cast<X11MonitorData*>(m_monitorSelectionData.selectedMonitor());
 
-    int width = selectedMonitor->width;
-    int height = selectedMonitor->height;
+    int width = static_cast<int>(selectedMonitor->width);
+    int height = static_cast<int>(selectedMonitor->height);
     auto ximage = m_xshmData->ximage();
 
     XShmGetImage(m_display.get(), RootWindow(m_display.get(), m_screenId), ximage, selectedMonitor->xPos, selectedMonitor->yPos, AllPlanes);
 
-    unsigned cvFormat;
+    int cvFormat;
     if(ximage->bits_per_pixel > 24){
       cvFormat = CV_8UC4;
       m_lastFullScreenFrame.format = Imaging::PixelFormat::RGBA;
@@ -171,7 +171,6 @@ namespace Huenicorn::Grabber
     }
 
     m_lastFullScreenFrame.imageMatrix = cv::Mat(height, width, cvFormat, ximage->data);
-    m_lastFullScreenFrame.isSubsampled = false;
 
     imageData = m_lastFullScreenFrame;
   }
@@ -223,8 +222,8 @@ namespace Huenicorn::Grabber
 
         int x = crtcInfo->x;
         int y = crtcInfo->y;
-        int width = crtcInfo->width;
-        int height = crtcInfo->height;
+        int width = static_cast<int>(crtcInfo->width);
+        int height = static_cast<int>(crtcInfo->height);
         bool isPrimary = (screenResources->outputs[i] == primaryId);
 
         monitorSelectionData.monitors.push_back(std::make_unique<X11MonitorData>(
@@ -248,6 +247,16 @@ namespace Huenicorn::Grabber
         }
       }
     }
+
+    if(monitorSelectionData.monitors.empty()){
+      throw std::runtime_error("No monitor available");
+    }
+
+    if(!monitorSelectionData.selectedMonitorId.has_value()){
+      Core::Logger::warn("No primary monitor reported by X11. Falling back to first monitor");
+      monitorSelectionData.selectedMonitorId = 0;
+    }
+
 
     // Add whole display surface to choices if there are multiple screens
     std::swap(m_monitorSelectionData, monitorSelectionData);

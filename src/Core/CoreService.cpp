@@ -6,6 +6,7 @@
 #include <Huenicorn/Core/Logger.hpp>
 
 #include <Huenicorn/Hue/Api/ApiTools.hpp>
+#include <Huenicorn/Hue/Api/BridgeAddress.hpp>
 #include <Huenicorn/Serialization/Json.hpp>
 #include <Huenicorn/Serialization/EntertainmentConfiguration.hpp>
 #include <Huenicorn/Serialization/JsonSerializer.hpp>
@@ -40,13 +41,13 @@ namespace Huenicorn::Core
     const std::string& bridgeAddress
   )
   {
-    std::string sanitizedAddress = bridgeAddress;
+    std::string sanitizedAddress = Hue::Api::sanitizeBridgeAddress(bridgeAddress);
 
     while(sanitizedAddress.back() == '/'){
       sanitizedAddress.pop_back();
     }
 
-    auto response = Network::Http::Client::sendRequest(sanitizedAddress + "/api/0/config", "GET", "");
+    auto response = Network::Http::Client::sendRequest(Hue::Api::HttpProtocol + sanitizedAddress + "/api/0/config", "GET", "");
     if(!response.has_value()){
       return false;
     }
@@ -72,7 +73,7 @@ namespace Huenicorn::Core
     const Hue::Auth::Credentials& credentials
   )
   {
-    auto response = Network::Http::Client::sendRequest(m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
+    auto response = Network::Http::Client::sendRequest(Hue::Api::HttpProtocol + m_config.bridgeAddress().value() + "/api/" + credentials.username(), "GET", "");
     if(!response.has_value()){
       return false;
     }

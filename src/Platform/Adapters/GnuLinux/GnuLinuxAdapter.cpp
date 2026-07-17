@@ -64,6 +64,8 @@ namespace Huenicorn::Platform
     }
 #endif
 
-    return nullptr;
+    throw Grabber::GrabberUnavailable(
+      "Unsupported session type: " + sessionType
+    );
   }
 }

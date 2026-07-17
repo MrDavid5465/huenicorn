@@ -91,22 +91,22 @@ namespace Huenicorn::Core
       float percentThreshold = 1.0;
       auto subsampleCandidates = m_grabber->subsampleResolutionCandidates();
 
-      unsigned bestSubsampleWidth = subsampleCandidates.back().x;
-      for(int i = subsampleCandidates.size(); i--;){
-        unsigned candidate = subsampleCandidates.at(i).x;
+      auto bestSubsampleWidth = subsampleCandidates.back().x;
+      for(auto i = subsampleCandidates.size(); i--;){
+        auto candidate = subsampleCandidates.at(i).x;
 
-        if((static_cast<float>(candidate) / displayResolution.x) * 100 >= percentThreshold){
+        if((static_cast<float>(candidate) / static_cast<float>(displayResolution.x)) * 100 >= percentThreshold){
           bestSubsampleWidth = candidate;
           break;
         }
       }
 
-      m_config.setSubsampleWidth(bestSubsampleWidth);
+      m_config.setSubsampleWidth(static_cast<unsigned>(bestSubsampleWidth));
     }
 
     const float warningThreshold = 50.0;
 
-    float ratio = static_cast<float>(m_config.subsampleWidth()) / m_grabber->displayResolution().x;
+    float ratio = static_cast<float>(m_config.subsampleWidth()) / static_cast<float>(m_grabber->displayResolution().x);
 
     if(ratio >= warningThreshold / 100){
       Logger::warn("Subsample width is >= ", warningThreshold, "% of the display resolution. Color computation might be intensive.");
@@ -138,7 +138,7 @@ namespace Huenicorn::Core
   bool Runtime::_initGrabber()
   {
     m_grabber = Platform::adapter.getGrabber(&m_config);
-    return true;
+    return m_grabber != nullptr;
   }
 
 
@@ -149,7 +149,7 @@ namespace Huenicorn::Core
     std::promise<bool> readyWebUIPromise;
     auto readyWebUIFuture = readyWebUIPromise.get_future();
 
-    unsigned restServerPort = m_config.restServerPort();
+    auto restServerPort = m_config.restServerPort();
     const std::string& boundBackendIP = m_config.boundBackendIP();
     m_webUIService.thread = std::jthread([&server = m_webUIService.server, restServerPort, boundBackendIP, &readyWebUIPromise, this](){
       server.emplace(m_coreService.get());
@@ -269,16 +269,21 @@ namespace Huenicorn::Core
       return;
     }
 
-    Imaging::ImageData subframeImageData;
+    Imaging::ImageData source = m_frameData;
 
-    const auto subsampleWidth = m_config.subsampleWidth();
+    const auto subsampleWidth = static_cast<int>(m_config.subsampleWidth());
 
-    if(!m_frameData.isSubsampled){
-      Imaging::ImageProcessing::rescale(m_frameData, subframeImageData, subsampleWidth, m_config.interpolation());
+    if(m_frameData.width() > subsampleWidth){
+      Imaging::ImageData resized;
+      Imaging::ImageProcessing::rescale(m_frameData, resized, subsampleWidth, m_config.interpolation());
+
+      if(resized.hasData()){
+        source = std::move(resized);
+      }
     }
 
-    if(m_frameData.format == Imaging::PixelFormat::RGBA){
-      Imaging::ImageProcessing::rgbaToRgb(subframeImageData, subframeImageData);
+    if(source.format == Imaging::PixelFormat::RGBA){
+      Imaging::ImageProcessing::rgbaToRgb(source, source);
     }
 
     for(auto& [channelId, channel] : m_channels){
@@ -297,11 +302,18 @@ namespace Huenicorn::Core
       }
       else{
         Imaging::ImageData crop;
-        Imaging::ImageProcessing::getSubImage(subframeImageData, crop, channel.uvs);
+        Imaging::ImageProcessing::getSubImage(source, crop, channel.uvs);
         auto color = Imaging::ImageProcessing::getDominantColor(crop);
 
+        glm::vec3 correctedColor;
+        /*/
         glm::vec3 normalized = color.toNormalized();
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));
+        /*/
+        glm::vec3 xybColor = color.toXYB();
+        xybColor.z = glm::pow(xybColor.z, channel.gammaExponent());
+        correctedColor = xybColor;
+        //*/
 
         channelStream.id = channelId;
         channelStream.r = correctedColor.r;
