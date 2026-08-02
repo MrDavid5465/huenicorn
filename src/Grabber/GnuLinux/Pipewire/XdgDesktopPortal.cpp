@@ -300,6 +300,7 @@ namespace Huenicorn::Grabber
       }
 
       capture->pwFd = static_cast<uint32_t>(pwFd);
+      capture->updateXdgContext = false;
       capture->fdReadyPromise.set_value(true);
     }
 
@@ -354,8 +355,8 @@ namespace Huenicorn::Grabber
       if(g_variant_lookup(result, "restore_token", "&s", &token)){
         Core::Config* config = capture->config;
 
-        if(!config->restoreToken().has_value()){
-          capture->config->setRestoreToken(token);
+        if(config){
+          config->setRestoreToken(token);
           Core::Logger::log("Registered restore token: '", token, "' into config");
         }
       }
@@ -471,12 +472,16 @@ namespace Huenicorn::Grabber
       g_variant_builder_add(&builder, "{sv}", "handle_token", g_variant_new_string(pathAndToken.second.c_str()));
 
       if(capture->config->restoreToken().has_value()){
+        Core::Logger::log("Using saved restore token for screen capture session");
         g_variant_builder_add(
           &builder,
           "{sv}",
           "restore_token",
           g_variant_new_string(capture->config->restoreToken()->c_str())
         );
+      }
+      else{
+        Core::Logger::log("No restore token available, user will be prompted for screen selection");
       }
 
       uint32_t available_cursor_modes = getAvailableCursorModes();
