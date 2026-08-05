@@ -355,7 +355,7 @@ namespace Huenicorn::Grabber
       if(g_variant_lookup(result, "restore_token", "&s", &token)){
         Core::Config* config = capture->config;
 
-        if(config){
+        if(!config->restoreToken().has_value() || *config->restoreToken() != token){
           config->setRestoreToken(token);
           Core::Logger::log("Registered restore token: '", token, "' into config");
         }
