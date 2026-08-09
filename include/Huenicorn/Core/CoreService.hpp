@@ -136,6 +136,14 @@ namespace Huenicorn::Core
     Imaging::Interpolation::Type interpolation() const;
 
 
+    /**
+     * @brief Returns the current transition smoothing factor
+     *
+     * @return float Transition smoothing factor
+     */
+    float transitionSmoothing() const;
+
+
     // Setters
     /**
      * @brief Sets the current entertainment configuration
@@ -205,6 +213,16 @@ namespace Huenicorn::Core
      */
     void setInterpolation(
       unsigned interpolation
+    );
+
+
+    /**
+     * @brief Set the transition smoothing factor
+     *
+     * @param transitionSmoothing Desired smoothing amount, in [0, 100]
+     */
+    void setTransitionSmoothing(
+      float transitionSmoothing
     );
 
 

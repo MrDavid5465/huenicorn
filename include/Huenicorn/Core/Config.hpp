@@ -28,6 +28,7 @@ namespace Huenicorn::Core
       std::optional<unsigned> refreshRate{0};
       std::optional<unsigned> subsampleWidth{0};
       std::optional<Imaging::Interpolation::Type> interpolation{Imaging::Interpolation::Type::Area};
+      std::optional<float> transitionSmoothing{0.f};
       std::optional<std::string> restoreToken;
     };
 
@@ -126,6 +127,14 @@ namespace Huenicorn::Core
 
 
     /**
+     * @brief Returns the registered transition smoothing factor
+     *
+     * @return float Transition smoothing factor, in [0, 1)
+    */
+    float transitionSmoothing() const;
+
+
+    /**
      * @brief Returns the registered restoration token for screen selection portal
      * 
      * @return Optional restore token string
@@ -191,6 +200,16 @@ namespace Huenicorn::Core
     */
     void setInterpolation(
       Imaging::Interpolation::Type interpolation
+    );
+
+
+    /**
+     * @brief Registers the transition smoothing factor
+     *
+     * @param transitionSmoothing Smoothing factor, clamped to [0, 0.97]
+    */
+    void setTransitionSmoothing(
+      float transitionSmoothing
     );
 
 

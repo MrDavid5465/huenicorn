@@ -3,6 +3,8 @@
 #include <fstream>
 #include <future>
 
+#include <glm/common.hpp>
+
 #include <Huenicorn/Grabber/DummyGrabber.hpp>
 #include <Huenicorn/Network/Http/Client/Client.hpp>
 #include <Huenicorn/Imaging/ImageProcessing.hpp>
@@ -298,6 +300,7 @@ namespace Huenicorn::Core
         channelStream.r = 0;
         channelStream.g = 0;
         channelStream.b = 0;
+        channel.hasPreviousXyb = false;
         channel.acknowledgeShutdown();
       }
       else{
@@ -311,6 +314,17 @@ namespace Huenicorn::Core
         glm::vec3 correctedColor = glm::pow(normalized, glm::vec3(channel.gammaExponent()));
         /*/
         glm::vec3 xybColor = color.toXYB();
+
+        // Ease toward the newly measured color instead of snapping to it, so
+        // fast-changing content doesn't produce an abrupt strobe-like cut.
+        // transitionSmoothing == 0 reproduces the previous (instant) behavior.
+        float smoothing = m_config.transitionSmoothing();
+        if(channel.hasPreviousXyb && smoothing > 0.f){
+          xybColor = glm::mix(channel.previousXyb, xybColor, 1.f - smoothing);
+        }
+        channel.previousXyb = xybColor;
+        channel.hasPreviousXyb = true;
+
         xybColor.z = glm::pow(xybColor.z, channel.gammaExponent());
         correctedColor = xybColor;
         //*/

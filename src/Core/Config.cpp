@@ -1,5 +1,6 @@
 #include <Huenicorn/Core/Config.hpp>
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 
@@ -70,6 +71,12 @@ namespace Huenicorn::Core
   Imaging::Interpolation::Type Config::interpolation() const
   {
     return m_configData.value().interpolation.value();
+  }
+
+
+  float Config::transitionSmoothing() const
+  {
+    return m_configData.value().transitionSmoothing.value();
   }
 
 
@@ -155,6 +162,15 @@ namespace Huenicorn::Core
   }
 
 
+  void Config::setTransitionSmoothing(
+    float transitionSmoothing
+  )
+  {
+    m_configData.value().transitionSmoothing = std::clamp(transitionSmoothing, 0.f, 0.97f);
+    _save();
+  }
+
+
   void Config::setRestoreToken(
     const std::string& restoreToken
   )
@@ -175,6 +191,7 @@ namespace Huenicorn::Core
       .refreshRate = 0,
       .subsampleWidth = 0,
       .interpolation = Imaging::Interpolation::Type::Area,
+      .transitionSmoothing = 0.f,
       .restoreToken = std::nullopt
     };
 

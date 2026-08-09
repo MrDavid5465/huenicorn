@@ -203,6 +203,13 @@ namespace Huenicorn::Core
   }
 
 
+  float CoreService::transitionSmoothing() const
+  {
+    // Config stores a raw [0, 1) blend factor; the API/UI works in percent.
+    return m_config.transitionSmoothing() * 100.f;
+  }
+
+
   bool CoreService::setEntertainmentConfiguration(
     const std::string& entertainmentConfigurationId
   )
@@ -269,6 +276,14 @@ namespace Huenicorn::Core
   )
   {
     m_config.setInterpolation(static_cast<Imaging::Interpolation::Type>(interpolation));
+  }
+
+
+  void CoreService::setTransitionSmoothing(
+    float transitionSmoothing
+  )
+  {
+    m_config.setTransitionSmoothing(transitionSmoothing / 100.f);
   }
 
 

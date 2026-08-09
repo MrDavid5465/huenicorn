@@ -106,7 +106,8 @@ namespace Huenicorn::Network::Http::Server
         {"subsampleWidth", m_coreService->subsampleWidth()},
         {"subsampleResolutionCandidates", jsonSubsampleCandidates},
         {"selectedRefreshRate", m_coreService->refreshRate()},
-        {"maxRefreshRate", m_coreService->maxRefreshRate()}
+        {"maxRefreshRate", m_coreService->maxRefreshRate()},
+        {"selectedTransitionSmoothing", m_coreService->transitionSmoothing()}
       };
 
       std::string response = jsonDisplayInfo.dump();
@@ -250,6 +251,21 @@ namespace Huenicorn::Network::Http::Server
       };
 
       std::string response = jsonInterpolation.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
+    m_httpServer.addRoute(HttpMethod::Put, "/api/setTransitionSmoothing", [this](const Request& req, Response& res){
+      const std::string& data = req.body;
+      float transitionSmoothing = Json::parse(data).get<float>();
+      m_coreService->setTransitionSmoothing(transitionSmoothing);
+
+      Json jsonTransitionSmoothing{
+        {"transitionSmoothing", m_coreService->transitionSmoothing()}
+      };
+
+      std::string response = jsonTransitionSmoothing.dump();
       res.contentType = "application/json";
       res.body = response;
     });

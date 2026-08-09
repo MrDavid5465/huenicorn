@@ -31,6 +31,10 @@ class WebUI
     this.availableInterpolationsNode.addEventListener("change", (event) => {this._setInterpolation(parseInt(event.target.value));});
     this.refreshRateInputNode = document.getElementById("refreshRate");
     this.refreshRateInputNode.addEventListener("change", (event) => {this._setRefreshRate(event.target.valueAsNumber);});
+    this.transitionSmoothingInputNode = document.getElementById("transitionSmoothing");
+    this.transitionSmoothingLabelNode = document.getElementById("transitionSmoothingLabel");
+    this.transitionSmoothingInputNode.addEventListener("input", (event) => {this.transitionSmoothingLabelNode.textContent = event.target.value;});
+    this.transitionSmoothingInputNode.addEventListener("change", (event) => {this._setTransitionSmoothing(event.target.valueAsNumber);});
 
     this.saveProfileButton = document.getElementById("saveProfileButton");
     this.saveProfileButton.addEventListener("click", () => {this._saveProfile();});
@@ -231,6 +235,8 @@ class WebUI
     let subsampleWidth = displayInfo.subsampleWidth;
     this.refreshRateInputNode.value = displayInfo.selectedRefreshRate;
     this.refreshRateInputNode.max = displayInfo.maxRefreshRate;
+    this.transitionSmoothingInputNode.value = displayInfo.selectedTransitionSmoothing;
+    this.transitionSmoothingLabelNode.textContent = Math.round(displayInfo.selectedTransitionSmoothing);
 
     this.screenWidget.setDimensions(x, y, subsampleWidth);
     let subsampleResolutionCandidates = displayInfo.subsampleResolutionCandidates;
@@ -383,6 +389,20 @@ class WebUI
   _setRefreshRateCallback(refreshRate)
   {
     this.refreshRateInputNode.value = refreshRate;
+  }
+
+
+  _setTransitionSmoothing(transitionSmoothing){
+    let promise = RequestUtils.put("/api/setTransitionSmoothing", JSON.stringify(transitionSmoothing));
+    promise.then((data) => {this._setTransitionSmoothingCallback(data.transitionSmoothing);});
+    promise.catch((error) => {log(error);});
+  }
+
+
+  _setTransitionSmoothingCallback(transitionSmoothing)
+  {
+    this.transitionSmoothingInputNode.value = transitionSmoothing;
+    this.transitionSmoothingLabelNode.textContent = Math.round(transitionSmoothing);
   }
 
 
