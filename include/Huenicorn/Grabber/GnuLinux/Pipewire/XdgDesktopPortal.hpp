@@ -50,10 +50,10 @@ namespace Huenicorn::Grabber
     struct Capture
     {
       CaptureType captureType;
-      GCancellable* cancellable;
-      char* sessionHandle;
-      uint32_t pwNode;
-      uint32_t pwFd;
+      GCancellable* cancellable{nullptr};
+      char* sessionHandle{nullptr};
+      uint32_t pwNode{0};
+      uint32_t pwFd{0};
       char cursorVisible;
       std::promise<bool> fdReadyPromise;
       bool updateXdgContext{true};
