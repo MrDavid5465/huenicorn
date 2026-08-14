@@ -177,7 +177,6 @@ make
 ```
 
 The output is a standalone executable called "huenicorn".
-When running Huenicorn, make sure that the ```webroot``` directory is in the cwd (current working directory).
 
 ### Executing program
 
