@@ -134,7 +134,7 @@ namespace Huenicorn::Grabber
     static void _onStreamParamChanged(
       void* userdata,
       uint32_t id,
-      const struct spa_pod* param
+      const spa_pod* param
     );
 
     /**
@@ -146,7 +146,7 @@ namespace Huenicorn::Grabber
       uint32_t permissions,
       const char* type,
       uint32_t version,
-      const struct spa_dict* props
+      const spa_dict* props
     );
 
     /**

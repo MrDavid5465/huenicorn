@@ -167,7 +167,7 @@ namespace Huenicorn::Grabber
   )
   {
     PipewireData* pw = static_cast<PipewireData*>(userdata);
-    struct pw_buffer* pwBuffer;
+    pw_buffer* pwBuffer;
 
     if((pwBuffer = pw_stream_dequeue_buffer(pw->stream)) == NULL){
       //pw_log_warn("out of buffers");
@@ -246,7 +246,7 @@ namespace Huenicorn::Grabber
   void PipewireGrabber::_onStreamParamChanged(
     void* userdata,
     uint32_t id,
-    const struct spa_pod* param
+    const spa_pod* param
   )
   {
     //Logger::log("Params changed !");
@@ -299,7 +299,7 @@ namespace Huenicorn::Grabber
     uint32_t /*permissions*/,
     const char* type,
     uint32_t /*version*/,
-    const struct spa_dict* props
+    const spa_dict* props
   )
   {
     PipewireData* pw = static_cast<PipewireData*>(userdata);
