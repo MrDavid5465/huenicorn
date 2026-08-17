@@ -18,6 +18,8 @@ namespace Huenicorn::Imaging
     using ChannelDepth = uint8_t;
     static constexpr float Max = static_cast<float>(std::numeric_limits<ChannelDepth>().max());
 
+    inline static constexpr glm::vec3 XYBBlack{0.315f, 0.3312f, 0.f};
+
     using GamutCoordinates = std::array<glm::vec2, 3>;
 
     /**
@@ -110,7 +112,7 @@ namespace Huenicorn::Imaging
       float sum = X + Y + Z;
 
       // White coordinates to be neutral in case of black (skip dividing by zero)
-      glm::vec3 xyb = glm::vec3(0.315f, 0.3312f, 0.f);
+      glm::vec3 xyb = XYBBlack;
 
       if(sum != 0.f){
         xyb[0] = X / sum;

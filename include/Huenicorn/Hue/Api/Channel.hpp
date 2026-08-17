@@ -7,7 +7,9 @@
 #include <glm/vec3.hpp>
 
 #include <Huenicorn/Hue/Api/Device.hpp>
+#include <Huenicorn/Imaging/Color.hpp>
 #include <Huenicorn/Imaging/UV.hpp>
+
 
 namespace Huenicorn::Hue::Api
 {
@@ -107,7 +109,7 @@ namespace Huenicorn::Hue::Api
 
     // Transient streaming state (not persisted): last xyBrightness value sent,
     // used to ease transitions when Config::transitionSmoothing() > 0.
-    glm::vec3 previousXyb{0.315f, 0.3312f, 0.f};
+    glm::vec3 previousXyb{Imaging::Color::XYBBlack};
     bool hasPreviousXyb{false};
   };
 }
