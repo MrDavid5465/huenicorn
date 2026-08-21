@@ -20,21 +20,19 @@ Huenicorn provides a simple web interface to assign specific portions of screen 
 
 ## Project status
 
-Huenicorn 1.1.0 is available.
+Huenicorn 1.2.0 is available.
 
 ### This new version brings
 
 - New features
-  - Switched to XY/Brightness color space (Better color brightness/saturation)
-  - Added Wayland restore token support to avoid repeated portal prompts
-  - Added command-line params for version / help
+  - Gamescope support
+  - Transition smoothing (with control in UI's advanced settings)
 
 - Fixes and improvements
-  - Ensured support Hue Bridge Pro
-  - Improved error handling during Grabber creation
-  - Added NixOS support and installation instructions
-  - Fixed CMake dependencies to allow offline builds
-  - Fixed some compiler-dependent warnings
+  - Support for MbedTLS 4.x
+  - Fix restoreToken update
+  - Fix config serialization
+  - Fix busy loop in xdg-portal
 
 ## Getting Started
 
@@ -376,7 +374,9 @@ Additionnal information and news can be found on [Huenicorn.org](http://huenicor
 
 ## Version history
 
-* 1.1.0 (latest)
+* 1.2.0 (latest)
+  * Add Gamescope support, Add transition smoothing, Add support for MbedTLS 4.0
+* 1.1.0
   * Better color brightness/saturation, Bridge Pro support, automatic wayland screen selection
 * 1.0.12
   * Global refactor for less dependencies and clearer workflow

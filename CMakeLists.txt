@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-project(Huenicorn VERSION 1.1.0)
+project(Huenicorn VERSION 1.2.0)
 
 set(BUILD_DOCUMENTATION FALSE CACHE BOOL "Build documentation")
 set(BUILD_TESTS FALSE CACHE BOOL "Build tests")
