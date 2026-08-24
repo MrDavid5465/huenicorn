@@ -154,6 +154,13 @@ namespace Huenicorn::Core
   }
 
 
+  Hue::Api::ChannelStreams CoreService::currentColors() const
+  {
+    std::lock_guard lock(m_runtime.m_currentColorsMutex);
+    return m_runtime.m_currentColorsSnapshot;
+  }
+
+
   const Hue::Api::EntertainmentConfiguration& CoreService::currentEntertainmentConfiguration() const
   {
     return m_runtime.m_selector->currentEntertainmentConfiguration();
