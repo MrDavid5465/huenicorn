@@ -249,6 +249,14 @@ namespace Huenicorn::Core
 
 
     /**
+     * @brief Returns a snapshot of the per-channel colors currently being streamed
+     *
+     * @return Hue::Api::ChannelStreams Current channel colors snapshot
+     */
+    Hue::Api::ChannelStreams currentColors() const;
+
+
+    /**
      * @brief Saves the current state of a user-defined configuration as profile
      * 
      */

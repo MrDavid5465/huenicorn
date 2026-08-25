@@ -166,6 +166,10 @@ namespace Huenicorn::Core
     Hue::Api::Channels m_channels;
     Hue::Api::ChannelStreams m_channelStreams;
 
+    // Current colors snapshot, for external consumers (e.g. REST API)
+    mutable std::mutex m_currentColorsMutex;
+    Hue::Api::ChannelStreams m_currentColorsSnapshot;
+
     // Streamer
     std::mutex m_streamerMutex;
     std::unique_ptr<Stream::Streamer> m_streamer;

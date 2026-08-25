@@ -16,6 +16,7 @@ namespace Huenicorn::Imaging
       int sourceWidth = inputImageData.width();
 
       if(sourceWidth < outputWidth){
+        outputImageData = inputImageData;
         return;
       }
 

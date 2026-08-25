@@ -342,6 +342,11 @@ namespace Huenicorn::Core
         m_streamer->streamChannels(m_channelStreams);
       }
     }
+
+    {
+      std::lock_guard lock(m_currentColorsMutex);
+      m_currentColorsSnapshot = m_channelStreams;
+    }
   }
 
 

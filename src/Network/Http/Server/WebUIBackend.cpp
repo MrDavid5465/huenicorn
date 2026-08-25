@@ -89,6 +89,23 @@ namespace Huenicorn::Network::Http::Server
     });
 
 
+    m_httpServer.addRoute(HttpMethod::Get, "/api/currentColors", [this](const Request& /*req*/, Response& res){
+      Json jsonResponse = Json::array();
+      for(const auto& channelStream : m_coreService->currentColors()){
+        jsonResponse.push_back({
+          {"channelId", channelStream.id},
+          {"r", channelStream.r},
+          {"g", channelStream.g},
+          {"b", channelStream.b}
+        });
+      }
+
+      std::string response = jsonResponse.dump();
+      res.contentType = "application/json";
+      res.body = response;
+    });
+
+
     m_httpServer.addRoute(HttpMethod::Get, "/api/displayInfo", [this](const Request& /*req*/, Response& res){
       auto displayResolution = m_coreService->displayResolution();
 
