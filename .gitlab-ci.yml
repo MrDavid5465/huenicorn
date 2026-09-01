@@ -1,5 +1,13 @@
+# Two stages: the existing flake check on every push, and packaging.
+#
+# Packaging is deliberately not run on every push. Each full matrix is six jobs
+# and roughly an hour of compute between them, against a Free namespace quota
+# of 400 minutes a month -- so it runs on tags, or manually when someone wants
+# artifacts. (These jobs were developed and proven on a GitHub mirror where
+# retries are free, then translated here.)
 stages:
   - test
+  - package
 
 flake-check:
   stage: test
@@ -7,3 +15,174 @@ flake-check:
   script:
     - nix --extra-experimental-features 'nix-command flakes' flake check
 
+.package-rules: &package-rules
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - when: manual
+      allow_failure: true
+
+# Version comes from the tag; anything that is not a version number becomes
+# 0.0.0, so scratch tags and manual runs still produce a valid package name.
+.version-script: &version-script
+  - VERSION="${CI_COMMIT_TAG#v}"
+  - case "$VERSION" in [0-9]*) ;; *) VERSION="0.0.0" ;; esac
+  - echo "packaging as $VERSION"
+
+.deb-job: &deb-job
+  stage: package
+  <<: *package-rules
+  before_script:
+    - apt-get update
+    - >
+      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
+      ca-certificates git curl build-essential cmake pkg-config dpkg-dev
+      libopencv-dev libcurl4-openssl-dev libmbedtls-dev
+      libx11-dev libxext-dev libxrandr-dev libxi-dev libxcursor-dev
+      libpipewire-0.3-dev libglib2.0-dev nlohmann-json3-dev libglm-dev
+  script:
+    - *version-script
+    # The *_INSTALL=OFF flags stop fetched dependencies installing themselves
+    # into the prefix; without them the package ships httplib.h and its cmake
+    # files, which dpkg-deb accepts silently.
+    - >
+      cmake -B build -DCMAKE_BUILD_TYPE=Release -DHUENICORN_FETCH_DEPS=ON
+      -DHTTPLIB_INSTALL=OFF -DJSON_Install=OFF -DGLM_BUILD_INSTALL=OFF
+    - cmake --build build -j"$(nproc)"
+    # Dependencies are computed by dpkg-shlibdeps from the built binary rather
+    # than maintained by hand -- library package names drift, and a stale list
+    # still builds fine, failing only at install time on someone else's machine.
+    - packaging/debian/build-deb.sh build "$VERSION" "huenicorn-${DISTRO}.deb"
+  artifacts:
+    paths:
+      - "huenicorn-${DISTRO}.deb"
+    expire_in: 30 days
+
+deb:debian-stable:
+  <<: *deb-job
+  image: debian:stable-slim
+  variables:
+    DISTRO: debian-stable
+
+deb:debian-testing:
+  <<: *deb-job
+  image: debian:testing
+  variables:
+    DISTRO: debian-testing
+
+deb:ubuntu-latest:
+  <<: *deb-job
+  image: ubuntu:latest
+  variables:
+    DISTRO: ubuntu-latest
+
+.rpm-job: &rpm-job
+  stage: package
+  <<: *package-rules
+  before_script:
+    - >
+      dnf install -y --setopt=install_weak_deps=False
+      git rpm-build rpmdevtools gcc-c++ cmake pkgconf-pkg-config
+      opencv-devel libcurl-devel mbedtls-devel
+      libX11-devel libXext-devel libXrandr-devel libXi-devel libXcursor-devel
+      pipewire-devel glib2-devel json-devel glm-devel
+  script:
+    - *version-script
+    - rpmdev-setuptree
+    # Builds this checkout, not a fresh clone of the default branch, so an
+    # rpm's contents are the commit it was built from.
+    - mkdir -p "/tmp/huenicorn-$VERSION"
+    - tar --exclude-vcs --exclude=build --exclude=.git -cf - . | tar -xf - -C "/tmp/huenicorn-$VERSION"
+    - tar -czf ~/rpmbuild/SOURCES/huenicorn-$VERSION.tar.gz -C /tmp "huenicorn-$VERSION"
+    - rpmbuild -ba --define "_version $VERSION" packaging/fedora/huenicorn.spec
+    # huenicorn-[0-9]*, not huenicorn-*: rpmbuild also emits debuginfo and
+    # debugsource packages.
+    - cp ~/rpmbuild/RPMS/x86_64/huenicorn-[0-9]*.rpm "huenicorn-${DISTRO}.rpm"
+    - rpm -qp --requires "huenicorn-${DISTRO}.rpm" | head -20
+  artifacts:
+    paths:
+      - "huenicorn-${DISTRO}.rpm"
+    expire_in: 30 days
+
+rpm:fedora-43:
+  <<: *rpm-job
+  image: fedora:43
+  variables:
+    DISTRO: fedora-43
+
+rpm:fedora-44:
+  <<: *rpm-job
+  image: fedora:44
+  variables:
+    DISTRO: fedora-44
+
+appimage:
+  stage: package
+  <<: *package-rules
+  # Built on an older base on purpose: an AppImage is only as portable as the
+  # oldest glibc it links against. mbedtls is built from source because 24.04
+  # ships 2.28 and Huenicorn requires 3.x or 4.x.
+  image: ubuntu:24.04
+  before_script:
+    - apt-get update
+    - >
+      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends
+      ca-certificates git curl wget file patchelf desktop-file-utils
+      build-essential cmake pkg-config
+      libopencv-dev libcurl4-openssl-dev
+      libx11-dev libxext-dev libxrandr-dev libxi-dev libxcursor-dev
+      libpipewire-0.3-dev libglib2.0-dev nlohmann-json3-dev libglm-dev
+  script:
+    - *version-script
+    - curl -sSL -o mbedtls.tar.bz2 https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2
+    - echo "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6  mbedtls.tar.bz2" | sha256sum -c -
+    - tar xf mbedtls.tar.bz2
+    - >
+      cmake -S mbedtls-3.6.7 -B mbedtls-build -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_INSTALL_PREFIX=/usr/local -DUSE_SHARED_MBEDTLS_LIBRARY=ON
+      -DUSE_STATIC_MBEDTLS_LIBRARY=OFF -DENABLE_TESTING=OFF -DENABLE_PROGRAMS=OFF
+    - cmake --build mbedtls-build --target install -j"$(nproc)"
+    - ldconfig
+    - >
+      cmake -B build -DCMAKE_BUILD_TYPE=Release -DHUENICORN_FETCH_DEPS=ON
+      -DHTTPLIB_INSTALL=OFF -DJSON_Install=OFF -DGLM_BUILD_INSTALL=OFF
+    - cmake --build build -j"$(nproc)"
+    - DESTDIR="$PWD/AppDir" cmake --install build --prefix /usr
+    - wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    - chmod +x linuxdeploy-x86_64.AppImage
+    - export APPIMAGE_EXTRACT_AND_RUN=1   # no FUSE in a CI container
+    - export OUTPUT="huenicorn-${VERSION}-x86_64.AppImage"
+    - >
+      ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
+      --desktop-file AppDir/usr/share/applications/io.gitlab.openjowelsofts.huenicorn.desktop
+      --icon-file assets/logo.svg
+  artifacts:
+    paths:
+      - "huenicorn-*-x86_64.AppImage"
+    expire_in: 30 days
+
+# Manual, and allowed to fail, because flatpak-builder needs to create user
+# namespaces for bwrap. That works on GitHub's VM runners, where this manifest
+# was developed, but GitLab's shared runners use the Docker executor and
+# unprivileged namespace creation is commonly unavailable there. On a runner
+# that permits it (privileged, or a self-hosted shell executor) this job passes
+# unchanged; --disable-rofiles-fuse covers the FUSE half of the problem.
+flatpak:
+  stage: package
+  image: debian:testing
+  rules:
+    - when: manual
+      allow_failure: true
+  before_script:
+    - apt-get update
+    - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates git flatpak flatpak-builder
+    - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    - flatpak install -y --noninteractive flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08
+  script:
+    - cd packaging/flatpak
+    - flatpak-builder --disable-rofiles-fuse --force-clean --repo=repo build-dir io.gitlab.openjowelsofts.huenicorn.yml
+    - flatpak build-bundle repo huenicorn.flatpak io.gitlab.openjowelsofts.huenicorn
+  artifacts:
+    paths:
+      - packaging/flatpak/huenicorn.flatpak
+    expire_in: 30 days
