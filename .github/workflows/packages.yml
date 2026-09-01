@@ -188,9 +188,24 @@ jobs:
           export OUTPUT="huenicorn-${v}-x86_64.AppImage"
           wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           chmod +x linuxdeploy-x86_64.AppImage
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage \
+
+          # Deploy first without packaging, so there is a populated AppDir to
+          # take licences from: an AppImage distributes every library it
+          # bundles, so their copyright files have to travel with it.
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/io.gitlab.openjowelsofts.huenicorn.desktop \
             --icon-file assets/logo.svg
+
+          packaging/ci/appimage-collect-licenses.sh AppDir
+
+          # Built here rather than installed from packages, so dpkg cannot
+          # account for them: Huenicorn itself, and the mbedtls compiled above.
+          install -Dm644 LICENSE.txt AppDir/usr/share/doc/huenicorn/LICENSE.txt
+          install -Dm644 mbedtls-3.6.7/LICENSE AppDir/usr/share/doc/mbedtls/LICENSE
+
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
+          echo "--- copyright files in the image ---"
+          find AppDir/usr/share/doc -name copyright | wc -l
           ls -la huenicorn*.AppImage
 
       - uses: actions/upload-artifact@v4

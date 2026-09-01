@@ -152,10 +152,17 @@ appimage:
     - chmod +x linuxdeploy-x86_64.AppImage
     - export APPIMAGE_EXTRACT_AND_RUN=1   # no FUSE in a CI container
     - export OUTPUT="huenicorn-${VERSION}-x86_64.AppImage"
+    # Deploy first without packaging, so the AppDir can be inspected: an
+    # AppImage ships every library it bundles, so their copyright files have to
+    # ship with it.
     - >
-      ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
+      ./linuxdeploy-x86_64.AppImage --appdir AppDir
       --desktop-file AppDir/usr/share/applications/io.gitlab.openjowelsofts.huenicorn.desktop
       --icon-file assets/logo.svg
+    - packaging/ci/appimage-collect-licenses.sh AppDir
+    - install -Dm644 LICENSE.txt AppDir/usr/share/doc/huenicorn/LICENSE.txt
+    - install -Dm644 mbedtls-3.6.7/LICENSE AppDir/usr/share/doc/mbedtls/LICENSE
+    - ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage
   artifacts:
     paths:
       - "huenicorn-*-x86_64.AppImage"

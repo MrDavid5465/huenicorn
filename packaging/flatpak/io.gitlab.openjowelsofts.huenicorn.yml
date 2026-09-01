@@ -41,6 +41,8 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DJSON_BuildTests=OFF
+    post-install:
+      - sh -c 'f=$(ls -1 COPYING COPYING.txt COPYING.LIB LICENSE LICENSE.txt LICENSE.MIT LICENSE.md LICENCE copying.txt licence.txt 2>/dev/null | head -1); if [ -n "$f" ]; then install -Dm644 "$f" /app/share/licenses/nlohmann-json/$(basename "$f"); else echo "WARNING: no licence file found for nlohmann-json"; fi'
     sources:
       - type: archive
         url: https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
@@ -62,6 +64,8 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DHTTPLIB_TEST=OFF
+    post-install:
+      - sh -c 'f=$(ls -1 COPYING COPYING.txt COPYING.LIB LICENSE LICENSE.txt LICENSE.MIT LICENSE.md LICENCE copying.txt licence.txt 2>/dev/null | head -1); if [ -n "$f" ]; then install -Dm644 "$f" /app/share/licenses/cpp-httplib/$(basename "$f"); else echo "WARNING: no licence file found for cpp-httplib"; fi'
     sources:
       - type: archive
         url: https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
@@ -77,6 +81,8 @@ modules:
       - -DUSE_STATIC_MBEDTLS_LIBRARY=OFF
       - -DENABLE_TESTING=OFF
       - -DENABLE_PROGRAMS=OFF
+    post-install:
+      - sh -c 'f=$(ls -1 COPYING COPYING.txt COPYING.LIB LICENSE LICENSE.txt LICENSE.MIT LICENSE.md LICENCE copying.txt licence.txt 2>/dev/null | head -1); if [ -n "$f" ]; then install -Dm644 "$f" /app/share/licenses/mbedtls/$(basename "$f"); else echo "WARNING: no licence file found for mbedtls"; fi'
     sources:
       - type: archive
         url: https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2
@@ -112,6 +118,8 @@ modules:
       - -DWITH_OPENEXR=OFF
       - -DWITH_PROTOBUF=OFF
       - -DOPENCV_ENABLE_NONFREE=OFF
+    post-install:
+      - sh -c 'f=$(ls -1 COPYING COPYING.txt COPYING.LIB LICENSE LICENSE.txt LICENSE.MIT LICENSE.md LICENCE copying.txt licence.txt 2>/dev/null | head -1); if [ -n "$f" ]; then install -Dm644 "$f" /app/share/licenses/opencv/$(basename "$f"); else echo "WARNING: no licence file found for opencv"; fi'
     sources:
       - type: archive
         url: https://github.com/opencv/opencv/archive/refs/tags/4.14.0.tar.gz
@@ -125,6 +133,17 @@ modules:
       # online fallback stays off -- a flatpak-builder build has no network,
       # and a silent fetch would defeat the point of pinning versions here.
       - -DHUENICORN_FETCH_DEPS=OFF
+    post-install:
+      # This bundle ships opencv, mbedtls, glm, nlohmann_json and cpp-httplib
+      # inside it, so their notices travel with it -- a distro package would
+      # leave them to their own packages. The notices file names each one's
+      # exact source archive and checksum.
+      - install -Dm644 LICENSE.txt /app/share/licenses/huenicorn/LICENSE.txt
+      # glm's own post-install does not run for reasons that were not worth
+      # chasing further; a checked-in copy of its licence is installed here,
+      # where the repo is the working directory.
+      - install -Dm644 packaging/licenses/glm-copying.txt /app/share/licenses/glm/copying.txt
+      - sh -c 'python3 packaging/ci/generate-third-party-notices.py packaging/flatpak/io.gitlab.openjowelsofts.huenicorn.yml > /tmp/notices.md && install -Dm644 /tmp/notices.md /app/share/licenses/THIRD-PARTY-NOTICES.md'
     sources:
       # Three levels up from packaging/flatpak/ is the repo root.
       - type: dir
