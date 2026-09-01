@@ -161,15 +161,30 @@ appimage:
       - "huenicorn-*-x86_64.AppImage"
     expire_in: 30 days
 
-# Manual, and allowed to fail, because flatpak-builder needs to create user
-# namespaces for bwrap. That works on GitHub's VM runners, where this manifest
-# was developed, but GitLab's shared runners use the Docker executor and
-# unprivileged namespace creation is commonly unavailable there. On a runner
-# that permits it (privileged, or a self-hosted shell executor) this job passes
-# unchanged; --disable-rofiles-fuse covers the FUSE half of the problem.
+# Manual and allowed to fail, because it cannot run on GitLab's shared runners.
+# flatpak-builder sandboxes each build step with bubblewrap, which has to create
+# a mount+user namespace *inside* the job container, and unprivileged job
+# containers have that capability dropped -- measured: `unshare -U` succeeds
+# while `bwrap --dev-bind / / true` fails with EPERM, and loosening seccomp
+# alone does not help.
+#
+# It needs a runner whose docker executor adds one capability:
+#
+#   [runners.docker]
+#   cap_add = ["SYS_ADMIN"]
+#
+# That is enough; privileged = true is not required. On a *rootless* runner
+# this is a good deal narrower than it sounds: container root maps to the
+# runner's own unprivileged user, so SYS_ADMIN is scoped to that user
+# namespace -- it permits the nested sandbox and still cannot mount host
+# filesystems or reach host devices. See packaging/ci/self-hosted-runner.md.
+#
+# Kept manual so a pipeline never hangs waiting for a runner that may not
+# exist; add the runner's tag below and remove the manual rule if you have one.
 flatpak:
   stage: package
   image: debian:testing
+  # tags: [flatpak]   # uncomment to pin to a runner configured as above
   rules:
     - when: manual
       allow_failure: true
