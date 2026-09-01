@@ -141,10 +141,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake pkg-config \
-            libopencv-dev libcurl4-openssl-dev libmbedtls-dev \
+            libopencv-dev libcurl4-openssl-dev \
             libx11-dev libxext-dev libxrandr-dev libxi-dev libxcursor-dev \
             libpipewire-0.3-dev libglib2.0-dev nlohmann-json3-dev libglm-dev \
             desktop-file-utils file patchelf wget
+
+      # Ubuntu 24.04 ships mbedtls 2.28 and huenicorn rejects it outright
+      # ("#error Unsupported Mbed TLS version" -- it supports 3.x and 4.x), so
+      # libmbedtls-dev is deliberately absent above and 3.6 is built here. The
+      # job stays on 24.04 rather than moving to a newer image because an
+      # AppImage is only as portable as the oldest glibc it is built against.
+      # Same version and checksum as the Flatpak manifest pins.
+      - name: Build mbedtls 3.6
+        run: |
+          curl -sSL -o mbedtls.tar.bz2 https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2
+          echo "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6  mbedtls.tar.bz2" | sha256sum -c -
+          tar xf mbedtls.tar.bz2
+          cmake -S mbedtls-3.6.7 -B mbedtls-build -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DUSE_SHARED_MBEDTLS_LIBRARY=ON -DUSE_STATIC_MBEDTLS_LIBRARY=OFF \
+            -DENABLE_TESTING=OFF -DENABLE_PROGRAMS=OFF
+          sudo cmake --build mbedtls-build --target install -j"$(nproc)"
+          sudo ldconfig
 
       - name: Build
         run: |
