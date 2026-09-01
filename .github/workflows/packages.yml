@@ -1,0 +1,221 @@
+# Builds every artifact: three .debs, two .rpms, an AppImage and a Flatpak.
+#
+# Runs on a tag (which also publishes a release) or on demand. The deb and rpm
+# legs build inside distro containers on ordinary GitHub-hosted runners rather
+# than needing self-hosted machines, and each computes its own dependencies
+# from the built binary -- see packaging/debian/build-deb.sh and the spec.
+name: Packages
+
+on:
+  push:
+    tags: [ "*" ]
+  workflow_dispatch: {}
+
+jobs:
+  debs:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: debian-stable
+            image: debian:stable-slim
+          - os: debian-testing
+            image: debian:testing
+          - os: ubuntu-latest
+            image: ubuntu:latest
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+    permissions:
+      contents: write
+    steps:
+      # Before checkout: these images ship no git, and without it the checkout
+      # action silently falls back to a tarball download.
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates git curl build-essential cmake pkg-config dpkg-dev \
+            libopencv-dev libcurl4-openssl-dev libmbedtls-dev \
+            libx11-dev libxext-dev libxrandr-dev libxi-dev libxcursor-dev \
+            libpipewire-0.3-dev libglib2.0-dev nlohmann-json3-dev libglm-dev
+
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          # The *_INSTALL=OFF flags keep fetched dependencies from installing
+          # themselves into the prefix: without them the package ends up
+          # shipping httplib.h and its cmake files, which rpmbuild refuses and
+          # dpkg-deb silently accepts.
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DHUENICORN_FETCH_DEPS=ON \
+            -DHTTPLIB_INSTALL=OFF -DJSON_Install=OFF -DGLM_BUILD_INSTALL=OFF
+          cmake --build build -j"$(nproc)"
+
+      - name: Package
+        id: pkg
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          case "$v" in [0-9]*) ;; *) v="0.0.0" ;; esac
+          out="huenicorn-${{ matrix.os }}.deb"
+          packaging/debian/build-deb.sh build "$v" "$out"
+          echo "file=$out" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: huenicorn-${{ matrix.os }}.deb
+          path: ${{ steps.pkg.outputs.file }}
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.pkg.outputs.file }}
+
+  rpms:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: fedora-43
+            image: fedora:43
+          - os: fedora-44
+            image: fedora:44
+    runs-on: ubuntu-latest
+    container:
+      image: registry.fedoraproject.org/${{ matrix.image }}
+    permissions:
+      contents: write
+    steps:
+      - name: Install build dependencies
+        run: |
+          dnf install -y --setopt=install_weak_deps=False \
+            git rpm-build rpmdevtools gcc-c++ cmake pkgconf-pkg-config \
+            opencv-devel libcurl-devel mbedtls-devel \
+            libX11-devel libXext-devel libXrandr-devel libXi-devel libXcursor-devel \
+            pipewire-devel glib2-devel json-devel glm-devel
+
+      - uses: actions/checkout@v4
+
+      - name: Build rpm
+        id: pkg
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          case "$v" in [0-9]*) ;; *) v="0.0.0" ;; esac
+          rpmdev-setuptree
+          # The spec builds the staged tree, so stage this checkout as the source.
+          mkdir -p "/tmp/huenicorn-$v"
+          tar --exclude-vcs --exclude=build --exclude=.github \
+              -cf - . | tar -xf - -C "/tmp/huenicorn-$v"
+          tar -czf ~/rpmbuild/SOURCES/huenicorn-$v.tar.gz -C /tmp "huenicorn-$v"
+          rpmbuild -ba --define "_version $v" packaging/fedora/huenicorn.spec
+          out="huenicorn-${{ matrix.os }}.rpm"
+          # huenicorn-[0-9]*, not huenicorn-*: rpmbuild also emits
+          # huenicorn-debuginfo and huenicorn-debugsource, and a three-source
+          # cp wants a directory as its target.
+          cp ~/rpmbuild/RPMS/x86_64/huenicorn-[0-9]*.rpm "$out"
+          echo "file=$out" >> "$GITHUB_OUTPUT"
+          echo "--- automatic Requires ---"
+          rpm -qp --requires "$out" | head -20
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: huenicorn-${{ matrix.os }}.rpm
+          path: ${{ steps.pkg.outputs.file }}
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.pkg.outputs.file }}
+
+  appimage:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkg-config \
+            libopencv-dev libcurl4-openssl-dev libmbedtls-dev \
+            libx11-dev libxext-dev libxrandr-dev libxi-dev libxcursor-dev \
+            libpipewire-0.3-dev libglib2.0-dev nlohmann-json3-dev libglm-dev \
+            desktop-file-utils file patchelf wget
+
+      - name: Build
+        run: |
+          # The *_INSTALL=OFF flags keep fetched dependencies from installing
+          # themselves into the prefix: without them the package ends up
+          # shipping httplib.h and its cmake files, which rpmbuild refuses and
+          # dpkg-deb silently accepts.
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DHUENICORN_FETCH_DEPS=ON \
+            -DHTTPLIB_INSTALL=OFF -DJSON_Install=OFF -DGLM_BUILD_INSTALL=OFF
+          cmake --build build -j"$(nproc)"
+
+      # Uses the install rules rather than copying the binary by hand, which is
+      # what they were added for.
+      - name: Populate AppDir
+        run: DESTDIR="$PWD/AppDir" cmake --install build --prefix /usr
+
+      - name: Build AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1   # no FUSE on the runner
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          case "$v" in [0-9]*) ;; *) v="0.0.0" ;; esac
+          export OUTPUT="huenicorn-${v}-x86_64.AppImage"
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --output appimage \
+            --desktop-file AppDir/usr/share/applications/io.gitlab.openjowelsofts.huenicorn.desktop \
+            --icon-file assets/logo.svg
+          ls -la huenicorn*.AppImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: huenicorn-x86_64.AppImage
+          path: huenicorn*.AppImage
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: huenicorn*.AppImage
+
+  flatpak:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # ppa:flatpak/stable, not the distro package: 24.04's flatpak-builder
+      # predates the freedesktop 25.08 runtime this manifest targets.
+      - name: Install flatpak-builder and the runtime
+        run: |
+          sudo add-apt-repository -y ppa:flatpak/stable
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08
+
+      - name: Build .flatpak
+        working-directory: packaging/flatpak
+        run: |
+          flatpak-builder --force-clean --repo=repo build-dir io.gitlab.openjowelsofts.huenicorn.yml
+          flatpak build-bundle repo huenicorn.flatpak io.gitlab.openjowelsofts.huenicorn
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: huenicorn.flatpak
+          path: packaging/flatpak/huenicorn.flatpak
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: packaging/flatpak/huenicorn.flatpak
