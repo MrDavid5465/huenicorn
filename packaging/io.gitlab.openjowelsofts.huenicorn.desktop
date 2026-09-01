@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Huenicorn
+GenericName=Ambient Lighting
+Comment=Drive Philips Hue lights from what is on your screen
+Exec=huenicorn
+Icon=io.gitlab.openjowelsofts.huenicorn
+Terminal=false
+Categories=Utility;Video;
+Keywords=hue;ambient;light;screen;capture;

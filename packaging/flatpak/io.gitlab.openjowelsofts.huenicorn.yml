@@ -1,0 +1,133 @@
+# Flatpak manifest for Huenicorn -- NOT submitted anywhere (Flathub or
+# otherwise) yet. Built on the patterns proven on the sibling monocoque and
+# typiql-tauri pipelines.
+#
+# Screen capture is the reason this works sandboxed at all: Huenicorn's
+# Pipewire grabber talks to xdg-desktop-portal's ScreenCast interface
+# (src/Grabber/GnuLinux/Pipewire/XdgDesktopPortal.cpp, itself lifted from OBS),
+# and portals are designed to be called from inside a sandbox -- the portal
+# hands back a PipeWire fd, so no direct socket grant is needed and the user
+# gets the usual "share your screen" prompt. The X11 grabber is the fallback
+# and needs a real X11 socket.
+#
+# Five dependencies are built here because the freedesktop runtime has none of
+# them: opencv, mbedtls, nlohmann_json, glm and cpp-httplib. Versions follow
+# upstream's own FetchContent declarations in CMakeLists.txt, so a packaged
+# build matches what `HUENICORN_FETCH_DEPS=ON` would have downloaded.
+app-id: io.gitlab.openjowelsofts.huenicorn
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: huenicorn
+
+finish-args:
+  # The Hue bridge lives on the LAN, and Huenicorn serves its own configuration
+  # web UI, so both directions are needed.
+  - --share=network
+  - --share=ipc
+  # X11 for the non-portal grabber; Wayland sessions capture through the portal
+  # instead, which needs no socket of its own.
+  - --socket=x11
+  - --socket=wayland
+  # Config is read from $HOME/.config/huenicorn built directly from $HOME
+  # (GnuLinuxAdapter.cpp), not from XDG_CONFIG_HOME, so the real directory has
+  # to be visible -- inside a sandbox XDG_CONFIG_HOME points at a private copy
+  # nothing else would ever read.
+  - --filesystem=xdg-config/huenicorn:create
+
+modules:
+  - name: nlohmann-json
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DJSON_BuildTests=OFF
+    sources:
+      - type: archive
+        url: https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+        sha256: 42f6e95cad6ec532fd372391373363b62a14af6d771056dbfc86160e6dfff7aa
+
+  - name: glm
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DGLM_BUILD_TESTS=OFF
+      - -DGLM_BUILD_INSTALL=ON
+    sources:
+      - type: archive
+        url: https://github.com/g-truc/glm/archive/refs/tags/1.0.3.tar.gz
+        sha256: 6775e47231a446fd086d660ecc18bcd076531cfedd912fbd66e576b118607001
+
+  - name: cpp-httplib
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DHTTPLIB_TEST=OFF
+    sources:
+      - type: archive
+        url: https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.46.0.tar.gz
+        sha256: 4b91c970132cd140586ba880beab099fd16f0dc48425a5a60c418422c04d9fc1
+
+  - name: mbedtls
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      # Shared, because Huenicorn find_library()s mbedtls/mbedx509/mbedcrypto
+      # rather than linking a bundled static copy.
+      - -DUSE_SHARED_MBEDTLS_LIBRARY=ON
+      - -DUSE_STATIC_MBEDTLS_LIBRARY=OFF
+      - -DENABLE_TESTING=OFF
+      - -DENABLE_PROGRAMS=OFF
+    sources:
+      - type: archive
+        url: https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2
+        sha256: a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6
+
+  # The expensive one. Huenicorn asks for exactly one component --
+  # find_package(OpenCV REQUIRED COMPONENTS imgproc) -- so BUILD_LIST trims the
+  # build to that plus the core it depends on, which is minutes rather than
+  # tens of minutes. Trimming also drops the modules that would try to download
+  # their own sources mid-build (dnn wants protobuf, gapi wants ade), which a
+  # flatpak-builder run has no network for; WITH_IPP is off for the same reason.
+  - name: opencv
+    buildsystem: cmake-ninja
+    # OpenCV's own CMakeLists refuses to configure in the source directory,
+    # which is where flatpak-builder builds by default.
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_LIST=imgproc
+      - -DBUILD_SHARED_LIBS=ON
+      - -DBUILD_TESTS=OFF
+      - -DBUILD_PERF_TESTS=OFF
+      - -DBUILD_EXAMPLES=OFF
+      - -DBUILD_DOCS=OFF
+      - -DBUILD_opencv_apps=OFF
+      - -DBUILD_JAVA=OFF
+      - -DWITH_IPP=OFF
+      - -DWITH_FFMPEG=OFF
+      - -DWITH_GSTREAMER=OFF
+      - -DWITH_GTK=OFF
+      - -DWITH_QT=OFF
+      - -DWITH_V4L=OFF
+      - -DWITH_OPENEXR=OFF
+      - -DWITH_PROTOBUF=OFF
+      - -DOPENCV_ENABLE_NONFREE=OFF
+    sources:
+      - type: archive
+        url: https://github.com/opencv/opencv/archive/refs/tags/4.14.0.tar.gz
+        sha256: ee8fb9b30eb60850431b4656447080e3737b56e45719c92b67f245950609f86e
+
+  - name: huenicorn
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      # Everything is already installed into /app by the modules above, so the
+      # online fallback stays off -- a flatpak-builder build has no network,
+      # and a silent fetch would defeat the point of pinning versions here.
+      - -DHUENICORN_FETCH_DEPS=OFF
+    sources:
+      # Three levels up from packaging/flatpak/ is the repo root.
+      - type: dir
+        path: ../..
+        skip:
+          - build

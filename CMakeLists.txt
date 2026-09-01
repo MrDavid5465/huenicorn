@@ -205,6 +205,32 @@ add_executable(huenicorn
 
 add_dependencies(huenicorn generate_version_header generate_webroot_header)
 
+
+# Installation rules. Packages need somewhere to take the build from -- until
+# these existed `cmake --install` produced nothing, so every packaging recipe
+# had to reach into the build directory and copy the binary by hand. The
+# webroot is embedded into the executable (see generate_webroot_header above),
+# so the binary plus its desktop metadata is the whole payload.
+include(GNUInstallDirs)
+
+install(TARGETS huenicorn RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Desktop entry, AppStream metadata and icon, named by the reverse-DNS
+# application id. Flatpak refuses to export an application without a desktop
+# file, and appstreamcli requires the metainfo to reference an icon that
+# actually ships -- assets/logo.svg is square (100x100), which icon tooling
+# insists on.
+option(HUENICORN_INSTALL_DESKTOP_FILES "Install .desktop, AppStream metadata and icon" ON)
+if(HUENICORN_INSTALL_DESKTOP_FILES)
+  install(FILES packaging/io.gitlab.openjowelsofts.huenicorn.desktop
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+  install(FILES packaging/io.gitlab.openjowelsofts.huenicorn.metainfo.xml
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
+  install(FILES assets/logo.svg
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps
+          RENAME io.gitlab.openjowelsofts.huenicorn.svg)
+endif()
+
 if(UNIX AND NOT APPLE) # For Gnu/Linux
   include(cmake/platforms/GnuLinux.cmake)
 endif()

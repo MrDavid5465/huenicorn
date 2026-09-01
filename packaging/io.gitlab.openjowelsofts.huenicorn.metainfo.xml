@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.gitlab.openjowelsofts.huenicorn</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Huenicorn</name>
+  <summary>Drive Philips Hue lights from what is on your screen</summary>
+  <developer id="io.gitlab.openjowelsofts">
+    <name>OpenJowelSofts</name>
+  </developer>
+  <description>
+    <p>
+      Huenicorn captures your screen and streams matching colors to Philips Hue
+      entertainment zones, giving an ambient lighting effect around whatever you
+      are watching or playing. It is configured through a web interface served
+      by the application itself.
+    </p>
+    <p>
+      Screen capture uses the desktop portal on Wayland and X11 directly
+      elsewhere, so no additional capture setup is needed.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.gitlab.openjowelsofts.huenicorn.desktop</launchable>
+  <url type="homepage">https://gitlab.com/openjowelsofts/huenicorn</url>
+  <url type="bugtracker">https://gitlab.com/openjowelsofts/huenicorn/-/issues</url>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="1.2.0" date="2026-08-31"/>
+  </releases>
+</component>
