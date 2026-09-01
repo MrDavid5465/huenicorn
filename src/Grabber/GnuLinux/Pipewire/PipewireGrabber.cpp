@@ -424,13 +424,21 @@ namespace Huenicorn::Grabber
 
     std::string streamName = "HuenicornStream";
 
-    pw->stream = pw_stream_new_simple(
-      pw_main_loop_get_loop(pw->loop),
-      streamName.c_str(),
-      props,
-      &streamEvents,
-      pw
-    );
+    // pw_stream_new(core, ...), not pw_stream_new_simple(loop, ...): the
+    // "simple" variant opens its *own* connection to PipeWire's default
+    // socket, discarding the core built from the portal's file descriptor a
+    // few lines above. On a normal desktop that socket is right there and
+    // nobody notices. Inside a sandbox it does not exist, so the whole portal
+    // exchange succeeds -- session, picker, tray indicator, fd -- and then the
+    // stream fails with "can't connect: Host is down", leaving a client with
+    // no node while the compositor holds a screen open for a consumer that
+    // never arrives. Building the stream on the core actually uses the fd the
+    // portal handed over, which is the point of asking for it.
+    pw->stream = pw_stream_new(core, streamName.c_str(), props);
+
+    static spa_hook streamListener;
+    spa_zero(streamListener);
+    pw_stream_add_listener(pw->stream, &streamListener, &streamEvents, pw);
 
     uint8_t buffer[1024];
     spa_pod_builder b = SPA_POD_BUILDER_INIT(buffer, sizeof(buffer));
